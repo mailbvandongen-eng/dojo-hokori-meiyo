@@ -1,6 +1,6 @@
 # Game Design Document: Dojo Hokori Meiyo Fight Game
 
-Versie 0.1 · 8 november 2026 · status: prototype (fase 1)
+Versie 0.3 · 8 november 2026 · status: prototype (fase 1)
 
 > **Eer & Trots (誇り名誉, Hokori Meiyo) · Osu no Seishin (押忍の精神)**
 > Een full-contact Kyokushin-vechtgame voor en over de vechters van Dojo Hokori Meiyo in Zoetermeer.
@@ -43,7 +43,7 @@ Een mobiele vechtgame (iOS en Android) met de klap en het spektakel van Tekken e
 | **UKE** 受 | wering | vasthouden = dekking hoog/midden; met ↓ = sune uke (scheenblok) |
 | **KIAI** 気 | strijdkreet | signature (1/3 meter) of super (volle meter) |
 
-De richting telt mee en is relatief (→ = naar de tegenstander toe). Zo heeft elke knop 4 tot 5 technieken. De volledige tabel staat in [ROSTER.md](ROSTER.md#basis-moveset-alle-vechters).
+De richting telt mee en is relatief (→ = naar de tegenstander toe). Zo heeft elke knop 4 tot 7 technieken. Ook de diagonalen naar achteren tellen: **↖ + GERI = Ushiro Mawashi Geri** (draaiende hiel naar het hoofd) en **↙ + GERI = Rol Kick** (Kaiten Kakato Geri: rollend naar voren, de hiel valt van boven; spectaculair maar riskant). De volledige tabel staat in [ROSTER.md](ROSTER.md#basis-moveset-alle-vechters).
 
 **Renzoku waza (combinaties):** druk opnieuw op TSUKI of GERI terwijl een techniek raakt of geblokt wordt. Voorbeeld: hidari seiken → migi gyaku-tsuki → gedan mawashi geri, de klassieke Kyokushin-combinatie.
 
@@ -176,7 +176,7 @@ In de modus **Dojo (vrij)** mag de jodan-stoot (↑ + TSUKI) en zijn er geen chu
 
 ### 4.2 Story / Arcade
 
-- Je kiest een vechter en klimt via 6 dojogenoten (op graad gesorteerd) naar **Skylar** (rivaal, de dochter van de sensei) en tot slot **Sensei Wesley**.
+- Je kiest een vechter en klimt door de dojo: vier kyu-graden plus **Skylar** (rivaal, de dochter van de sensei), op graad gesorteerd, dan twee **senpai** (dan-graden), **Sensei Conchita** (4e dan) en tot slot **Sensei Wesley** (4e dan).
 - Elke stap heeft een korte tekst en de quote van de tegenstander.
 - Sensei Wesley verslaan speelt Sensei Wesley vrij voor alle modi.
 - **Fase 2:** een echte verhaallijn per vechter in stripstijl (stills), met momenten in de dojo: training, examen (graduatie), wintertraining aan het strand (*fuyu geiko*) en het eerste toernooi.
@@ -205,7 +205,9 @@ In de modus **Dojo (vrij)** mag de jodan-stoot (↑ + TSUKI) en zijn er geen chu
 
 Het volledige roster met movesets staat in **[ROSTER.md](ROSTER.md)** (gegenereerd uit de data).
 
-- **29 vechters**, met Sensei Wesley (4e dan, bondscoach) als eindbaas en Skylar als rivaal in Story.
+- **37 vechters**, met Sensei Wesley (4e dan, bondscoach) als eindbaas en Skylar als rivaal in Story.
+- **Graad en geslacht** zijn aangeleverd door de dojo. De graad bepaalt de bandkleur en telt mee in de kracht (een 10e kyu vecht op 88%, een 4e dan op 104%). Het geslacht bepaalt de bouw en het kapsel van het figuur.
+- **Bandkleuren van de dojo:** 10e kyu wit · 9e rood · 8e–7e blauw · 6e–5e geel · 4e–3e groen · 2e–1e bruin · dan zwart met gouden strepen.
 - Elke vechter heeft een **stijl-archetype**, 5 stats, 3 signatures, een super, een finisher en een AI-profiel.
 - Archetypes: Compleet · Technicus · Counter-vechter · Infighter · Lowkick-specialist · Tank · Hoogtrapper · Snelheidsvechter · Allrounder · Spinner · Afstandsvechter.
 - **Afstemmen met de dojo:** persoonlijkheden, stijlen en graden zijn een voorstel. Laat iedere vechter de eigen signature moves kiezen. Dat maakt het spel van hen. Voor kinderen is toestemming van de ouders nodig (zie §12).
@@ -216,7 +218,7 @@ Het volledige roster met movesets staat in **[ROSTER.md](ROSTER.md)** (gegeneree
 
 ### 6.1 Graden (kyu/dan)
 
-De speler begint als **10e kyu (oranje band)** en verdient **keiko-punten**:
+De speler begint als **10e kyu (witte band)** en verdient **keiko-punten**:
 
 | Actie | Punten |
 |---|---|
@@ -225,7 +227,7 @@ De speler begint als **10e kyu (oranje band)** en verdient **keiko-punten**:
 | Toernooi gewonnen | +200 |
 | Story uitgespeeld | +300 |
 
-Gradenreeks: 10e kyu oranje → 9e (oranje, blauwe streep) → 8e blauw → 7e → 6e geel → 5e → 4e groen → 3e → 2e bruin → 1e (bruin, gouden streep) → **shodan** (zwart) → 2e dan → 3e dan. Elke promotie wordt gevierd met "Osu!" en een promotiescherm. Fase 2: een **examen**-wedstrijd per promotie (bijvoorbeeld 3 partijen achter elkaar, net als bij een echt examen).
+Gradenreeks (bandkleuren van de dojo): 10e kyu wit → 9e rood → 8e blauw → 7e blauw (gele streep) → 6e geel → 5e geel (groene streep) → 4e groen → 3e groen (bruine streep) → 2e bruin → 1e bruin (gouden streep) → **shodan** (zwart) → 2e dan → 3e dan. Elke promotie wordt gevierd met "Osu!" en een promotiescherm. Fase 2: een **examen**-wedstrijd per promotie (bijvoorbeeld 3 partijen achter elkaar, net als bij een echt examen).
 
 ### 6.2 Vrij te spelen
 
@@ -261,6 +263,7 @@ Gradenreeks: 10e kyu oranje → 9e (oranje, blauwe streep) → 8e blauw → 7e �
 
 - Standaard: **witte Kyokushin-dogi** met korte mouwen (net onder de elleboog), met de **Kyokushin-kanji 極真** op de linkerborst en de **Hokori Meiyo-badge** eronder. Op de rug staat "DOJO HOKORI MEIYO".
 - De band toont de graad van de vechter (met strepen). Dan-graden hebben gouden strepen.
+- **Mannen en vrouwen** zien er verschillend uit: vrouwen hebben smallere schouders, iets bredere heupen, een staart of knot, en dragen (zoals gebruikelijk in Kyokushin) een wit T-shirt onder de dogi. Mannen hebben bredere schouders en kort haar.
 - Aka/shiro-lint achter op de band, zoals in een echte wedstrijd.
 - Fase 2: dojo-shirt, zwarte dogi, wedstrijddogi met bondsembleem, en een eigen bandkleur = graad van de speler.
 
@@ -331,7 +334,7 @@ Stemopnames zet je neer volgens [assets/voice/README.md](../assets/voice/README.
 ## 12. Echte personen, kinderen en rechten
 
 - **Toestemming:** de game gebruikt de namen van echte dojoleden, onder wie minderjarigen. Vraag vóór publicatie schriftelijke toestemming van iedere vechter, en bij kinderen van de ouders. Laat iedere vechter de eigen persoonlijkheid, stijl en moves goedkeuren. De checklist staat onderaan [ROSTER.md](ROSTER.md#checklist-voor-de-dojo).
-- **Uiterlijk:** het prototype gebruikt neutrale standaardfiguren. Lengte, bouw, huidskleur en haar stelt de dojo per persoon in (`uiterlijk` in `roster.js`), samen met de persoon zelf. Er worden geen foto's van kinderen in de app gebruikt zonder expliciete toestemming.
+- **Uiterlijk:** het prototype gebruikt standaardfiguren met een mannelijke of vrouwelijke bouw (geslacht volgens de dojo). Lengte, bouw, huidskleur, haarkleur en kapsel (`kapsel`: kort/staart/knot) stelt de dojo per persoon in (`uiterlijk` in `roster.js`), samen met de persoon zelf. Er worden geen foto's van kinderen in de app gebruikt zonder expliciete toestemming.
 - **Positief neerzetten:** iedere vechter is sterk en sympathiek. Er zijn geen vernederende verlies-animaties: de verliezer staat op en groet.
 - **Privacy (AVG):** leaderboards gebruiken bijnamen; er wordt geen persoonsdata verzameld zonder toestemming. Bij online functies komt er een privacyverklaring.
 - **Kyokushin-naam en -kanji:** de naam en de kanji 極真 worden door meerdere organisaties gebruikt, soms als beschermd merk. Voor een publieke release in de app stores: vraag na bij de bond waar de dojo bij aangesloten is of gebruik in een game is toegestaan.
@@ -374,7 +377,7 @@ Gevecht ─► Pauze ─► Hervatten / Fotomodus / Technieken / Opties / Menu
 | Kamae | gevechtshouding |
 | Seiken | vuist (de eerste twee knokkels) |
 | Tsuki | stoot · *gyaku-tsuki* = stoot met de achterste hand · *shita-tsuki* = opwaartse stoot |
-| Geri | trap · *mae* = voorwaarts · *mawashi* = rond · *ushiro* = achterwaarts · *kakato otoshi* = bijltrap |
+| Geri | trap · *mae* = voorwaarts · *mawashi* = rond · *ushiro* = achterwaarts · *ushiro mawashi* = draaiende hiel · *kakato otoshi* = bijltrap · *kaiten kakato geri* = rol kick |
 | Hiza geri | kniestoot · *tobi hiza* = vliegende knie |
 | Hiji-ate | elleboogstoot |
 | Uke | wering · *gedan barai* = lage veegwering · *sune uke* = scheenblok |
@@ -392,7 +395,7 @@ Gevecht ─► Pauze ─► Hervatten / Fotomodus / Technieken / Opties / Menu
 
 | Fase | Doel | Inhoud |
 |---|---|---|
-| **1. Prototype** ✅ | is het leuk en voelt het als Kyokushin? | speelbare web-build: 29 vechters (data), alle modi in basisvorm, regels, officials, logo overal |
+| **1. Prototype** ✅ | is het leuk en voelt het als Kyokushin? | speelbare web-build: 37 vechters (data), alle modi in basisvorm, regels, officials, logo overal |
 | **2. Verticale slice** | hoe ziet de eindkwaliteit eruit? | 4 vechters met echte 3D-modellen en motion capture (Sensei Wesley, Skylar, Senpai Anjay, Djordy), de arena Dojo Hokori Meiyo, echte stemopnames, controller, Capacitor-builds via TestFlight en Play intern testen |
 | **3. Content en online** | compleet spel | alle vechters gemodelleerd, Story met verhaal, kostuums, dojo-leaderboard, online versus |
 | **4. Release** | stores | balans, toegankelijkheid, localisatie (NL/EN/JP), store-assets, IARC-rating, privacyverklaring |

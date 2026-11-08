@@ -8,6 +8,8 @@ import { beltOf } from '../data/roster.js';
 const DOGI = new THREE.Color('#f4f1ea');
 let dogiTexCache = {};
 
+function hash(s) { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h); }
+
 function cyl(rTop, rBot, h, mat, seg = 10, open = false) {
   const geo = new THREE.CylinderGeometry(rTop, rBot, h, seg, 1, open);
   geo.translate(0, -h / 2, 0); // hangt omlaag vanaf het gewricht
@@ -19,6 +21,12 @@ function sphere(r, mat, seg = 14) { const m = new THREE.Mesh(new THREE.SphereGeo
 export function buildFighter(data, corner = 'aka', costume = {}) {
   const look = data.uiterlijk || {};
   const L = look.lengte || 1, B = look.bouw || 1;
+  // Geslacht: vrouwen smallere schouders, iets bredere heupen, lang haar (staart of knot)
+  // en een wit T-shirt onder de dogi (zoals gebruikelijk in Kyokushin); mannen bredere
+  // schouders, dikkere nek en kort haar.
+  const female = data.geslacht === 'v';
+  const SH = female ? 0.88 : 1.06, HP = female ? 1.08 : 1.0;
+  const hairStyle = look.kapsel || (female ? (hash(data.id || data.naam) % 2 ? 'staart' : 'knot') : 'kort');
   const variant = costume.dogi || 'wit';
   const official = !!costume.official; // scheidsrechter: wit shirt, donkere broek, geen band
   const skin = new THREE.MeshStandardMaterial({ color: look.huid || '#c3946c', roughness: 0.65 });
@@ -42,11 +50,11 @@ export function buildFighter(data, corner = 'aka', costume = {}) {
   root.position.y = hipH;
   const pelvis = joint('pelvis', root, 0, 0, 0);
   // jas-rok onder de band en broekzitvlak
-  const skirt = cyl(0.17 * B, 0.19 * B, 0.22 * L, jacket, 14, true); skirt.material = cloth; skirt.position.y = 0.04; skirt.scale.z = 0.66; pelvis.add(skirt);
-  const seat = sphere(0.15 * B, pants); seat.scale.set(1.05, 0.7, 0.75); seat.position.y = -0.05; pelvis.add(seat);
+  const skirt = cyl(0.17 * B * HP, 0.19 * B * HP, 0.22 * L, jacket, 14, true); skirt.material = cloth; skirt.position.y = 0.04; skirt.scale.z = 0.66; pelvis.add(skirt);
+  const seat = sphere(0.15 * B * HP, pants); seat.scale.set(1.05, 0.7, 0.75); seat.position.y = -0.05; pelvis.add(seat);
   // band (obi)
   if (!official) {
-  const obi = cyl(0.176 * B, 0.176 * B, 0.055, beltMat, 16, true); obi.position.y = 0.06; obi.scale.z = 0.68; pelvis.add(obi);
+  const obi = cyl(0.176 * B * HP, 0.176 * B * HP, 0.055, beltMat, 16, true); obi.position.y = 0.06; obi.scale.z = 0.68; pelvis.add(obi);
   const knot = box(0.07, 0.05, 0.04, beltMat); knot.position.set(0.02, 0.035, 0.125 * B); pelvis.add(knot);
   for (const [i, ang] of [[0, 0.18], [1, -0.12]]) {
     const end = box(0.045, 0.24, 0.012, beltMat); end.position.set(0.035 - i * 0.05, -0.08, 0.13 * B); end.rotation.z = ang; pelvis.add(end);
@@ -61,22 +69,32 @@ export function buildFighter(data, corner = 'aka', costume = {}) {
   // romp
   const spine = joint('spine', pelvis, 0, 0.07, 0);
   const torsoH = 0.5 * L;
-  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.2 * B, 0.168 * B, torsoH, 20, 1, false, Math.PI), jacket);
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.2 * B * SH, 0.168 * B * (female ? 0.94 : 1), torsoH, 20, 1, false, Math.PI), jacket);
   torso.position.y = torsoH / 2; torso.scale.z = 0.64; torso.castShadow = true; spine.add(torso);
-  const chestTop = sphere(0.2 * B, cloth); chestTop.scale.set(1, 0.32, 0.64); chestTop.position.y = torsoH; spine.add(chestTop);
-  const neck = cyl(0.05, 0.055, 0.09, skin, 8); neck.position.y = torsoH + 0.1; spine.add(neck);
+  const chestTop = sphere(0.2 * B * SH, cloth); chestTop.scale.set(1, 0.32, 0.64); chestTop.position.y = torsoH; spine.add(chestTop);
+  const neck = cyl(female ? 0.043 : 0.056, female ? 0.048 : 0.062, 0.09, skin, 8); neck.position.y = torsoH + 0.1; spine.add(neck);
+  if (female && !official) { // ronde hals van het witte T-shirt
+    const tee = cyl(0.068, 0.078, 0.05, new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.85 }), 12);
+    tee.position.y = torsoH + 0.035; spine.add(tee);
+  }
   const head = joint('head', spine, 0, torsoH + 0.09, 0);
   const skull = sphere(0.105, skin); skull.scale.set(0.95, 1.12, 1.02); skull.position.y = 0.11; head.add(skull);
-  const cap = sphere(0.11, hair); cap.scale.set(0.98, 0.95, 1.05); cap.position.set(0, 0.15, -0.012); head.add(cap);
+  const cap = sphere(0.11, hair); cap.scale.set(0.98, female ? 1.0 : 0.95, 1.05); cap.position.set(0, female ? 0.145 : 0.15, female ? -0.016 : -0.012); head.add(cap);
+  if (hairStyle === 'staart') {
+    const tie = sphere(0.03, hair); tie.position.set(0, 0.17, -0.11); head.add(tie);
+    const tail = new THREE.Mesh(new THREE.CapsuleGeometry(0.032, 0.17, 4, 8), hair); tail.position.set(0, 0.07, -0.135); tail.rotation.x = 0.35; tail.castShadow = true; head.add(tail);
+  } else if (hairStyle === 'knot') {
+    const bun = sphere(0.055, hair); bun.position.set(0, 0.2, -0.1); head.add(bun);
+  }
   for (const sx of [-0.035, 0.035]) { const eye = sphere(0.012, dark, 6); eye.position.set(sx, 0.12, 0.098); head.add(eye); }
-  const brow = box(0.09, 0.012, 0.02, hair); brow.position.set(0, 0.145, 0.095); head.add(brow);
+  const brow = box(0.09, female ? 0.008 : 0.014, 0.02, hair); brow.position.set(0, 0.145, 0.095); head.add(brow);
 
   // armen: Kyokushin-mouwen eindigen net onder de elleboog
   for (const side of ['l', 'r']) {
     const sx = side === 'l' ? 1 : -1;
-    const sh = joint(side + 'Sh', spine, 0.205 * B * sx, torsoH - 0.06, 0);
+    const sh = joint(side + 'Sh', spine, 0.205 * B * SH * sx, torsoH - 0.06, 0);
     const pad = sphere(0.07 * B, cloth); pad.scale.set(1, 0.85, 0.9); sh.add(pad);
-    const upper = cyl(0.064 * B, 0.058 * B, 0.29 * L, cloth, 10); sh.add(upper);
+    const upper = cyl(0.064 * B * (female ? 0.92 : 1.04), 0.058 * B * (female ? 0.92 : 1.04), 0.29 * L, cloth, 10); sh.add(upper);
     const el = joint(side + 'El', sh, 0, -0.29 * L, 0);
     const sleeve = cyl(0.06 * B, 0.056 * B, 0.12 * L, cloth, 10); el.add(sleeve);
     const fore = cyl(0.04 * B, 0.034 * B, 0.17 * L, official ? cloth : skin, 8); fore.position.y = -0.1 * L; el.add(fore);
@@ -85,7 +103,7 @@ export function buildFighter(data, corner = 'aka', costume = {}) {
   // benen: wijde broek tot boven de enkel, blote voeten
   for (const side of ['l', 'r']) {
     const sx = side === 'l' ? 1 : -1;
-    const hip = joint(side + 'Hip', pelvis, 0.095 * B * sx, -0.03, 0);
+    const hip = joint(side + 'Hip', pelvis, 0.095 * B * HP * sx, -0.03, 0);
     const thigh = cyl(0.09 * B, 0.078 * B, 0.44 * L, pants, 10); hip.add(thigh);
     const knee = joint(side + 'Knee', hip, 0, -0.44 * L, 0);
     const shin = cyl(0.078 * B, 0.072 * B, 0.4 * L, pants, 10); knee.add(shin);

@@ -11,7 +11,7 @@ const N = +(process.argv[2] || 6);
   const results = [];
   for (let i = 0; i < N; i++) {
     const r = await p.evaluate(async ([i, RT]) => {
-      const ids = ['wesley', 'skylar', 'djordy', 'daan', 'roshni', 'yassin', 'anjay', 'conchita', 'nino', 'seth'];
+      const ids = ['wesley', 'djordy', 'micha', 'ferry', 'nina', 'yassin', 'naotaka', 'conchita', 'leo', 'skylar'];
       const a = ids[i % ids.length], b = ids[(i * 3 + 1) % ids.length] === a ? 'dave' : ids[(i * 3 + 1) % ids.length];
       __game.pause(true);
       let ended = null; const calls = [];

@@ -14,6 +14,7 @@ npm run serve        # python3 -m http.server 8766
 | | Toetsenbord | Touch |
 |---|---|---|
 | Lopen | A / D | joystick links (overal op de linkerhelft) |
+| Diagonaal achteruit (↖ ↙) | W+A / S+A | joystick schuin naar achteren |
 | Omhoog / omlaag | W / S | joystick omhoog/omlaag |
 | Tsuki (stoot) | J | 突 TSUKI |
 | Geri (trap) | K | 蹴 GERI |
@@ -27,7 +28,7 @@ npm run serve        # python3 -m http.server 8766
 
 - **Toernooi** (single elimination, 8 vechters), **Story** (naar Sensei Wesley), **Versus** (CPU of 2 spelers), **Training** (met uitleg), **Photo Mode**.
 - Kyokushin-wedstrijdregels: rei-ceremonie, Hajime/Yame, waza-ari, ippon, awasete ippon, knock-down-telling, hantei met de vlaggen van de hoekscheidsrechters, encho-sen, chui/genten/hansoku, jogai.
-- 29 vechters met stats, 3 signatures, een super en een finisher, 17 technieken met Japanse naam en uitleg.
+- 37 vechters (mannen en vrouwen, met de echte graden en bandkleuren van de dojo), elk met stats, 3 signatures, een super en een finisher. 18 technieken met Japanse naam en uitleg, waaronder Ushiro Mawashi Geri en de Rol Kick.
 - Schademodel met beenschade (lage trappen), rompschade en hoofdtreffers.
 - Toernooihal met tatami, scheidsrechter, 2 hoekscheidsrechters met rode en witte vlaggen, publiek, banners en wapperende Hokori Meiyo-vlaggen.
 - Graden van 10e kyu tot 3e dan, keiko-punten en vrij te spelen dogi.

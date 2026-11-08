@@ -30,7 +30,7 @@ dojo-hokori-meiyo/
 ├── src/
 │   ├── main.js             schermflow, spelmodi, camera, HUD, hoofdlus
 │   ├── data/
-│   │   ├── roster.js       29 vechters: stats, stijl, signatures, super, finisher, AI-profiel
+│   │   ├── roster.js       37 vechters: geslacht, graad/bandkleur, stats, stijl, signatures, super, finisher, AI
 │   │   ├── moves.js        technieken-bibliotheek (timing, bereik, schade, poses, uitleg)
 │   │   ├── terms.js        scheidsrechterscommando's (romaji, kana, NL) + laadtips
 │   │   ├── profile.js      graden, keiko-punten, unlocks (localStorage)
@@ -152,7 +152,7 @@ npx cap open android|ios
 
 | Test | Commando | Controleert |
 |---|---|---|
-| Data | `node tools/test/data.mjs` | roster compleet (29, geen Jalissa/tweede Jaylee), technieken en poses bestaan |
+| Data | `node tools/test/data.mjs` | roster volgens de opgave van de dojo (37 namen, geslacht, graad; geen Jalissa/tweede Jaylee), Djordy high kicks, technieken en poses bestaan |
 | Rooktest | `node tools/test/smoke.cjs` | splash → menu → toernooi → gevecht, screenshots, JS-fouten |
 | Posegalerij | `node tools/test/poses.cjs` | screenshot van elke techniek op het treffermoment |
 | Regels | `node tools/test/rules.cjs 8` | AI tegen AI: elke wedstrijd eindigt (ippon/hantei/encho) |

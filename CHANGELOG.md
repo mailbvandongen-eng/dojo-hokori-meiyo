@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 (2026-11-08): roster volgens de dojo
+- 8 nieuwe vechters: Azad, Senpai Ferry, Senpai Micha, Mano, Leo, Nina, Naotaka en Niven (37 in totaal).
+- Senpai Dave (2e dan), Senpai Daan en Senpai Niesje (1e dan). Sensei Conchita is 4e dan, Senpai Anjay 2e dan.
+- Alle graden en geslachten volgens de opgave van de dojo. Bandkleuren van de dojo: 10e kyu wit, 9e rood, 8e-7e blauw, 6e-5e geel, 4e-3e groen, 2e-1e bruin, dan zwart.
+- Figuren zien er mannelijk of vrouwelijk uit: bouw, kapsel (kort, staart, knot) en een wit T-shirt onder de dogi voor vrouwen.
+- De graad telt mee in de kracht: 10e kyu 88% tot 4e dan 104%.
+- Djordy: specialist high kicks (Hemelhoog, Rol Kick, Draaiende hiel; super Tenkū).
+- Nieuwe techniek Rol Kick (Kaiten Kakato Geri). Ushiro Mawashi Geri (↖ + GERI) en Rol Kick (↙ + GERI) zitten in de basis-moveset van iedereen; de AI gebruikt ze ook.
+- Vechterkeuze op graad gesorteerd, met graad en geslacht op de kaart. Story: kyu-graden en Skylar, dan twee senpai, Sensei Conchita, Sensei Wesley.
+- De datatest controleert de opgave van de dojo letterlijk.
+
 ## 0.2.0 (2026-11-08): officieel logo
 - Het officiële Dojo Hokori Meiyo-logo vervangt de benadering, overal: splash, menu, pauze, opties, laden, uitslag, HUD, banners, boarding, wandlogo, vlaggen, dogi-badge en het watermerk van foto's.
 - `tools/logo/complete-logo.py` maakt het logo scherp, geeft het meer ruimte en vult de drie penseelstreken aan die links waren afgesneden.

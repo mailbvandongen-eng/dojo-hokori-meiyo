@@ -1,18 +1,20 @@
 // Genereert docs/ROSTER.md uit src/data/roster.js en moves.js (bron van waarheid = de data).
 import { writeFileSync } from 'node:fs';
-import { ROSTER, beltOf } from '../src/data/roster.js';
+import { ROSTER, beltOf, graadNiveau } from '../src/data/roster.js';
 import { MOVES, INPUT_MAP } from '../src/data/moves.js';
 
-const DIR = { n: '', f: '→ + ', b: '← + ', d: '↓ + ', u: '↑ + ' };
+const DIR = { n: '', f: '→ + ', b: '← + ', d: '↓ + ', u: '↑ + ', ub: '↖ + ', db: '↙ + ' };
 const bar = v => '█'.repeat(v) + '░'.repeat(10 - v);
 const L = [];
 L.push('# Roster & movesets: Dojo Hokori Meiyo', '');
 L.push('> Gegenereerd met `npm run docs:roster` uit `src/data/roster.js`. Pas de data aan, niet dit bestand.', '');
-L.push('> **Let op:** dit zijn echte dojoleden. Persoonlijkheid, speelstijl, graad en uiterlijk zijn een **voorstel**.',
-  '> Laat iedere vechter (bij kinderen samen met ouders) zelf kiezen en akkoord geven; zie de checklist onderaan.', '');
-L.push('## Overzicht', '', '| # | Vechter | Stijl | Rol | Graad (spel) | Kr | Sn | Be | Co | Bn |', '|---|---|---|---|---|---|---|---|---|---|');
-ROSTER.forEach((f, i) => { const s = f.stats; L.push(`| ${i + 1} | **${f.naam}** | ${f.stijl} | ${f.rol} | ${beltOf(f.graad).naam}${f.bevestigd?.graad ? '' : ' *'} | ${s.kracht} | ${s.snelheid} | ${s.bereik} | ${s.conditie} | ${s.benen} |`); });
-L.push('', '\\* = voorlopig, nog te bevestigen. Kr = kracht, Sn = snelheid, Be = bereik, Co = conditie, Bn = benen (weerstand tegen lage trappen).', '');
+L.push('> **Let op:** dit zijn echte dojoleden. Graad en geslacht komen van de dojo. Persoonlijkheid, speelstijl en moves zijn een **voorstel**:',
+  '> laat iedere vechter (bij kinderen samen met de ouders) zelf kiezen en akkoord geven. De checklist staat onderaan.', '');
+const SORTED = ROSTER.slice().sort((a, b) => graadNiveau(b.graad) - graadNiveau(a.graad));
+L.push('## Overzicht (op graad)', '', '| # | Vechter | M/V | Graad | Stijl | Rol | Kr | Sn | Be | Co | Bn |', '|---|---|---|---|---|---|---|---|---|---|---|');
+SORTED.forEach((f, i) => { const s = f.stats; L.push(`| ${i + 1} | **${f.naam}** | ${f.geslacht.toUpperCase()} | ${beltOf(f.graad).naam} | ${f.stijl} | ${f.rol} | ${s.kracht} | ${s.snelheid} | ${s.bereik} | ${s.conditie} | ${s.benen} |`); });
+L.push('', 'Kr = kracht, Sn = snelheid, Be = bereik, Co = conditie, Bn = benen (weerstand tegen lage trappen). De graad telt in het spel ook mee: een 10e kyu vecht op 88% en een 4e dan op 104%.', '');
+L.push('**Bandkleuren van de dojo:** 10e kyu wit · 9e rood · 8e–7e blauw · 6e–5e geel · 4e–3e groen · 2e–1e bruin · dan zwart (met gouden strepen per dan). Op de 7e, 5e, 3e en 1e kyu zit een streep in de kleur van de volgende band.', '');
 
 L.push('## Basis-moveset (alle vechters)', '', 'Richting is relatief: → = naar de tegenstander toe.', '', '| Input | Techniek | Wat het is | Doel | Startup | Schade |', '|---|---|---|---|---|---|');
 for (const [k, id] of Object.entries(INPUT_MAP)) { if (k === 'tsuki.u') continue; const [b, d] = k.split('.'), m = MOVES[id]; L.push(`| ${DIR[d]}${b.toUpperCase()} | ${m.jp} | ${m.nl} | ${m.target} | ${Math.round(m.startup * 1000)} ms | ${m.dmg}${m.legDmg ? ` (+${m.legDmg} been)` : ''} |`); }
@@ -21,9 +23,9 @@ L.push(`| UKE (vasthouden) | ${MOVES.uke.jp} | ${MOVES.uke.nl} | | | |`, `| ↓ 
 L.push(`| KIAI / → KIAI / ↓ KIAI | Signature 1/2/3 | kost 1/3 kiai-meter | | | |`, `| KIAI (meter vol) | Super | slow motion; finisher als de tegenstander bijna op is | | | |`, '');
 L.push('Renzoku (combinaties): druk TSUKI of GERI opnieuw als de vorige techniek raakt. Bijvoorbeeld jab → gyaku-tsuki → gedan mawashi.', '');
 
-for (const f of ROSTER) {
+for (const f of SORTED) {
   L.push(`## ${f.naam}${f.eindbaas ? ' (eindbaas)' : ''}`, '');
-  L.push(`*${f.titel ? f.titel + ' · ' : ''}${f.stijl} · ${beltOf(f.graad).naam}${f.bevestigd?.graad ? '' : ' (voorlopig)'}*`, '');
+  L.push(`*${f.titel ? f.titel + ' · ' : ''}${f.stijl} · ${beltOf(f.graad).naam} · ${f.geslacht === 'v' ? 'vrouw' : 'man'}*`, '');
   L.push(`> “${f.quote}”`, '', f.persoonlijkheid, '');
   const s = f.stats;
   L.push('```', `Kracht    ${bar(s.kracht)}  Snelheid ${bar(s.snelheid)}`, `Bereik    ${bar(s.bereik)}  Conditie ${bar(s.conditie)}`, `Benen     ${bar(s.benen)}`, '```', '');
@@ -38,8 +40,8 @@ for (const f of ROSTER) {
   const ai = f.ai; L.push(`<sub>AI-profiel: lage trap ${ai.lowkick} · romp ${ai.body} · hoofd ${ai.head} · draai ${ai.spin} · agressie ${ai.aggression} · verdediging ${ai.defense}</sub>`, '');
 }
 L.push('## Checklist voor de dojo', '', 'Per vechter afstemmen en in `roster.js` op `bevestigd: true` zetten:', '');
-L.push('| Vechter | Graad | Stijl & moves | Uiterlijk (lengte, bouw, huid, haar) | Toestemming naam (bij kind: ouder) |', '|---|---|---|---|---|');
-for (const f of ROSTER) L.push(`| ${f.naam} | ${f.bevestigd?.graad ? '✅' : '☐'} | ☐ | ${f.uiterlijk?.bevestigd ? '✅' : '☐'} | ☐ |`);
+L.push('| Vechter | Graad | Geslacht | Stijl & moves | Uiterlijk (huid, haar, kapsel) | Toestemming naam (bij kind: ouder) |', '|---|---|---|---|---|---|');
+for (const f of SORTED) L.push(`| ${f.naam} | ${f.bevestigd?.graad ? '✅' : '☐'} | ${f.bevestigd?.geslacht ? '✅' : '☐'} | ☐ | ${f.uiterlijk?.bevestigd ? '✅' : '☐'} | ☐ |`);
 L.push('');
 writeFileSync(new URL('../docs/ROSTER.md', import.meta.url), L.join('\n'));
 console.log('docs/ROSTER.md geschreven');

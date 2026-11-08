@@ -1,35 +1,42 @@
 // Roster van Dojo Hokori Meiyo (Zoetermeer).
 //
-// LET OP: dit zijn echte dojoleden. Persoonlijkheid, speelstijl, graad en uiterlijk
-// hieronder zijn een VOORSTEL voor de game, geen feiten. Laat elke vechter (bij kinderen:
-// met ouders) zelf kiezen en bevestigen. Velden met `bevestigd: false` staan in de
-// checklist in docs/ROSTER.md. Alleen Sensei Wesley (4e dan, bondscoach) en Skylar
-// (dochter van Sensei Wesley) zijn bevestigd uit de opdracht.
+// Graad en geslacht zijn aangeleverd door de dojo (8 november 2026) en dus bevestigd.
+// Persoonlijkheid, speelstijl en signature moves zijn nog een VOORSTEL: laat elke vechter
+// (bij kinderen samen met de ouders) zelf kiezen. Uiterlijk (huid, haar) is nog niet ingevuld.
+// De checklist staat in docs/ROSTER.md.
 //
+// geslacht: 'm' of 'v' (bepaalt bouw, haar en het T-shirt onder de dogi, zie model.js).
 // stats: 1-10. kracht = schade, snelheid = startup/loopsnelheid, bereik = reach,
 //        conditie = ki (uithouding), benen = weerstand tegen lage trappen.
+//        De graad telt ook mee: een dan-houder is sterker dan een beginner (fighter.js).
 // ai: gewichten voor de computer-tegenstander (0-1).
 // signatures: speciale technieken (Kiai-knop + richting, kost 1/3 kiai-meter).
 // super: Kiai met volle meter. Raakt die als de tegenstander bijna op is, dan volgt de finisher.
 
 const s = (naam, jp, base, mod, uitleg) => ({ naam, jp, base, mod, uitleg });
 
-// Graad: { kyu: 10..1 } of { dan: 1..10 }. Kleuren volgens de gangbare Kyokushin-volgorde.
+// Bandkleuren van Dojo Hokori Meiyo:
+// 10e kyu wit · 9e rood · 8e-7e blauw · 6e-5e geel · 4e-3e groen · 2e-1e bruin · dan zwart.
+// Op de oneven graden vanaf de 7e kyu een streep in de kleur van de volgende band.
+const BELTS = {
+  10: ['#f4f4f2', 'wit'], 9: ['#c8102e', 'rood'], 8: ['#2f63c9', 'blauw'], 7: ['#2f63c9', 'blauw'],
+  6: ['#f2cf2a', 'geel'], 5: ['#f2cf2a', 'geel'], 4: ['#2e8b3e', 'groen'], 3: ['#2e8b3e', 'groen'],
+  2: ['#6b4226', 'bruin'], 1: ['#6b4226', 'bruin'],
+};
+const STRIPE = { 7: '#f2cf2a', 5: '#2e8b3e', 3: '#6b4226', 1: '#d9a441' };
 export function beltOf(graad) {
-  if (!graad) return { kleur: '#f2f2f2', streep: null, naam: 'mukyu (wit)' };
-  if (graad.dan) return { kleur: '#151515', streep: '#d9a441', strepen: graad.dan, naam: `${graad.dan}e dan` };
-  const k = graad.kyu;
-  const kleur = k >= 9 ? '#f08a24' : k >= 7 ? '#2f63c9' : k >= 5 ? '#f2cf2a' : k >= 3 ? '#2e8b3e' : '#6b4226';
-  const naam = (k >= 9 ? 'oranje' : k >= 7 ? 'blauw' : k >= 5 ? 'geel' : k >= 3 ? 'groen' : 'bruin');
-  // oneven kyu: streep in de kleur van de volgende band (1e kyu: goud)
-  const streep = k % 2 === 1 ? ({ 9: '#2f63c9', 7: '#f2cf2a', 5: '#2e8b3e', 3: '#6b4226', 1: '#d9a441' })[k] : null;
-  return { kleur, streep, strepen: streep ? 1 : 0, naam: `${k}e kyu (${naam}${streep ? ' met streep' : ''})` };
+  if (!graad) return { kleur: BELTS[10][0], streep: null, strepen: 0, naam: 'wit (mukyu)', kort: 'wit' };
+  if (graad.dan) return { kleur: '#151515', streep: '#d9a441', strepen: graad.dan, naam: `${graad.dan}e dan (zwart)`, kort: `${graad.dan}e dan` };
+  const k = graad.kyu, [kleur, kn] = BELTS[k], streep = STRIPE[k] || null;
+  return { kleur, streep, strepen: streep ? 1 : 0, naam: `${k}e kyu (${kn}${streep ? ' met streep' : ''})`, kort: `${k}e kyu` };
 }
+// 0 = 10e kyu ... 9 = 1e kyu, 10 = 1e dan, 13 = 4e dan
+export function graadNiveau(graad) { return !graad ? 0 : graad.dan ? 9 + graad.dan : 10 - graad.kyu; }
 
 export const ROSTER = [
   {
-    id: 'wesley', naam: 'Sensei Wesley', titel: 'Sensei · bondscoach', eindbaas: true,
-    graad: { dan: 4 }, bevestigd: { graad: true },
+    id: 'wesley', geslacht: 'm', naam: 'Sensei Wesley', titel: 'Sensei · bondscoach', eindbaas: true,
+    graad: { dan: 4 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Compleet', rol: 'Eindbaas',
     persoonlijkheid: 'Rustig, onverstoorbaar en altijd een stap vooruit. Zegt weinig; de houding zegt genoeg. Leest als bondscoach elke tegenstander in de eerste tien seconden.',
     quote: 'Osu. Laat me je geest zien, niet alleen je techniek.',
@@ -45,30 +52,30 @@ export const ROSTER = [
     uiterlijk: { lengte: 1.04, bouw: 1.1, bevestigd: false },
   },
   {
-    id: 'skylar', naam: 'Skylar', titel: 'Dochter van Sensei Wesley',
-    graad: { kyu: 3 }, bevestigd: { graad: false },
+    id: 'skylar', geslacht: 'v', naam: 'Skylar', titel: 'Dochter van Sensei Wesley',
+    graad: { kyu: 6 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Technicus', rol: 'Rivaal in Story Mode',
-    persoonlijkheid: 'Opgegroeid op de mat. Kent elke techniek van Sensei Wesley en wil een eigen stijl laten zien. Snel, precies en ongeduldig met wie de etiquette vergeet.',
+    persoonlijkheid: 'Opgegroeid op de mat. Kent elke techniek van haar vader en wil een eigen stijl laten zien. Snel, precies en ongeduldig met wie de etiquette vergeet.',
     quote: 'Ik ben niet de dochter van de sensei. Vandaag ben ik je tegenstander.',
     stats: { kracht: 6, snelheid: 9, bereik: 7, conditie: 7, benen: 7 },
     ai: { lowkick: 0.5, body: 0.6, head: 0.55, spin: 0.35, aggression: 0.6, defense: 0.65 },
     signatures: [
       s('Familietraditie', 'Renzoku Geri', 'gedan_mawashi', { sequence: ['gedan_mawashi', 'chudan_mawashi'], dmg: 1.1 }, 'Laag-midden met hetzelfde been, zonder het neer te zetten.'),
       s('Bliksemknie', 'Hiza Geri', 'hiza_geri', { startup: 0.75, dmg: 1.15 }, 'Een knie die er al is voor je hem ziet.'),
-      s('Eigen weg', 'Ushiro Mawashi Geri', 'ushiro_mawashi', { startup: 0.85 }, 'De draaitrap die niet uit het lesboek van Sensei Wesley komt.'),
+      s('Eigen weg', 'Ushiro Mawashi Geri', 'ushiro_mawashi', { startup: 0.85 }, 'De draaitrap die niet uit het lesboek van haar vader komt.'),
     ],
     super: { naam: 'Oya Ko Kumite', jp: '親子組手', sequence: ['seiken_jab', 'seiken_gyaku', 'gedan_mawashi', 'ushiro_mawashi'], uitleg: 'Een reeks die duizend keer in de dojo geoefend is.' },
     finisher: { naam: 'Erfgoed', uitleg: 'Draaiende hieltrap; de camera toont even Sensei Wesley die knikt.' },
     uiterlijk: { lengte: 0.94, bouw: 0.9, bevestigd: false },
   },
   {
-    id: 'conchita', naam: 'Sensei Conchita', titel: 'Sensei',
-    graad: { dan: 1 }, bevestigd: { graad: false },
+    id: 'conchita', geslacht: 'v', naam: 'Sensei Conchita', titel: 'Sensei',
+    graad: { dan: 4 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Counter-vechter', rol: 'Mentor in Training Mode',
     persoonlijkheid: 'Warm buiten de mat, meedogenloos erop. Laat tegenstanders komen en straft elke fout af. Legt in Training Mode de technieken uit.',
     quote: 'Kiai! Uit je buik, niet uit je keel.',
-    stats: { kracht: 7, snelheid: 8, bereik: 7, conditie: 8, benen: 8 },
-    ai: { lowkick: 0.5, body: 0.6, head: 0.4, spin: 0.55, aggression: 0.35, defense: 0.9 },
+    stats: { kracht: 8, snelheid: 8, bereik: 8, conditie: 9, benen: 9 },
+    ai: { lowkick: 0.5, body: 0.6, head: 0.45, spin: 0.55, aggression: 0.4, defense: 0.92 },
     signatures: [
       s('Spiegel', 'Ushiro Geri Kaeshi', 'ushiro_geri', { counter: true, dmg: 1.3 }, 'Wacht op je aanval en draait er een ushiro geri doorheen.'),
       s('Les één', 'Gedan Barai Gyaku-tsuki', 'seiken_gyaku', { sequence: ['seiken_gyaku', 'seiken_gyaku'], dmg: 1.1 }, 'Wering, stoot. Kihon wordt kumite.'),
@@ -79,8 +86,8 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.95, bouw: 0.95, bevestigd: false },
   },
   {
-    id: 'anjay', naam: 'Senpai Anjay', titel: 'Senpai',
-    graad: { kyu: 1 }, bevestigd: { graad: false },
+    id: 'anjay', geslacht: 'm', naam: 'Senpai Anjay', titel: 'Senpai',
+    graad: { dan: 2 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Infighter', rol: 'Toernooifavoriet',
     persoonlijkheid: 'De senpai die de warming-up leidt en als laatste de dojo verlaat. Gaat recht naar voren en blijft daar.',
     quote: 'Nog tien. Osu!',
@@ -96,23 +103,23 @@ export const ROSTER = [
     uiterlijk: { lengte: 1.0, bouw: 1.05, bevestigd: false },
   },
   {
-    id: 'djordy', naam: 'Djordy', graad: { kyu: 2 }, bevestigd: { graad: false },
-    stijl: 'Lowkick-specialist', rol: 'Toernooivechter',
-    persoonlijkheid: 'Geduldig als een houthakker. Elke lage trap is een hak in dezelfde boom.',
-    quote: 'Eerst de benen. De rest komt vanzelf.',
-    stats: { kracht: 8, snelheid: 6, bereik: 7, conditie: 8, benen: 9 },
-    ai: { lowkick: 0.95, body: 0.5, head: 0.2, spin: 0.1, aggression: 0.6, defense: 0.6 },
+    id: 'djordy', geslacht: 'm', naam: 'Djordy', graad: { kyu: 7 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Hoogtrapper', rol: 'Toernooivechter · specialist high kicks',
+    persoonlijkheid: 'Lenig en explosief. Zoekt altijd de opening voor een trap naar het hoofd en durft de rol kick te gooien als niemand het verwacht.',
+    quote: 'Kijk niet naar mijn handen. Kijk omhoog.',
+    stats: { kracht: 7, snelheid: 8, bereik: 9, conditie: 7, benen: 6 },
+    ai: { lowkick: 0.2, body: 0.4, head: 0.95, spin: 0.6, aggression: 0.6, defense: 0.55 },
     signatures: [
-      s('Houthakker', 'Gedan Mawashi Geri', 'gedan_mawashi', { dmg: 1.2, legDmg: 1.6 }, 'Een lage trap die door de dij heen gaat.'),
-      s('Binnenkant', 'Uchi-momo Geri', 'gedan_mawashi', { legDmg: 1.4, startup: 0.85 }, 'Lage trap op de binnenkant van het voorste been.'),
-      s('Omzagen', 'Gedan Renzoku', 'gedan_mawashi', { sequence: ['seiken_gyaku', 'gedan_mawashi', 'gedan_mawashi'] }, 'Stoot om de dekking omhoog te halen, dan twee keer laag.'),
+      s('Hemelhoog', 'Jodan Mawashi Geri', 'jodan_mawashi', { startup: 0.85, kdChance: 0.55 }, 'Een ronde trap naar het hoofd, sneller dan je verwacht.'),
+      s('Rol Kick', 'Kaiten Kakato Geri', 'rol_kick', { dmg: 1.1, startup: 0.9 }, 'Rollend naar voren, de hiel valt op hoofd of schouder.'),
+      s('Draaiende hiel', 'Ushiro Mawashi Geri', 'ushiro_mawashi', { startup: 0.85 }, 'Wegdraaien en de hiel rond naar het hoofd.'),
     ],
-    super: { naam: 'Kiri Taoshi', jp: '切り倒し', sequence: ['gedan_mawashi', 'seiken_gyaku', 'gedan_mawashi', 'gedan_mawashi'], uitleg: '"Omhakken": drie lage trappen tot het been het opgeeft.' },
-    finisher: { naam: 'Gevallen boom', uitleg: 'Het standbeen klapt weg; slow motion op de knie die de mat raakt.' },
-    uiterlijk: { lengte: 1.0, bouw: 1.05, bevestigd: false },
+    super: { naam: 'Tenkū', jp: '天空', sequence: ['chudan_mawashi', 'jodan_mawashi', 'ushiro_mawashi', 'kakato_otoshi'], uitleg: '"Hemel": vier trappen die steeds hoger komen.' },
+    finisher: { naam: 'Uit de lucht', uitleg: 'Een rol kick in slow motion; de camera kijkt van onderaf mee.' },
+    uiterlijk: { lengte: 1.0, bouw: 0.96, bevestigd: false },
   },
   {
-    id: 'daan', naam: 'Daan', graad: { kyu: 4 }, bevestigd: { graad: false },
+    id: 'daan', geslacht: 'm', naam: 'Senpai Daan', titel: 'Senpai', graad: { dan: 1 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Tank', rol: 'Toernooivechter',
     persoonlijkheid: 'Incasseert alles en glimlacht erbij. Wint wedstrijden in de extra ronde, als de rest op is.',
     quote: 'Is dat alles? Hajime.',
@@ -128,7 +135,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 1.03, bouw: 1.2, bevestigd: false },
   },
   {
-    id: 'roshni', naam: 'Roshni', graad: { kyu: 3 }, bevestigd: { graad: false },
+    id: 'roshni', geslacht: 'v', naam: 'Roshni', graad: { kyu: 4 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Hoogtrapper', rol: 'Toernooivechter',
     persoonlijkheid: 'Lenig, sierlijk en gevaarlijk. Wacht op het moment dat de dekking zakt.',
     quote: 'Kijk omhoog.',
@@ -144,11 +151,11 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.96, bouw: 0.9, bevestigd: false },
   },
   {
-    id: 'niesje', naam: 'Niesje', graad: { kyu: 6 }, bevestigd: { graad: false },
-    stijl: 'Snelheidsvechter', rol: 'Arcade-vechter',
+    id: 'niesje', geslacht: 'v', naam: 'Senpai Niesje', titel: 'Senpai', graad: { dan: 1 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Snelheidsvechter', rol: 'Toernooivechter',
     persoonlijkheid: 'Altijd in beweging, nooit op dezelfde plek. Maakt tegenstanders gek met snelle stoten en zijstappen.',
     quote: 'Te laat!',
-    stats: { kracht: 5, snelheid: 10, bereik: 6, conditie: 7, benen: 6 },
+    stats: { kracht: 6, snelheid: 10, bereik: 7, conditie: 8, benen: 7 },
     ai: { lowkick: 0.4, body: 0.7, head: 0.35, spin: 0.2, aggression: 0.7, defense: 0.6 },
     signatures: [
       s('Wervelwind', 'Renzoku Tsuki', 'seiken_jab', { sequence: ['seiken_jab', 'seiken_jab', 'seiken_gyaku'], startup: 0.8 }, 'Drie stoten in een oogwenk.'),
@@ -160,7 +167,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.92, bouw: 0.88, bevestigd: false },
   },
   {
-    id: 'gwenn', naam: 'Gwenn', graad: { kyu: 5 }, bevestigd: { graad: false },
+    id: 'gwenn', geslacht: 'v', naam: 'Gwenn', graad: { kyu: 2 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Allrounder', rol: 'Arcade-vechter',
     persoonlijkheid: 'Leergierig en sportief. Buigt na elke wedstrijd het diepst, winst of verlies.',
     quote: 'Osu! Dank je voor de wedstrijd.',
@@ -176,7 +183,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.95, bouw: 0.92, bevestigd: false },
   },
   {
-    id: 'yassin', naam: 'Yassin', graad: { kyu: 3 }, bevestigd: { graad: false },
+    id: 'yassin', geslacht: 'm', naam: 'Yassin', graad: { kyu: 2 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Spinner', rol: 'Toernooivechter',
     persoonlijkheid: 'Showvechter. Het publiek komt voor de draaitrappen, en Yassin levert.',
     quote: 'Draai je om, dan zie je hem niet aankomen.',
@@ -192,7 +199,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 1.0, bouw: 0.98, bevestigd: false },
   },
   {
-    id: 'dave', naam: 'Dave', graad: { kyu: 2 }, bevestigd: { graad: false },
+    id: 'dave', geslacht: 'm', naam: 'Senpai Dave', titel: 'Senpai', graad: { dan: 2 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Tank', rol: 'Toernooivechter',
     persoonlijkheid: 'Ervaren en nuchter. Geen poespas: stoten, lage trap, klaar.',
     quote: 'Gewoon blijven werken.',
@@ -208,7 +215,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 1.04, bouw: 1.2, bevestigd: false },
   },
   {
-    id: 'seth', naam: 'Seth', graad: { kyu: 4 }, bevestigd: { graad: false },
+    id: 'seth', geslacht: 'm', naam: 'Seth', graad: { kyu: 2 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Afstandsvechter', rol: 'Toernooivechter',
     persoonlijkheid: 'Lang en geduldig. Houdt je met mae geri op afstand tot je een fout maakt.',
     quote: 'Blijf daar maar staan.',
@@ -224,7 +231,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 1.08, bouw: 0.95, bevestigd: false },
   },
   {
-    id: 'james', naam: 'James', graad: { kyu: 5 }, bevestigd: { graad: false },
+    id: 'james', geslacht: 'm', naam: 'James', graad: { kyu: 10 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Technicus', rol: 'Arcade-vechter',
     persoonlijkheid: 'Bestudeert video\'s van kampioenen en probeert alles uit. Elke week een nieuwe combinatie.',
     quote: 'Deze heb ik gisteren geoefend.',
@@ -240,7 +247,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.98, bouw: 0.95, bevestigd: false },
   },
   {
-    id: 'raf', naam: 'Raf', graad: { kyu: 6 }, bevestigd: { graad: false },
+    id: 'raf', geslacht: 'm', naam: 'Raf', graad: { kyu: 10 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Infighter', rol: 'Arcade-vechter',
     persoonlijkheid: 'Explosief. Wil dichtbij staan en meteen beginnen.',
     quote: 'Kom maar dichterbij.',
@@ -256,7 +263,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.96, bouw: 1.0, bevestigd: false },
   },
   {
-    id: 'eli', naam: 'Eli', graad: { kyu: 7 }, bevestigd: { graad: false },
+    id: 'eli', geslacht: 'm', naam: 'Eli', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Counter-vechter', rol: 'Arcade-vechter',
     persoonlijkheid: 'Kalm en oplettend. Wacht, kijkt, en slaat dan precies op tijd terug.',
     quote: '...Nu.',
@@ -272,7 +279,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.97, bouw: 0.92, bevestigd: false },
   },
   {
-    id: 'rayaan', naam: 'Rayaan', graad: { kyu: 6 }, bevestigd: { graad: false },
+    id: 'rayaan', geslacht: 'm', naam: 'Rayaan', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Hoogtrapper', rol: 'Arcade-vechter',
     persoonlijkheid: 'Springerig en vol energie. Probeert altijd de spectaculairste techniek.',
     quote: 'Deze gaat hoog!',
@@ -288,7 +295,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.94, bouw: 0.9, bevestigd: false },
   },
   {
-    id: 'livia', naam: 'Livia', graad: { kyu: 5 }, bevestigd: { graad: false },
+    id: 'livia', geslacht: 'v', naam: 'Livia', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Technicus', rol: 'Arcade-vechter',
     persoonlijkheid: 'Precies en gefocust. Elke techniek is een kata-beweging: zuiver uitgevoerd.',
     quote: 'Techniek wint van kracht.',
@@ -304,7 +311,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.95, bouw: 0.88, bevestigd: false },
   },
   {
-    id: 'senna', naam: 'Senna', graad: { kyu: 7 }, bevestigd: { graad: false },
+    id: 'senna', geslacht: 'v', naam: 'Senna', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Snelheidsvechter', rol: 'Arcade-vechter',
     persoonlijkheid: 'Snel als een racewagen, met een grijns.',
     quote: 'Eerste!',
@@ -320,7 +327,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.93, bouw: 0.88, bevestigd: false },
   },
   {
-    id: 'sophia', naam: 'Sophia', graad: { kyu: 6 }, bevestigd: { graad: false },
+    id: 'sophia', geslacht: 'v', naam: 'Sophia', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Afstandsvechter', rol: 'Arcade-vechter',
     persoonlijkheid: 'Slim en tactisch. Denkt drie technieken vooruit.',
     quote: 'Ik zag je al aankomen.',
@@ -336,7 +343,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.97, bouw: 0.9, bevestigd: false },
   },
   {
-    id: 'jailey', naam: 'Jailey', graad: { kyu: 8 }, bevestigd: { graad: false },
+    id: 'jailey', geslacht: 'v', naam: 'Jailey', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Allrounder', rol: 'Arcade-vechter',
     persoonlijkheid: 'Vrolijk en onvermoeibaar. Traint elke les alsof het een toernooi is.',
     quote: 'Nog een keer!',
@@ -352,7 +359,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.9, bouw: 0.9, bevestigd: false },
   },
   {
-    id: 'maylea', naam: 'Maylea', graad: { kyu: 8 }, bevestigd: { graad: false },
+    id: 'maylea', geslacht: 'v', naam: 'Maylea', graad: { kyu: 10 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Hoogtrapper', rol: 'Arcade-vechter',
     persoonlijkheid: 'Rustig en verrassend: niemand verwacht die hoge trap.',
     quote: 'Osu.',
@@ -368,7 +375,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.93, bouw: 0.88, bevestigd: false },
   },
   {
-    id: 'yien', naam: 'Yi-En', graad: { kyu: 5 }, bevestigd: { graad: false },
+    id: 'yien', geslacht: 'm', naam: 'Yi-En', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Technicus', rol: 'Arcade-vechter',
     persoonlijkheid: 'Geconcentreerd en efficiënt. Geen beweging te veel.',
     quote: 'Eén techniek is genoeg.',
@@ -384,7 +391,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.95, bouw: 0.9, bevestigd: false },
   },
   {
-    id: 'ace', naam: 'Ace', graad: { kyu: 6 }, bevestigd: { graad: false },
+    id: 'ace', geslacht: 'm', naam: 'Ace', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Spinner', rol: 'Arcade-vechter',
     persoonlijkheid: 'Zelfverzekerd en een tikje brutaal. De naam is het plan.',
     quote: 'Troefkaart.',
@@ -400,7 +407,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.97, bouw: 0.95, bevestigd: false },
   },
   {
-    id: 'riley', naam: 'Riley', graad: { kyu: 7 }, bevestigd: { graad: false },
+    id: 'riley', geslacht: 'v', naam: 'Riley', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Lowkick-specialist', rol: 'Arcade-vechter',
     persoonlijkheid: 'Taai en koppig. Geeft nooit op, ook niet met zere benen.',
     quote: 'Ik sta nog.',
@@ -416,7 +423,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.95, bouw: 0.95, bevestigd: false },
   },
   {
-    id: 'azim', naam: 'Azim', graad: { kyu: 4 }, bevestigd: { graad: false },
+    id: 'azim', geslacht: 'm', naam: 'Azim', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Infighter', rol: 'Toernooivechter',
     persoonlijkheid: 'Sterk en beheerst. Werkt op de romp tot de tegenstander dubbel klapt.',
     quote: 'Adem maar uit.',
@@ -432,7 +439,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 1.0, bouw: 1.08, bevestigd: false },
   },
   {
-    id: 'amir', naam: 'Amir', graad: { kyu: 5 }, bevestigd: { graad: false },
+    id: 'amir', geslacht: 'm', naam: 'Amir', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Allrounder', rol: 'Arcade-vechter',
     persoonlijkheid: 'Evenwichtig en betrouwbaar. Past zich aan elke tegenstander aan.',
     quote: 'Laat zien wat je hebt.',
@@ -448,7 +455,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.98, bouw: 1.0, bevestigd: false },
   },
   {
-    id: 'nino', naam: 'Nino', graad: { kyu: 8 }, bevestigd: { graad: false },
+    id: 'nino', geslacht: 'm', naam: 'Nino', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Snelheidsvechter', rol: 'Arcade-vechter',
     persoonlijkheid: 'Klein, snel en onvoorspelbaar. Duikt onder alles door.',
     quote: 'Hier! Nee, hier!',
@@ -464,7 +471,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.88, bouw: 0.88, bevestigd: false },
   },
   {
-    id: 'laura', naam: 'Laura', graad: { kyu: 4 }, bevestigd: { graad: false },
+    id: 'laura', geslacht: 'v', naam: 'Laura', graad: { kyu: 8 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Counter-vechter', rol: 'Toernooivechter',
     persoonlijkheid: 'Ervaren en kalm. Laat de ander het werk doen en pakt de punten.',
     quote: 'Rustig. Ik heb tijd.',
@@ -480,7 +487,7 @@ export const ROSTER = [
     uiterlijk: { lengte: 0.96, bouw: 0.92, bevestigd: false },
   },
   {
-    id: 'jayh', naam: 'Jayh', graad: { kyu: 6 }, bevestigd: { graad: false },
+    id: 'jayh', geslacht: 'm', naam: 'Jayh', graad: { kyu: 7 }, bevestigd: { graad: true, geslacht: true },
     stijl: 'Spinner', rol: 'Arcade-vechter',
     persoonlijkheid: 'Creatief en eigenwijs. Bedenkt eigen combinaties.',
     quote: 'Deze staat in geen enkel boek.',
@@ -494,6 +501,134 @@ export const ROSTER = [
     super: { naam: 'Jiyu', jp: '自由', sequence: ['gedan_mawashi', 'chudan_mawashi', 'ushiro_geri', 'kakato_otoshi'], uitleg: '"Vrijheid".' },
     finisher: { naam: 'Eigen stijl', uitleg: 'Draaiende camera, eigen kiai.' },
     uiterlijk: { lengte: 0.96, bouw: 0.92, bevestigd: false },
+  },
+  {
+    id: 'ferry', geslacht: 'm', naam: 'Senpai Ferry', titel: 'Senpai', graad: { dan: 2 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Lowkick-specialist', rol: 'Toernooivechter · veteraan',
+    persoonlijkheid: 'Veteraan van talloze toernooien. Rustig, sterk en meedogenloos op de benen. Weet precies wanneer de tegenstander gaat hinken.',
+    quote: 'Eerst de basis. Altijd eerst de basis.',
+    stats: { kracht: 9, snelheid: 6, bereik: 7, conditie: 9, benen: 10 },
+    ai: { lowkick: 0.95, body: 0.6, head: 0.25, spin: 0.15, aggression: 0.65, defense: 0.75 },
+    signatures: [
+      s('Bijlslag', 'Gedan Mawashi Geri', 'gedan_mawashi', { dmg: 1.25, legDmg: 1.6 }, 'Een lage trap van een tweede dan: daar sta je niet meer op.'),
+      s('Binnenkant', 'Uchi-momo Geri', 'gedan_mawashi', { legDmg: 1.4, startup: 0.85 }, 'Lage trap op de binnenkant van het voorste been.'),
+      s('Veteranenreeks', 'Gedan Renzoku', 'seiken_gyaku', { sequence: ['seiken_gyaku', 'gedan_mawashi', 'seiken_gyaku', 'gedan_mawashi'] }, 'Stoot, laag, stoot, laag. Simpel en vernietigend.'),
+    ],
+    super: { naam: 'Kiri Taoshi', jp: '切り倒し', sequence: ['gedan_mawashi', 'seiken_gyaku', 'gedan_mawashi', 'gedan_mawashi', 'jodan_mawashi'], uitleg: '"Omhakken": eerst de benen, dan het hoofd.' },
+    finisher: { naam: 'Ervaring', uitleg: 'De laatste lage trap in slow motion; het standbeen klapt weg.' },
+    uiterlijk: { lengte: 1.03, bouw: 1.12, bevestigd: false },
+  },
+  {
+    id: 'micha', geslacht: 'v', naam: 'Senpai Micha', titel: 'Senpai', graad: { dan: 1 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Afstandsvechter', rol: 'Toernooivechter',
+    persoonlijkheid: 'Beheerst en scherp. Bepaalt de afstand met haar voortrap en straft elke stap naar binnen af.',
+    quote: 'Jij bepaalt niet wanneer je binnenkomt. Ik wel.',
+    stats: { kracht: 7, snelheid: 8, bereik: 9, conditie: 8, benen: 8 },
+    ai: { lowkick: 0.45, body: 0.6, head: 0.6, spin: 0.3, aggression: 0.45, defense: 0.8 },
+    signatures: [
+      s('Slagboom', 'Mae Geri Kekomi', 'mae_geri', { push: 1.7, dmg: 1.2 }, 'Een stoottrap die je terugzet op je startlijn.'),
+      s('Lange lijn', 'Mae-Jodan', 'mae_geri', { sequence: ['mae_geri', 'jodan_mawashi'] }, 'Voortrap, en als je dekking zakt: hoog.'),
+      s('Draaiende hiel', 'Ushiro Mawashi Geri', 'ushiro_mawashi', {}, 'Als je toch binnenkomt.'),
+    ],
+    super: { naam: 'Maai no Senpai', jp: '間合い', sequence: ['mae_geri', 'chudan_mawashi', 'mae_geri', 'jodan_mawashi'], uitleg: 'Afstand is alles, en zij heeft hem.' },
+    finisher: { naam: 'Grens', uitleg: 'Jodan mawashi geri vanaf maximale afstand, in slow motion.' },
+    uiterlijk: { lengte: 0.96, bouw: 0.92, bevestigd: false },
+  },
+  {
+    id: 'azad', geslacht: 'm', naam: 'Azad', graad: { kyu: 8 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Infighter', rol: 'Arcade-vechter',
+    persoonlijkheid: 'Fel en gedreven. Stapt naar binnen en blijft stoten tot de bel.',
+    quote: 'Dichtbij is mijn plek.',
+    stats: { kracht: 7, snelheid: 7, bereik: 6, conditie: 8, benen: 7 },
+    ai: { lowkick: 0.45, body: 0.85, head: 0.2, spin: 0.1, aggression: 0.8, defense: 0.5 },
+    signatures: [
+      s('Drukte', 'Renzoku Tsuki', 'seiken_gyaku', { sequence: ['seiken_jab', 'seiken_gyaku', 'shita_tsuki'] }, 'Drie stoten op de romp.'),
+      s('Knie', 'Hiza Geri', 'hiza_geri', { dmg: 1.1 }, 'Knie als de tegenstander inzakt.'),
+      s('Ribben', 'Shita-tsuki', 'shita_tsuki', { bodyBonus: 1.6 }, 'Onder de ribben.'),
+    ],
+    super: { naam: 'Zenshin', jp: '前進', sequence: ['seiken_gyaku', 'seiken_gyaku', 'shita_tsuki', 'hiza_geri'], uitleg: '"Vooruit": geen stap terug.' },
+    finisher: { naam: 'Vooruit', uitleg: 'Een laatste knie in slow motion.' },
+    uiterlijk: { lengte: 0.98, bouw: 1.0, bevestigd: false },
+  },
+  {
+    id: 'mano', geslacht: 'm', naam: 'Mano', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Tank', rol: 'Arcade-vechter',
+    persoonlijkheid: 'Stevig en onverstoorbaar. Loopt gewoon door, wat er ook komt.',
+    quote: 'Nog een keer? Prima.',
+    stats: { kracht: 7, snelheid: 5, bereik: 6, conditie: 9, benen: 8 },
+    ai: { lowkick: 0.55, body: 0.75, head: 0.15, spin: 0.05, aggression: 0.7, defense: 0.5 },
+    signatures: [
+      s('Muurtje', 'Ibuki', 'seiken_gyaku', { armor: true }, 'Ademt uit en loopt door een treffer heen.'),
+      s('Duw', 'Mae Geri', 'mae_geri', { push: 1.6 }, 'Duwt de tegenstander weg.'),
+      s('Mokerknie', 'Hiza Geri', 'hiza_geri', { dmg: 1.2 }, 'Met het volle gewicht.'),
+    ],
+    super: { naam: 'Iwa', jp: '岩', sequence: ['seiken_gyaku', 'hiza_geri', 'seiken_gyaku', 'gedan_mawashi'], uitleg: '"Rots".' },
+    finisher: { naam: 'Rots', uitleg: 'Mano staat stil terwijl de tegenstander valt.' },
+    uiterlijk: { lengte: 1.0, bouw: 1.15, bevestigd: false },
+  },
+  {
+    id: 'naotaka', geslacht: 'm', naam: 'Naotaka', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Counter-vechter', rol: 'Arcade-vechter',
+    persoonlijkheid: 'Geduldig en oplettend. Laat de ander beginnen en antwoordt precies op het juiste moment.',
+    quote: 'Kom maar. Ik wacht.',
+    stats: { kracht: 6, snelheid: 8, bereik: 7, conditie: 7, benen: 7 },
+    ai: { lowkick: 0.45, body: 0.55, head: 0.45, spin: 0.4, aggression: 0.3, defense: 0.85 },
+    signatures: [
+      s('Antwoord', 'Gyaku-tsuki Kaeshi', 'seiken_gyaku', { counter: true, dmg: 1.25 }, 'Blok en meteen terug.'),
+      s('Draaideur', 'Ushiro Geri', 'ushiro_geri', {}, 'Achterwaartse trap als counter.'),
+      s('Hoge hiel', 'Ushiro Mawashi Geri', 'ushiro_mawashi', {}, 'Draaiende hiel naar het hoofd.'),
+    ],
+    super: { naam: 'Kaeshi Waza', jp: '返し技', sequence: ['seiken_gyaku', 'chudan_mawashi', 'ushiro_mawashi'], uitleg: 'Elke aanval krijgt een antwoord.' },
+    finisher: { naam: 'Juiste moment', uitleg: 'Het beeld bevriest op het moment van de counter.' },
+    uiterlijk: { lengte: 0.97, bouw: 0.92, bevestigd: false },
+  },
+  {
+    id: 'niven', geslacht: 'm', naam: 'Niven', graad: { kyu: 9 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Lowkick-specialist', rol: 'Arcade-vechter',
+    persoonlijkheid: 'Koppig en taai. Heeft de lage trap ontdekt en laat hem niet meer los.',
+    quote: 'Nog een op hetzelfde been.',
+    stats: { kracht: 6, snelheid: 7, bereik: 7, conditie: 8, benen: 8 },
+    ai: { lowkick: 0.85, body: 0.5, head: 0.2, spin: 0.15, aggression: 0.6, defense: 0.55 },
+    signatures: [
+      s('Zelfde been', 'Gedan Mawashi Geri', 'gedan_mawashi', { legDmg: 1.35 }, 'Steeds op dezelfde plek.'),
+      s('Combinatie', 'Gyaku-Gedan', 'seiken_gyaku', { sequence: ['seiken_gyaku', 'gedan_mawashi'] }, 'Stoot, dan laag.'),
+      s('Verrassing', 'Jodan Mawashi', 'jodan_mawashi', {}, 'Laag laten kijken, hoog trappen.'),
+    ],
+    super: { naam: 'Shinbō', jp: '辛抱', sequence: ['gedan_mawashi', 'seiken_gyaku', 'gedan_mawashi', 'gedan_mawashi'], uitleg: '"Volharding".' },
+    finisher: { naam: 'Volharding', uitleg: 'De laatste lage trap in slow motion.' },
+    uiterlijk: { lengte: 0.96, bouw: 0.95, bevestigd: false },
+  },
+  {
+    id: 'leo', geslacht: 'm', naam: 'Leo', graad: { kyu: 10 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Allrounder', rol: 'Arcade-vechter · beginner',
+    persoonlijkheid: 'Net begonnen en vol enthousiasme. Probeert alles wat de sensei laat zien.',
+    quote: 'Osu! Mag ik ook?',
+    stats: { kracht: 5, snelheid: 7, bereik: 6, conditie: 7, benen: 6 },
+    ai: { lowkick: 0.5, body: 0.6, head: 0.35, spin: 0.2, aggression: 0.6, defense: 0.45 },
+    signatures: [
+      s('Eerste les', 'Gyaku-tsuki Gedan', 'seiken_gyaku', { sequence: ['seiken_gyaku', 'gedan_mawashi'] }, 'Stoot en lage trap, net als in de les.'),
+      s('Voortrap', 'Mae Geri', 'mae_geri', {}, 'Afstand houden.'),
+      s('Ronde trap', 'Chudan Mawashi', 'chudan_mawashi', {}, 'Op de ribben.'),
+    ],
+    super: { naam: 'Hajimari', jp: '始まり', sequence: ['seiken_jab', 'seiken_gyaku', 'gedan_mawashi', 'chudan_mawashi'], uitleg: '"Het begin".' },
+    finisher: { naam: 'Eerste ippon', uitleg: 'Leo kijkt verbaasd naar de scheidsrechter, en dan gaat de arm omhoog.' },
+    uiterlijk: { lengte: 0.94, bouw: 0.92, bevestigd: false },
+  },
+  {
+    id: 'nina', geslacht: 'v', naam: 'Nina', graad: { kyu: 10 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Snelheidsvechter', rol: 'Arcade-vechter · beginner',
+    persoonlijkheid: 'Klein, snel en dapper. Is al weg voordat de tegenstander kan terugslaan.',
+    quote: 'Te traag!',
+    stats: { kracht: 4, snelheid: 9, bereik: 6, conditie: 7, benen: 6 },
+    ai: { lowkick: 0.45, body: 0.7, head: 0.3, spin: 0.25, aggression: 0.7, defense: 0.55 },
+    signatures: [
+      s('Prik prik', 'Renzoku Tsuki', 'seiken_jab', { sequence: ['seiken_jab', 'seiken_jab', 'seiken_gyaku'], startup: 0.8 }, 'Drie snelle stoten.'),
+      s('Pijl', 'Mae Geri', 'mae_geri', { startup: 0.8 }, 'Snelle voortrap.'),
+      s('Wegwezen', 'Gedan Mawashi', 'gedan_mawashi', { startup: 0.85 }, 'Lage trap en weg.'),
+    ],
+    super: { naam: 'Kogarashi', jp: '木枯らし', sequence: ['seiken_jab', 'seiken_gyaku', 'seiken_jab', 'chudan_mawashi'], uitleg: '"Herfstwind".' },
+    finisher: { naam: 'Wervelwind', uitleg: 'Snelle flitsen over het scherm, en dan Ippon.' },
+    uiterlijk: { lengte: 0.9, bouw: 0.88, bevestigd: false },
   },
 ];
 

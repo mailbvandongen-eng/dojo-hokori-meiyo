@@ -2,44 +2,54 @@
 
 > Gegenereerd met `npm run docs:roster` uit `src/data/roster.js`. Pas de data aan, niet dit bestand.
 
-> **Let op:** dit zijn echte dojoleden. Persoonlijkheid, speelstijl, graad en uiterlijk zijn een **voorstel**.
-> Laat iedere vechter (bij kinderen samen met ouders) zelf kiezen en akkoord geven; zie de checklist onderaan.
+> **Let op:** dit zijn echte dojoleden. Graad en geslacht komen van de dojo. Persoonlijkheid, speelstijl en moves zijn een **voorstel**:
+> laat iedere vechter (bij kinderen samen met de ouders) zelf kiezen en akkoord geven. De checklist staat onderaan.
 
-## Overzicht
+## Overzicht (op graad)
 
-| # | Vechter | Stijl | Rol | Graad (spel) | Kr | Sn | Be | Co | Bn |
-|---|---|---|---|---|---|---|---|---|---|
-| 1 | **Sensei Wesley** | Compleet | Eindbaas | 4e dan | 9 | 8 | 8 | 10 | 10 |
-| 2 | **Skylar** | Technicus | Rivaal in Story Mode | 3e kyu (groen met streep) * | 6 | 9 | 7 | 7 | 7 |
-| 3 | **Sensei Conchita** | Counter-vechter | Mentor in Training Mode | 1e dan * | 7 | 8 | 7 | 8 | 8 |
-| 4 | **Senpai Anjay** | Infighter | Toernooifavoriet | 1e kyu (bruin met streep) * | 8 | 7 | 6 | 9 | 8 |
-| 5 | **Djordy** | Lowkick-specialist | Toernooivechter | 2e kyu (bruin) * | 8 | 6 | 7 | 8 | 9 |
-| 6 | **Daan** | Tank | Toernooivechter | 4e kyu (groen) * | 8 | 5 | 6 | 10 | 9 |
-| 7 | **Roshni** | Hoogtrapper | Toernooivechter | 3e kyu (groen met streep) * | 6 | 8 | 9 | 7 | 6 |
-| 8 | **Niesje** | Snelheidsvechter | Arcade-vechter | 6e kyu (geel) * | 5 | 10 | 6 | 7 | 6 |
-| 9 | **Gwenn** | Allrounder | Arcade-vechter | 5e kyu (geel met streep) * | 6 | 7 | 7 | 8 | 7 |
-| 10 | **Yassin** | Spinner | Toernooivechter | 3e kyu (groen met streep) * | 7 | 8 | 8 | 7 | 6 |
-| 11 | **Dave** | Tank | Toernooivechter | 2e kyu (bruin) * | 9 | 5 | 7 | 9 | 9 |
-| 12 | **Seth** | Afstandsvechter | Toernooivechter | 4e kyu (groen) * | 7 | 7 | 10 | 7 | 7 |
-| 13 | **James** | Technicus | Arcade-vechter | 5e kyu (geel met streep) * | 6 | 8 | 7 | 7 | 7 |
-| 14 | **Raf** | Infighter | Arcade-vechter | 6e kyu (geel) * | 7 | 7 | 6 | 8 | 7 |
-| 15 | **Eli** | Counter-vechter | Arcade-vechter | 7e kyu (blauw met streep) * | 6 | 8 | 7 | 7 | 7 |
-| 16 | **Rayaan** | Hoogtrapper | Arcade-vechter | 6e kyu (geel) * | 6 | 8 | 8 | 6 | 6 |
-| 17 | **Livia** | Technicus | Arcade-vechter | 5e kyu (geel met streep) * | 5 | 8 | 7 | 8 | 7 |
-| 18 | **Senna** | Snelheidsvechter | Arcade-vechter | 7e kyu (blauw met streep) * | 5 | 9 | 7 | 7 | 6 |
-| 19 | **Sophia** | Afstandsvechter | Arcade-vechter | 6e kyu (geel) * | 5 | 7 | 9 | 8 | 7 |
-| 20 | **Jailey** | Allrounder | Arcade-vechter | 8e kyu (blauw) * | 5 | 7 | 6 | 9 | 7 |
-| 21 | **Maylea** | Hoogtrapper | Arcade-vechter | 8e kyu (blauw) * | 5 | 8 | 8 | 7 | 6 |
-| 22 | **Yi-En** | Technicus | Arcade-vechter | 5e kyu (geel met streep) * | 6 | 9 | 7 | 7 | 7 |
-| 23 | **Ace** | Spinner | Arcade-vechter | 6e kyu (geel) * | 7 | 8 | 7 | 6 | 6 |
-| 24 | **Riley** | Lowkick-specialist | Arcade-vechter | 7e kyu (blauw met streep) * | 6 | 7 | 7 | 8 | 9 |
-| 25 | **Azim** | Infighter | Toernooivechter | 4e kyu (groen) * | 8 | 6 | 6 | 8 | 8 |
-| 26 | **Amir** | Allrounder | Arcade-vechter | 5e kyu (geel met streep) * | 7 | 7 | 7 | 7 | 7 |
-| 27 | **Nino** | Snelheidsvechter | Arcade-vechter | 8e kyu (blauw) * | 5 | 10 | 5 | 7 | 6 |
-| 28 | **Laura** | Counter-vechter | Toernooivechter | 4e kyu (groen) * | 6 | 7 | 8 | 8 | 8 |
-| 29 | **Jayh** | Spinner | Arcade-vechter | 6e kyu (geel) * | 6 | 8 | 7 | 7 | 6 |
+| # | Vechter | M/V | Graad | Stijl | Rol | Kr | Sn | Be | Co | Bn |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | **Sensei Wesley** | M | 4e dan (zwart) | Compleet | Eindbaas | 9 | 8 | 8 | 10 | 10 |
+| 2 | **Sensei Conchita** | V | 4e dan (zwart) | Counter-vechter | Mentor in Training Mode | 8 | 8 | 8 | 9 | 9 |
+| 3 | **Senpai Anjay** | M | 2e dan (zwart) | Infighter | Toernooifavoriet | 8 | 7 | 6 | 9 | 8 |
+| 4 | **Senpai Dave** | M | 2e dan (zwart) | Tank | Toernooivechter | 9 | 5 | 7 | 9 | 9 |
+| 5 | **Senpai Ferry** | M | 2e dan (zwart) | Lowkick-specialist | Toernooivechter · veteraan | 9 | 6 | 7 | 9 | 10 |
+| 6 | **Senpai Daan** | M | 1e dan (zwart) | Tank | Toernooivechter | 8 | 5 | 6 | 10 | 9 |
+| 7 | **Senpai Niesje** | V | 1e dan (zwart) | Snelheidsvechter | Toernooivechter | 6 | 10 | 7 | 8 | 7 |
+| 8 | **Senpai Micha** | V | 1e dan (zwart) | Afstandsvechter | Toernooivechter | 7 | 8 | 9 | 8 | 8 |
+| 9 | **Gwenn** | V | 2e kyu (bruin) | Allrounder | Arcade-vechter | 6 | 7 | 7 | 8 | 7 |
+| 10 | **Yassin** | M | 2e kyu (bruin) | Spinner | Toernooivechter | 7 | 8 | 8 | 7 | 6 |
+| 11 | **Seth** | M | 2e kyu (bruin) | Afstandsvechter | Toernooivechter | 7 | 7 | 10 | 7 | 7 |
+| 12 | **Roshni** | V | 4e kyu (groen) | Hoogtrapper | Toernooivechter | 6 | 8 | 9 | 7 | 6 |
+| 13 | **Skylar** | V | 6e kyu (geel) | Technicus | Rivaal in Story Mode | 6 | 9 | 7 | 7 | 7 |
+| 14 | **Djordy** | M | 7e kyu (blauw met streep) | Hoogtrapper | Toernooivechter · specialist high kicks | 7 | 8 | 9 | 7 | 6 |
+| 15 | **Jayh** | M | 7e kyu (blauw met streep) | Spinner | Arcade-vechter | 6 | 8 | 7 | 7 | 6 |
+| 16 | **Laura** | V | 8e kyu (blauw) | Counter-vechter | Toernooivechter | 6 | 7 | 8 | 8 | 8 |
+| 17 | **Azad** | M | 8e kyu (blauw) | Infighter | Arcade-vechter | 7 | 7 | 6 | 8 | 7 |
+| 18 | **Eli** | M | 9e kyu (rood) | Counter-vechter | Arcade-vechter | 6 | 8 | 7 | 7 | 7 |
+| 19 | **Rayaan** | M | 9e kyu (rood) | Hoogtrapper | Arcade-vechter | 6 | 8 | 8 | 6 | 6 |
+| 20 | **Livia** | V | 9e kyu (rood) | Technicus | Arcade-vechter | 5 | 8 | 7 | 8 | 7 |
+| 21 | **Senna** | V | 9e kyu (rood) | Snelheidsvechter | Arcade-vechter | 5 | 9 | 7 | 7 | 6 |
+| 22 | **Sophia** | V | 9e kyu (rood) | Afstandsvechter | Arcade-vechter | 5 | 7 | 9 | 8 | 7 |
+| 23 | **Jailey** | V | 9e kyu (rood) | Allrounder | Arcade-vechter | 5 | 7 | 6 | 9 | 7 |
+| 24 | **Yi-En** | M | 9e kyu (rood) | Technicus | Arcade-vechter | 6 | 9 | 7 | 7 | 7 |
+| 25 | **Ace** | M | 9e kyu (rood) | Spinner | Arcade-vechter | 7 | 8 | 7 | 6 | 6 |
+| 26 | **Riley** | V | 9e kyu (rood) | Lowkick-specialist | Arcade-vechter | 6 | 7 | 7 | 8 | 9 |
+| 27 | **Azim** | M | 9e kyu (rood) | Infighter | Toernooivechter | 8 | 6 | 6 | 8 | 8 |
+| 28 | **Amir** | M | 9e kyu (rood) | Allrounder | Arcade-vechter | 7 | 7 | 7 | 7 | 7 |
+| 29 | **Nino** | M | 9e kyu (rood) | Snelheidsvechter | Arcade-vechter | 5 | 10 | 5 | 7 | 6 |
+| 30 | **Mano** | M | 9e kyu (rood) | Tank | Arcade-vechter | 7 | 5 | 6 | 9 | 8 |
+| 31 | **Naotaka** | M | 9e kyu (rood) | Counter-vechter | Arcade-vechter | 6 | 8 | 7 | 7 | 7 |
+| 32 | **Niven** | M | 9e kyu (rood) | Lowkick-specialist | Arcade-vechter | 6 | 7 | 7 | 8 | 8 |
+| 33 | **James** | M | 10e kyu (wit) | Technicus | Arcade-vechter | 6 | 8 | 7 | 7 | 7 |
+| 34 | **Raf** | M | 10e kyu (wit) | Infighter | Arcade-vechter | 7 | 7 | 6 | 8 | 7 |
+| 35 | **Maylea** | V | 10e kyu (wit) | Hoogtrapper | Arcade-vechter | 5 | 8 | 8 | 7 | 6 |
+| 36 | **Leo** | M | 10e kyu (wit) | Allrounder | Arcade-vechter · beginner | 5 | 7 | 6 | 7 | 6 |
+| 37 | **Nina** | V | 10e kyu (wit) | Snelheidsvechter | Arcade-vechter · beginner | 4 | 9 | 6 | 7 | 6 |
 
-\* = voorlopig, nog te bevestigen. Kr = kracht, Sn = snelheid, Be = bereik, Co = conditie, Bn = benen (weerstand tegen lage trappen).
+Kr = kracht, Sn = snelheid, Be = bereik, Co = conditie, Bn = benen (weerstand tegen lage trappen). De graad telt in het spel ook mee: een 10e kyu vecht op 88% en een 4e dan op 104%.
+
+**Bandkleuren van de dojo:** 10e kyu wit · 9e rood · 8e–7e blauw · 6e–5e geel · 4e–3e groen · 2e–1e bruin · dan zwart (met gouden strepen per dan). Op de 7e, 5e, 3e en 1e kyu zit een streep in de kleur van de volgende band.
 
 ## Basis-moveset (alle vechters)
 
@@ -56,6 +66,8 @@ Richting is relatief: → = naar de tegenstander toe.
 | → + GERI | Hiza Geri | Knie naar de romp | chudan | 170 ms | 12 |
 | ← + GERI | Ushiro Geri | Draaiende achterwaartse trap | chudan | 300 ms | 16 |
 | ↑ + GERI | Jodan Mawashi Geri | Ronde trap naar het hoofd | jodan | 320 ms | 18 |
+| ↖ + GERI | Ushiro Mawashi Geri | Draaiende hiel naar het hoofd | jodan | 360 ms | 20 |
+| ↙ + GERI | Kaiten Kakato Geri | Rol Kick: rollende hieltrap | jodan | 460 ms | 22 |
 | → + GERI (op afstand) | Chudan Mae Geri | Voorwaartse trap naar de buik | chudan | 200 ms | 9 |
 | UKE (vasthouden) | Jodan/Chudan Uke | Dekking hoog en midden | | | |
 | ↓ + UKE | Sune Uke | Scheenblok tegen de lage trap | | | |
@@ -66,7 +78,7 @@ Renzoku (combinaties): druk TSUKI of GERI opnieuw als de vorige techniek raakt. 
 
 ## Sensei Wesley (eindbaas)
 
-*Sensei · bondscoach · Compleet · 4e dan*
+*Sensei · bondscoach · Compleet · 4e dan (zwart) · man*
 
 > “Osu. Laat me je geest zien, niet alleen je techniek.”
 
@@ -90,44 +102,18 @@ Benen     ██████████
 
 <sub>AI-profiel: lage trap 0.7 · romp 0.7 · hoofd 0.5 · draai 0.4 · agressie 0.65 · verdediging 0.85</sub>
 
-## Skylar
-
-*Dochter van Sensei Wesley · Technicus · 3e kyu (groen met streep) (voorlopig)*
-
-> “Ik ben niet de dochter van de sensei. Vandaag ben ik je tegenstander.”
-
-Opgegroeid op de mat. Kent elke techniek van Sensei Wesley en wil een eigen stijl laten zien. Snel, precies en ongeduldig met wie de etiquette vergeet.
-
-```
-Kracht    ██████░░░░  Snelheid █████████░
-Bereik    ███████░░░  Conditie ███████░░░
-Benen     ███████░░░
-```
-
-| Input | Signature | Techniek | Effect |
-|---|---|---|---|
-| KIAI | **Familietraditie** | Renzoku Geri | Laag-midden met hetzelfde been, zonder het neer te zetten. *(reeks: Gedan Mawashi Geri → Chudan Mawashi Geri; schade ×1.1)* |
-| → + KIAI | **Bliksemknie** | Hiza Geri | Een knie die er al is voor je hem ziet. *(schade ×1.15; snelheid ×1.33)* |
-| ↓ + KIAI | **Eigen weg** | Ushiro Mawashi Geri | De draaitrap die niet uit het lesboek van Sensei Wesley komt. *(snelheid ×1.18)* |
-
-**Super: Oya Ko Kumite** (親子組手): Een reeks die duizend keer in de dojo geoefend is. Reeks: Hidari Seiken Chudan Tsuki → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Ushiro Mawashi Geri.
-
-**Finisher: Erfgoed**: Draaiende hieltrap; de camera toont even Sensei Wesley die knikt.
-
-<sub>AI-profiel: lage trap 0.5 · romp 0.6 · hoofd 0.55 · draai 0.35 · agressie 0.6 · verdediging 0.65</sub>
-
 ## Sensei Conchita
 
-*Sensei · Counter-vechter · 1e dan (voorlopig)*
+*Sensei · Counter-vechter · 4e dan (zwart) · vrouw*
 
 > “Kiai! Uit je buik, niet uit je keel.”
 
 Warm buiten de mat, meedogenloos erop. Laat tegenstanders komen en straft elke fout af. Legt in Training Mode de technieken uit.
 
 ```
-Kracht    ███████░░░  Snelheid ████████░░
-Bereik    ███████░░░  Conditie ████████░░
-Benen     ████████░░
+Kracht    ████████░░  Snelheid ████████░░
+Bereik    ████████░░  Conditie █████████░
+Benen     █████████░
 ```
 
 | Input | Signature | Techniek | Effect |
@@ -140,11 +126,11 @@ Benen     ████████░░
 
 **Finisher: Zanshin**: Na de ushiro geri blijft Sensei Conchita in kamae staan, alert, terwijl de tegenstander valt.
 
-<sub>AI-profiel: lage trap 0.5 · romp 0.6 · hoofd 0.4 · draai 0.55 · agressie 0.35 · verdediging 0.9</sub>
+<sub>AI-profiel: lage trap 0.5 · romp 0.6 · hoofd 0.45 · draai 0.55 · agressie 0.4 · verdediging 0.92</sub>
 
 ## Senpai Anjay
 
-*Senpai · Infighter · 1e kyu (bruin met streep) (voorlopig)*
+*Senpai · Infighter · 2e dan (zwart) · man*
 
 > “Nog tien. Osu!”
 
@@ -168,35 +154,61 @@ Benen     ████████░░
 
 <sub>AI-profiel: lage trap 0.55 · romp 0.85 · hoofd 0.25 · draai 0.15 · agressie 0.85 · verdediging 0.55</sub>
 
-## Djordy
+## Senpai Dave
 
-*Lowkick-specialist · 2e kyu (bruin) (voorlopig)*
+*Senpai · Tank · 2e dan (zwart) · man*
 
-> “Eerst de benen. De rest komt vanzelf.”
+> “Gewoon blijven werken.”
 
-Geduldig als een houthakker. Elke lage trap is een hak in dezelfde boom.
+Ervaren en nuchter. Geen poespas: stoten, lage trap, klaar.
 
 ```
-Kracht    ████████░░  Snelheid ██████░░░░
-Bereik    ███████░░░  Conditie ████████░░
+Kracht    █████████░  Snelheid █████░░░░░
+Bereik    ███████░░░  Conditie █████████░
 Benen     █████████░
 ```
 
 | Input | Signature | Techniek | Effect |
 |---|---|---|---|
-| KIAI | **Houthakker** | Gedan Mawashi Geri | Een lage trap die door de dij heen gaat. *(schade ×1.2)* |
+| KIAI | **Voorhamer** | Seiken Gyaku-tsuki | Een stoot die je in je rug voelt. *(schade ×1.4)* |
+| → + KIAI | **Dijbreker** | Gedan Mawashi | Lage trap van een zwaargewicht. |
+| ↓ + KIAI | **Doorwalsen** | Renzoku | Loopt door alles heen. *(reeks: Migi Seiken Chudan Gyaku-tsuki → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri; loopt door een treffer heen)* |
+
+**Super: Tetsu** (鉄): "IJzer". Reeks: Migi Seiken Chudan Gyaku-tsuki → Migi Seiken Chudan Gyaku-tsuki → Shita-tsuki → Gedan Mawashi Geri.
+
+**Finisher: Werkdag**: Eén laatste lage trap. Dave knikt en loopt terug naar de startlijn.
+
+<sub>AI-profiel: lage trap 0.75 · romp 0.75 · hoofd 0.15 · draai 0.05 · agressie 0.75 · verdediging 0.55</sub>
+
+## Senpai Ferry
+
+*Senpai · Lowkick-specialist · 2e dan (zwart) · man*
+
+> “Eerst de basis. Altijd eerst de basis.”
+
+Veteraan van talloze toernooien. Rustig, sterk en meedogenloos op de benen. Weet precies wanneer de tegenstander gaat hinken.
+
+```
+Kracht    █████████░  Snelheid ██████░░░░
+Bereik    ███████░░░  Conditie █████████░
+Benen     ██████████
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Bijlslag** | Gedan Mawashi Geri | Een lage trap van een tweede dan: daar sta je niet meer op. *(schade ×1.25)* |
 | → + KIAI | **Binnenkant** | Uchi-momo Geri | Lage trap op de binnenkant van het voorste been. *(snelheid ×1.18)* |
-| ↓ + KIAI | **Omzagen** | Gedan Renzoku | Stoot om de dekking omhoog te halen, dan twee keer laag. *(reeks: Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Gedan Mawashi Geri)* |
+| ↓ + KIAI | **Veteranenreeks** | Gedan Renzoku | Stoot, laag, stoot, laag. Simpel en vernietigend. *(reeks: Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri)* |
 
-**Super: Kiri Taoshi** (切り倒し): "Omhakken": drie lage trappen tot het been het opgeeft. Reeks: Gedan Mawashi Geri → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Gedan Mawashi Geri.
+**Super: Kiri Taoshi** (切り倒し): "Omhakken": eerst de benen, dan het hoofd. Reeks: Gedan Mawashi Geri → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Gedan Mawashi Geri → Jodan Mawashi Geri.
 
-**Finisher: Gevallen boom**: Het standbeen klapt weg; slow motion op de knie die de mat raakt.
+**Finisher: Ervaring**: De laatste lage trap in slow motion; het standbeen klapt weg.
 
-<sub>AI-profiel: lage trap 0.95 · romp 0.5 · hoofd 0.2 · draai 0.1 · agressie 0.6 · verdediging 0.6</sub>
+<sub>AI-profiel: lage trap 0.95 · romp 0.6 · hoofd 0.25 · draai 0.15 · agressie 0.65 · verdediging 0.75</sub>
 
-## Daan
+## Senpai Daan
 
-*Tank · 4e kyu (groen) (voorlopig)*
+*Senpai · Tank · 1e dan (zwart) · man*
 
 > “Is dat alles? Hajime.”
 
@@ -220,44 +232,18 @@ Benen     █████████░
 
 <sub>AI-profiel: lage trap 0.6 · romp 0.75 · hoofd 0.2 · draai 0.1 · agressie 0.7 · verdediging 0.5</sub>
 
-## Roshni
+## Senpai Niesje
 
-*Hoogtrapper · 3e kyu (groen met streep) (voorlopig)*
-
-> “Kijk omhoog.”
-
-Lenig, sierlijk en gevaarlijk. Wacht op het moment dat de dekking zakt.
-
-```
-Kracht    ██████░░░░  Snelheid ████████░░
-Bereik    █████████░  Conditie ███████░░░
-Benen     ██████░░░░
-```
-
-| Input | Signature | Techniek | Effect |
-|---|---|---|---|
-| KIAI | **Komeet** | Jodan Mawashi Geri | Een hoge trap die vanuit een lage beweging opkomt. *(snelheid ×1.18; grote kans op knock-down)* |
-| → + KIAI | **Valbijl** | Kakato Otoshi | Hoog op, en dan naar beneden. *(schade ×1.1)* |
-| ↓ + KIAI | **Twee niveaus** | Chudan-Jodan | Eerst de ribben, dan het hoofd. *(reeks: Chudan Mawashi Geri → Jodan Mawashi Geri)* |
-
-**Super: Tenchi** (天地): "Hemel en aarde": van laag naar hoog. Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Jodan Mawashi Geri → Kakato Otoshi.
-
-**Finisher: Hemelhiel**: Kakato otoshi in slow motion met stofwolk van de tatami.
-
-<sub>AI-profiel: lage trap 0.3 · romp 0.5 · hoofd 0.85 · draai 0.4 · agressie 0.5 · verdediging 0.6</sub>
-
-## Niesje
-
-*Snelheidsvechter · 6e kyu (geel) (voorlopig)*
+*Senpai · Snelheidsvechter · 1e dan (zwart) · vrouw*
 
 > “Te laat!”
 
 Altijd in beweging, nooit op dezelfde plek. Maakt tegenstanders gek met snelle stoten en zijstappen.
 
 ```
-Kracht    █████░░░░░  Snelheid ██████████
-Bereik    ██████░░░░  Conditie ███████░░░
-Benen     ██████░░░░
+Kracht    ██████░░░░  Snelheid ██████████
+Bereik    ███████░░░  Conditie ████████░░
+Benen     ███████░░░
 ```
 
 | Input | Signature | Techniek | Effect |
@@ -272,9 +258,35 @@ Benen     ██████░░░░
 
 <sub>AI-profiel: lage trap 0.4 · romp 0.7 · hoofd 0.35 · draai 0.2 · agressie 0.7 · verdediging 0.6</sub>
 
+## Senpai Micha
+
+*Senpai · Afstandsvechter · 1e dan (zwart) · vrouw*
+
+> “Jij bepaalt niet wanneer je binnenkomt. Ik wel.”
+
+Beheerst en scherp. Bepaalt de afstand met haar voortrap en straft elke stap naar binnen af.
+
+```
+Kracht    ███████░░░  Snelheid ████████░░
+Bereik    █████████░  Conditie ████████░░
+Benen     ████████░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Slagboom** | Mae Geri Kekomi | Een stoottrap die je terugzet op je startlijn. *(schade ×1.2; duwt ver weg)* |
+| → + KIAI | **Lange lijn** | Mae-Jodan | Voortrap, en als je dekking zakt: hoog. *(reeks: Chudan Mae Geri → Jodan Mawashi Geri)* |
+| ↓ + KIAI | **Draaiende hiel** | Ushiro Mawashi Geri | Als je toch binnenkomt. |
+
+**Super: Maai no Senpai** (間合い): Afstand is alles, en zij heeft hem. Reeks: Chudan Mae Geri → Chudan Mawashi Geri → Chudan Mae Geri → Jodan Mawashi Geri.
+
+**Finisher: Grens**: Jodan mawashi geri vanaf maximale afstand, in slow motion.
+
+<sub>AI-profiel: lage trap 0.45 · romp 0.6 · hoofd 0.6 · draai 0.3 · agressie 0.45 · verdediging 0.8</sub>
+
 ## Gwenn
 
-*Allrounder · 5e kyu (geel met streep) (voorlopig)*
+*Allrounder · 2e kyu (bruin) · vrouw*
 
 > “Osu! Dank je voor de wedstrijd.”
 
@@ -300,7 +312,7 @@ Benen     ███████░░░
 
 ## Yassin
 
-*Spinner · 3e kyu (groen met streep) (voorlopig)*
+*Spinner · 2e kyu (bruin) · man*
 
 > “Draai je om, dan zie je hem niet aankomen.”
 
@@ -324,35 +336,9 @@ Benen     ██████░░░░
 
 <sub>AI-profiel: lage trap 0.35 · romp 0.5 · hoofd 0.6 · draai 0.85 · agressie 0.6 · verdediging 0.45</sub>
 
-## Dave
-
-*Tank · 2e kyu (bruin) (voorlopig)*
-
-> “Gewoon blijven werken.”
-
-Ervaren en nuchter. Geen poespas: stoten, lage trap, klaar.
-
-```
-Kracht    █████████░  Snelheid █████░░░░░
-Bereik    ███████░░░  Conditie █████████░
-Benen     █████████░
-```
-
-| Input | Signature | Techniek | Effect |
-|---|---|---|---|
-| KIAI | **Voorhamer** | Seiken Gyaku-tsuki | Een stoot die je in je rug voelt. *(schade ×1.4)* |
-| → + KIAI | **Dijbreker** | Gedan Mawashi | Lage trap van een zwaargewicht. |
-| ↓ + KIAI | **Doorwalsen** | Renzoku | Loopt door alles heen. *(reeks: Migi Seiken Chudan Gyaku-tsuki → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri; loopt door een treffer heen)* |
-
-**Super: Tetsu** (鉄): "IJzer". Reeks: Migi Seiken Chudan Gyaku-tsuki → Migi Seiken Chudan Gyaku-tsuki → Shita-tsuki → Gedan Mawashi Geri.
-
-**Finisher: Werkdag**: Eén laatste lage trap. Dave knikt en loopt terug naar de startlijn.
-
-<sub>AI-profiel: lage trap 0.75 · romp 0.75 · hoofd 0.15 · draai 0.05 · agressie 0.75 · verdediging 0.55</sub>
-
 ## Seth
 
-*Afstandsvechter · 4e kyu (groen) (voorlopig)*
+*Afstandsvechter · 2e kyu (bruin) · man*
 
 > “Blijf daar maar staan.”
 
@@ -376,39 +362,143 @@ Benen     ███████░░░
 
 <sub>AI-profiel: lage trap 0.45 · romp 0.6 · hoofd 0.5 · draai 0.25 · agressie 0.4 · verdediging 0.7</sub>
 
-## James
+## Roshni
 
-*Technicus · 5e kyu (geel met streep) (voorlopig)*
+*Hoogtrapper · 4e kyu (groen) · vrouw*
 
-> “Deze heb ik gisteren geoefend.”
+> “Kijk omhoog.”
 
-Bestudeert video's van kampioenen en probeert alles uit. Elke week een nieuwe combinatie.
+Lenig, sierlijk en gevaarlijk. Wacht op het moment dat de dekking zakt.
 
 ```
 Kracht    ██████░░░░  Snelheid ████████░░
+Bereik    █████████░  Conditie ███████░░░
+Benen     ██████░░░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Komeet** | Jodan Mawashi Geri | Een hoge trap die vanuit een lage beweging opkomt. *(snelheid ×1.18; grote kans op knock-down)* |
+| → + KIAI | **Valbijl** | Kakato Otoshi | Hoog op, en dan naar beneden. *(schade ×1.1)* |
+| ↓ + KIAI | **Twee niveaus** | Chudan-Jodan | Eerst de ribben, dan het hoofd. *(reeks: Chudan Mawashi Geri → Jodan Mawashi Geri)* |
+
+**Super: Tenchi** (天地): "Hemel en aarde": van laag naar hoog. Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Jodan Mawashi Geri → Kakato Otoshi.
+
+**Finisher: Hemelhiel**: Kakato otoshi in slow motion met stofwolk van de tatami.
+
+<sub>AI-profiel: lage trap 0.3 · romp 0.5 · hoofd 0.85 · draai 0.4 · agressie 0.5 · verdediging 0.6</sub>
+
+## Skylar
+
+*Dochter van Sensei Wesley · Technicus · 6e kyu (geel) · vrouw*
+
+> “Ik ben niet de dochter van de sensei. Vandaag ben ik je tegenstander.”
+
+Opgegroeid op de mat. Kent elke techniek van haar vader en wil een eigen stijl laten zien. Snel, precies en ongeduldig met wie de etiquette vergeet.
+
+```
+Kracht    ██████░░░░  Snelheid █████████░
 Bereik    ███████░░░  Conditie ███████░░░
 Benen     ███████░░░
 ```
 
 | Input | Signature | Techniek | Effect |
 |---|---|---|---|
-| KIAI | **Huiswerk** | Renzoku | Stoot, opstoot, hoge trap. *(reeks: Hidari Seiken Chudan Tsuki → Shita-tsuki → Jodan Mawashi Geri)* |
-| → + KIAI | **Analyse** | Chudan Mawashi | Precies in de open plek. *(schade ×1.15)* |
-| ↓ + KIAI | **Nieuwe truc** | Kakato Otoshi | Nog niet perfect, wel gevaarlijk. |
+| KIAI | **Familietraditie** | Renzoku Geri | Laag-midden met hetzelfde been, zonder het neer te zetten. *(reeks: Gedan Mawashi Geri → Chudan Mawashi Geri; schade ×1.1)* |
+| → + KIAI | **Bliksemknie** | Hiza Geri | Een knie die er al is voor je hem ziet. *(schade ×1.15; snelheid ×1.33)* |
+| ↓ + KIAI | **Eigen weg** | Ushiro Mawashi Geri | De draaitrap die niet uit het lesboek van haar vader komt. *(snelheid ×1.18)* |
 
-**Super: Kenkyu** (研究): "Onderzoek": de combinatie uit de video. Reeks: Hidari Seiken Chudan Tsuki → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Chudan Mawashi Geri → Jodan Mawashi Geri.
+**Super: Oya Ko Kumite** (親子組手): Een reeks die duizend keer in de dojo geoefend is. Reeks: Hidari Seiken Chudan Tsuki → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Ushiro Mawashi Geri.
 
-**Finisher: Replay**: De finisher wordt meteen nog eens afgespeeld vanuit een andere hoek.
+**Finisher: Erfgoed**: Draaiende hieltrap; de camera toont even Sensei Wesley die knikt.
 
-<sub>AI-profiel: lage trap 0.5 · romp 0.6 · hoofd 0.5 · draai 0.35 · agressie 0.55 · verdediging 0.6</sub>
+<sub>AI-profiel: lage trap 0.5 · romp 0.6 · hoofd 0.55 · draai 0.35 · agressie 0.6 · verdediging 0.65</sub>
 
-## Raf
+## Djordy
 
-*Infighter · 6e kyu (geel) (voorlopig)*
+*Hoogtrapper · 7e kyu (blauw met streep) · man*
 
-> “Kom maar dichterbij.”
+> “Kijk niet naar mijn handen. Kijk omhoog.”
 
-Explosief. Wil dichtbij staan en meteen beginnen.
+Lenig en explosief. Zoekt altijd de opening voor een trap naar het hoofd en durft de rol kick te gooien als niemand het verwacht.
+
+```
+Kracht    ███████░░░  Snelheid ████████░░
+Bereik    █████████░  Conditie ███████░░░
+Benen     ██████░░░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Hemelhoog** | Jodan Mawashi Geri | Een ronde trap naar het hoofd, sneller dan je verwacht. *(snelheid ×1.18; grote kans op knock-down)* |
+| → + KIAI | **Rol Kick** | Kaiten Kakato Geri | Rollend naar voren, de hiel valt op hoofd of schouder. *(schade ×1.1; snelheid ×1.11)* |
+| ↓ + KIAI | **Draaiende hiel** | Ushiro Mawashi Geri | Wegdraaien en de hiel rond naar het hoofd. *(snelheid ×1.18)* |
+
+**Super: Tenkū** (天空): "Hemel": vier trappen die steeds hoger komen. Reeks: Chudan Mawashi Geri → Jodan Mawashi Geri → Ushiro Mawashi Geri → Kakato Otoshi.
+
+**Finisher: Uit de lucht**: Een rol kick in slow motion; de camera kijkt van onderaf mee.
+
+<sub>AI-profiel: lage trap 0.2 · romp 0.4 · hoofd 0.95 · draai 0.6 · agressie 0.6 · verdediging 0.55</sub>
+
+## Jayh
+
+*Spinner · 7e kyu (blauw met streep) · man*
+
+> “Deze staat in geen enkel boek.”
+
+Creatief en eigenwijs. Bedenkt eigen combinaties.
+
+```
+Kracht    ██████░░░░  Snelheid ████████░░
+Bereik    ███████░░░  Conditie ███████░░░
+Benen     ██████░░░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Freestyle** | Ushiro Renzoku | Ronde trap, draaitrap. *(reeks: Chudan Mawashi Geri → Ushiro Geri)* |
+| → + KIAI | **Draaiing** | Ushiro Mawashi | Draaiende hiel. |
+| ↓ + KIAI | **Valbijl** | Kakato Otoshi | Van boven. |
+
+**Super: Jiyu** (自由): "Vrijheid". Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Ushiro Geri → Kakato Otoshi.
+
+**Finisher: Eigen stijl**: Draaiende camera, eigen kiai.
+
+<sub>AI-profiel: lage trap 0.4 · romp 0.5 · hoofd 0.55 · draai 0.75 · agressie 0.6 · verdediging 0.45</sub>
+
+## Laura
+
+*Counter-vechter · 8e kyu (blauw) · vrouw*
+
+> “Rustig. Ik heb tijd.”
+
+Ervaren en kalm. Laat de ander het werk doen en pakt de punten.
+
+```
+Kracht    ██████░░░░  Snelheid ███████░░░
+Bereik    ████████░░  Conditie ████████░░
+Benen     ████████░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Uitnodiging** | Sune Uke Gaeshi | Scheenblok en terug. *(counter (blokt en antwoordt); schade ×1.3)* |
+| → + KIAI | **Strafschop** | Ushiro Geri | Counter met de hiel. *(schade ×1.15)* |
+| ↓ + KIAI | **Afstand** | Mae Geri | Op afstand houden. *(duwt ver weg)* |
+
+**Super: Heijoshin** (平常心): "Kalme geest". Reeks: Chudan Mae Geri → Migi Seiken Chudan Gyaku-tsuki → Chudan Mawashi Geri → Ushiro Geri.
+
+**Finisher: Rust**: Laura keert terug naar de startlijn voordat de scheidsrechter "Ippon" roept.
+
+<sub>AI-profiel: lage trap 0.5 · romp 0.55 · hoofd 0.45 · draai 0.35 · agressie 0.35 · verdediging 0.85</sub>
+
+## Azad
+
+*Infighter · 8e kyu (blauw) · man*
+
+> “Dichtbij is mijn plek.”
+
+Fel en gedreven. Stapt naar binnen en blijft stoten tot de bel.
 
 ```
 Kracht    ███████░░░  Snelheid ███████░░░
@@ -418,19 +508,19 @@ Benen     ███████░░░
 
 | Input | Signature | Techniek | Effect |
 |---|---|---|---|
-| KIAI | **Ribbenkast** | Renzoku Tsuki | Twee keer op dezelfde rib. *(reeks: Migi Seiken Chudan Gyaku-tsuki → Shita-tsuki)* |
-| → + KIAI | **Elleboog** | Hiji-ate | Kort en hard. *(schade ×1.2)* |
-| ↓ + KIAI | **Knie omhoog** | Hiza Geri | Knie in de maag. |
+| KIAI | **Drukte** | Renzoku Tsuki | Drie stoten op de romp. *(reeks: Hidari Seiken Chudan Tsuki → Migi Seiken Chudan Gyaku-tsuki → Shita-tsuki)* |
+| → + KIAI | **Knie** | Hiza Geri | Knie als de tegenstander inzakt. *(schade ×1.1)* |
+| ↓ + KIAI | **Ribben** | Shita-tsuki | Onder de ribben. |
 
-**Super: Tsukkomi** (突っ込み): Erop en erover. Reeks: Migi Seiken Chudan Gyaku-tsuki → Migi Seiken Chudan Gyaku-tsuki → Mae Hiji-ate → Hiza Geri.
+**Super: Zenshin** (前進): "Vooruit": geen stap terug. Reeks: Migi Seiken Chudan Gyaku-tsuki → Migi Seiken Chudan Gyaku-tsuki → Shita-tsuki → Hiza Geri.
 
-**Finisher: Kortsluiting**: Slow motion op de laatste knie.
+**Finisher: Vooruit**: Een laatste knie in slow motion.
 
-<sub>AI-profiel: lage trap 0.45 · romp 0.85 · hoofd 0.2 · draai 0.1 · agressie 0.85 · verdediging 0.45</sub>
+<sub>AI-profiel: lage trap 0.45 · romp 0.85 · hoofd 0.2 · draai 0.1 · agressie 0.8 · verdediging 0.5</sub>
 
 ## Eli
 
-*Counter-vechter · 7e kyu (blauw met streep) (voorlopig)*
+*Counter-vechter · 9e kyu (rood) · man*
 
 > “...Nu.”
 
@@ -456,7 +546,7 @@ Benen     ███████░░░
 
 ## Rayaan
 
-*Hoogtrapper · 6e kyu (geel) (voorlopig)*
+*Hoogtrapper · 9e kyu (rood) · man*
 
 > “Deze gaat hoog!”
 
@@ -482,7 +572,7 @@ Benen     ██████░░░░
 
 ## Livia
 
-*Technicus · 5e kyu (geel met streep) (voorlopig)*
+*Technicus · 9e kyu (rood) · vrouw*
 
 > “Techniek wint van kracht.”
 
@@ -508,7 +598,7 @@ Benen     ███████░░░
 
 ## Senna
 
-*Snelheidsvechter · 7e kyu (blauw met streep) (voorlopig)*
+*Snelheidsvechter · 9e kyu (rood) · vrouw*
 
 > “Eerste!”
 
@@ -534,7 +624,7 @@ Benen     ██████░░░░
 
 ## Sophia
 
-*Afstandsvechter · 6e kyu (geel) (voorlopig)*
+*Afstandsvechter · 9e kyu (rood) · vrouw*
 
 > “Ik zag je al aankomen.”
 
@@ -560,7 +650,7 @@ Benen     ███████░░░
 
 ## Jailey
 
-*Allrounder · 8e kyu (blauw) (voorlopig)*
+*Allrounder · 9e kyu (rood) · vrouw*
 
 > “Nog een keer!”
 
@@ -584,35 +674,9 @@ Benen     ███████░░░
 
 <sub>AI-profiel: lage trap 0.5 · romp 0.6 · hoofd 0.35 · draai 0.2 · agressie 0.65 · verdediging 0.55</sub>
 
-## Maylea
-
-*Hoogtrapper · 8e kyu (blauw) (voorlopig)*
-
-> “Osu.”
-
-Rustig en verrassend: niemand verwacht die hoge trap.
-
-```
-Kracht    █████░░░░░  Snelheid ████████░░
-Bereik    ████████░░  Conditie ███████░░░
-Benen     ██████░░░░
-```
-
-| Input | Signature | Techniek | Effect |
-|---|---|---|---|
-| KIAI | **Stille storm** | Jodan Mawashi | Hoog, zonder aankondiging. *(snelheid ×1.14)* |
-| → + KIAI | **Valbijl** | Kakato Otoshi | Van boven. |
-| ↓ + KIAI | **Opbouw** | Chudan-Jodan | Midden, hoog. *(reeks: Chudan Mawashi Geri → Jodan Mawashi Geri)* |
-
-**Super: Shizuka** (静か): "Stil". Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Kakato Otoshi.
-
-**Finisher: Stilte voor de storm**: Slow motion kakato otoshi.
-
-<sub>AI-profiel: lage trap 0.3 · romp 0.5 · hoofd 0.75 · draai 0.35 · agressie 0.45 · verdediging 0.6</sub>
-
 ## Yi-En
 
-*Technicus · 5e kyu (geel met streep) (voorlopig)*
+*Technicus · 9e kyu (rood) · man*
 
 > “Eén techniek is genoeg.”
 
@@ -638,7 +702,7 @@ Benen     ███████░░░
 
 ## Ace
 
-*Spinner · 6e kyu (geel) (voorlopig)*
+*Spinner · 9e kyu (rood) · man*
 
 > “Troefkaart.”
 
@@ -664,7 +728,7 @@ Benen     ██████░░░░
 
 ## Riley
 
-*Lowkick-specialist · 7e kyu (blauw met streep) (voorlopig)*
+*Lowkick-specialist · 9e kyu (rood) · vrouw*
 
 > “Ik sta nog.”
 
@@ -690,7 +754,7 @@ Benen     █████████░
 
 ## Azim
 
-*Infighter · 4e kyu (groen) (voorlopig)*
+*Infighter · 9e kyu (rood) · man*
 
 > “Adem maar uit.”
 
@@ -716,7 +780,7 @@ Benen     ████████░░
 
 ## Amir
 
-*Allrounder · 5e kyu (geel met streep) (voorlopig)*
+*Allrounder · 9e kyu (rood) · man*
 
 > “Laat zien wat je hebt.”
 
@@ -742,7 +806,7 @@ Benen     ███████░░░
 
 ## Nino
 
-*Snelheidsvechter · 8e kyu (blauw) (voorlopig)*
+*Snelheidsvechter · 9e kyu (rood) · man*
 
 > “Hier! Nee, hier!”
 
@@ -766,90 +830,254 @@ Benen     ██████░░░░
 
 <sub>AI-profiel: lage trap 0.45 · romp 0.7 · hoofd 0.3 · draai 0.3 · agressie 0.75 · verdediging 0.55</sub>
 
-## Laura
+## Mano
 
-*Counter-vechter · 4e kyu (groen) (voorlopig)*
+*Tank · 9e kyu (rood) · man*
 
-> “Rustig. Ik heb tijd.”
+> “Nog een keer? Prima.”
 
-Ervaren en kalm. Laat de ander het werk doen en pakt de punten.
+Stevig en onverstoorbaar. Loopt gewoon door, wat er ook komt.
 
 ```
-Kracht    ██████░░░░  Snelheid ███████░░░
-Bereik    ████████░░  Conditie ████████░░
+Kracht    ███████░░░  Snelheid █████░░░░░
+Bereik    ██████░░░░  Conditie █████████░
 Benen     ████████░░
 ```
 
 | Input | Signature | Techniek | Effect |
 |---|---|---|---|
-| KIAI | **Uitnodiging** | Sune Uke Gaeshi | Scheenblok en terug. *(counter (blokt en antwoordt); schade ×1.3)* |
-| → + KIAI | **Strafschop** | Ushiro Geri | Counter met de hiel. *(schade ×1.15)* |
-| ↓ + KIAI | **Afstand** | Mae Geri | Op afstand houden. *(duwt ver weg)* |
+| KIAI | **Muurtje** | Ibuki | Ademt uit en loopt door een treffer heen. *(loopt door een treffer heen)* |
+| → + KIAI | **Duw** | Mae Geri | Duwt de tegenstander weg. *(duwt ver weg)* |
+| ↓ + KIAI | **Mokerknie** | Hiza Geri | Met het volle gewicht. *(schade ×1.2)* |
 
-**Super: Heijoshin** (平常心): "Kalme geest". Reeks: Chudan Mae Geri → Migi Seiken Chudan Gyaku-tsuki → Chudan Mawashi Geri → Ushiro Geri.
+**Super: Iwa** (岩): "Rots". Reeks: Migi Seiken Chudan Gyaku-tsuki → Hiza Geri → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri.
 
-**Finisher: Rust**: Laura keert terug naar de startlijn voordat de scheidsrechter "Ippon" roept.
+**Finisher: Rots**: Mano staat stil terwijl de tegenstander valt.
 
-<sub>AI-profiel: lage trap 0.5 · romp 0.55 · hoofd 0.45 · draai 0.35 · agressie 0.35 · verdediging 0.85</sub>
+<sub>AI-profiel: lage trap 0.55 · romp 0.75 · hoofd 0.15 · draai 0.05 · agressie 0.7 · verdediging 0.5</sub>
 
-## Jayh
+## Naotaka
 
-*Spinner · 6e kyu (geel) (voorlopig)*
+*Counter-vechter · 9e kyu (rood) · man*
 
-> “Deze staat in geen enkel boek.”
+> “Kom maar. Ik wacht.”
 
-Creatief en eigenwijs. Bedenkt eigen combinaties.
+Geduldig en oplettend. Laat de ander beginnen en antwoordt precies op het juiste moment.
 
 ```
 Kracht    ██████░░░░  Snelheid ████████░░
 Bereik    ███████░░░  Conditie ███████░░░
+Benen     ███████░░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Antwoord** | Gyaku-tsuki Kaeshi | Blok en meteen terug. *(counter (blokt en antwoordt); schade ×1.25)* |
+| → + KIAI | **Draaideur** | Ushiro Geri | Achterwaartse trap als counter. |
+| ↓ + KIAI | **Hoge hiel** | Ushiro Mawashi Geri | Draaiende hiel naar het hoofd. |
+
+**Super: Kaeshi Waza** (返し技): Elke aanval krijgt een antwoord. Reeks: Migi Seiken Chudan Gyaku-tsuki → Chudan Mawashi Geri → Ushiro Mawashi Geri.
+
+**Finisher: Juiste moment**: Het beeld bevriest op het moment van de counter.
+
+<sub>AI-profiel: lage trap 0.45 · romp 0.55 · hoofd 0.45 · draai 0.4 · agressie 0.3 · verdediging 0.85</sub>
+
+## Niven
+
+*Lowkick-specialist · 9e kyu (rood) · man*
+
+> “Nog een op hetzelfde been.”
+
+Koppig en taai. Heeft de lage trap ontdekt en laat hem niet meer los.
+
+```
+Kracht    ██████░░░░  Snelheid ███████░░░
+Bereik    ███████░░░  Conditie ████████░░
+Benen     ████████░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Zelfde been** | Gedan Mawashi Geri | Steeds op dezelfde plek. |
+| → + KIAI | **Combinatie** | Gyaku-Gedan | Stoot, dan laag. *(reeks: Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri)* |
+| ↓ + KIAI | **Verrassing** | Jodan Mawashi | Laag laten kijken, hoog trappen. |
+
+**Super: Shinbō** (辛抱): "Volharding". Reeks: Gedan Mawashi Geri → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Gedan Mawashi Geri.
+
+**Finisher: Volharding**: De laatste lage trap in slow motion.
+
+<sub>AI-profiel: lage trap 0.85 · romp 0.5 · hoofd 0.2 · draai 0.15 · agressie 0.6 · verdediging 0.55</sub>
+
+## James
+
+*Technicus · 10e kyu (wit) · man*
+
+> “Deze heb ik gisteren geoefend.”
+
+Bestudeert video's van kampioenen en probeert alles uit. Elke week een nieuwe combinatie.
+
+```
+Kracht    ██████░░░░  Snelheid ████████░░
+Bereik    ███████░░░  Conditie ███████░░░
+Benen     ███████░░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Huiswerk** | Renzoku | Stoot, opstoot, hoge trap. *(reeks: Hidari Seiken Chudan Tsuki → Shita-tsuki → Jodan Mawashi Geri)* |
+| → + KIAI | **Analyse** | Chudan Mawashi | Precies in de open plek. *(schade ×1.15)* |
+| ↓ + KIAI | **Nieuwe truc** | Kakato Otoshi | Nog niet perfect, wel gevaarlijk. |
+
+**Super: Kenkyu** (研究): "Onderzoek": de combinatie uit de video. Reeks: Hidari Seiken Chudan Tsuki → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Chudan Mawashi Geri → Jodan Mawashi Geri.
+
+**Finisher: Replay**: De finisher wordt meteen nog eens afgespeeld vanuit een andere hoek.
+
+<sub>AI-profiel: lage trap 0.5 · romp 0.6 · hoofd 0.5 · draai 0.35 · agressie 0.55 · verdediging 0.6</sub>
+
+## Raf
+
+*Infighter · 10e kyu (wit) · man*
+
+> “Kom maar dichterbij.”
+
+Explosief. Wil dichtbij staan en meteen beginnen.
+
+```
+Kracht    ███████░░░  Snelheid ███████░░░
+Bereik    ██████░░░░  Conditie ████████░░
+Benen     ███████░░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Ribbenkast** | Renzoku Tsuki | Twee keer op dezelfde rib. *(reeks: Migi Seiken Chudan Gyaku-tsuki → Shita-tsuki)* |
+| → + KIAI | **Elleboog** | Hiji-ate | Kort en hard. *(schade ×1.2)* |
+| ↓ + KIAI | **Knie omhoog** | Hiza Geri | Knie in de maag. |
+
+**Super: Tsukkomi** (突っ込み): Erop en erover. Reeks: Migi Seiken Chudan Gyaku-tsuki → Migi Seiken Chudan Gyaku-tsuki → Mae Hiji-ate → Hiza Geri.
+
+**Finisher: Kortsluiting**: Slow motion op de laatste knie.
+
+<sub>AI-profiel: lage trap 0.45 · romp 0.85 · hoofd 0.2 · draai 0.1 · agressie 0.85 · verdediging 0.45</sub>
+
+## Maylea
+
+*Hoogtrapper · 10e kyu (wit) · vrouw*
+
+> “Osu.”
+
+Rustig en verrassend: niemand verwacht die hoge trap.
+
+```
+Kracht    █████░░░░░  Snelheid ████████░░
+Bereik    ████████░░  Conditie ███████░░░
 Benen     ██████░░░░
 ```
 
 | Input | Signature | Techniek | Effect |
 |---|---|---|---|
-| KIAI | **Freestyle** | Ushiro Renzoku | Ronde trap, draaitrap. *(reeks: Chudan Mawashi Geri → Ushiro Geri)* |
-| → + KIAI | **Draaiing** | Ushiro Mawashi | Draaiende hiel. |
-| ↓ + KIAI | **Valbijl** | Kakato Otoshi | Van boven. |
+| KIAI | **Stille storm** | Jodan Mawashi | Hoog, zonder aankondiging. *(snelheid ×1.14)* |
+| → + KIAI | **Valbijl** | Kakato Otoshi | Van boven. |
+| ↓ + KIAI | **Opbouw** | Chudan-Jodan | Midden, hoog. *(reeks: Chudan Mawashi Geri → Jodan Mawashi Geri)* |
 
-**Super: Jiyu** (自由): "Vrijheid". Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Ushiro Geri → Kakato Otoshi.
+**Super: Shizuka** (静か): "Stil". Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Kakato Otoshi.
 
-**Finisher: Eigen stijl**: Draaiende camera, eigen kiai.
+**Finisher: Stilte voor de storm**: Slow motion kakato otoshi.
 
-<sub>AI-profiel: lage trap 0.4 · romp 0.5 · hoofd 0.55 · draai 0.75 · agressie 0.6 · verdediging 0.45</sub>
+<sub>AI-profiel: lage trap 0.3 · romp 0.5 · hoofd 0.75 · draai 0.35 · agressie 0.45 · verdediging 0.6</sub>
+
+## Leo
+
+*Allrounder · 10e kyu (wit) · man*
+
+> “Osu! Mag ik ook?”
+
+Net begonnen en vol enthousiasme. Probeert alles wat de sensei laat zien.
+
+```
+Kracht    █████░░░░░  Snelheid ███████░░░
+Bereik    ██████░░░░  Conditie ███████░░░
+Benen     ██████░░░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Eerste les** | Gyaku-tsuki Gedan | Stoot en lage trap, net als in de les. *(reeks: Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri)* |
+| → + KIAI | **Voortrap** | Mae Geri | Afstand houden. |
+| ↓ + KIAI | **Ronde trap** | Chudan Mawashi | Op de ribben. |
+
+**Super: Hajimari** (始まり): "Het begin". Reeks: Hidari Seiken Chudan Tsuki → Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Chudan Mawashi Geri.
+
+**Finisher: Eerste ippon**: Leo kijkt verbaasd naar de scheidsrechter, en dan gaat de arm omhoog.
+
+<sub>AI-profiel: lage trap 0.5 · romp 0.6 · hoofd 0.35 · draai 0.2 · agressie 0.6 · verdediging 0.45</sub>
+
+## Nina
+
+*Snelheidsvechter · 10e kyu (wit) · vrouw*
+
+> “Te traag!”
+
+Klein, snel en dapper. Is al weg voordat de tegenstander kan terugslaan.
+
+```
+Kracht    ████░░░░░░  Snelheid █████████░
+Bereik    ██████░░░░  Conditie ███████░░░
+Benen     ██████░░░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Prik prik** | Renzoku Tsuki | Drie snelle stoten. *(reeks: Hidari Seiken Chudan Tsuki → Hidari Seiken Chudan Tsuki → Migi Seiken Chudan Gyaku-tsuki; snelheid ×1.25)* |
+| → + KIAI | **Pijl** | Mae Geri | Snelle voortrap. *(snelheid ×1.25)* |
+| ↓ + KIAI | **Wegwezen** | Gedan Mawashi | Lage trap en weg. *(snelheid ×1.18)* |
+
+**Super: Kogarashi** (木枯らし): "Herfstwind". Reeks: Hidari Seiken Chudan Tsuki → Migi Seiken Chudan Gyaku-tsuki → Hidari Seiken Chudan Tsuki → Chudan Mawashi Geri.
+
+**Finisher: Wervelwind**: Snelle flitsen over het scherm, en dan Ippon.
+
+<sub>AI-profiel: lage trap 0.45 · romp 0.7 · hoofd 0.3 · draai 0.25 · agressie 0.7 · verdediging 0.55</sub>
 
 ## Checklist voor de dojo
 
 Per vechter afstemmen en in `roster.js` op `bevestigd: true` zetten:
 
-| Vechter | Graad | Stijl & moves | Uiterlijk (lengte, bouw, huid, haar) | Toestemming naam (bij kind: ouder) |
-|---|---|---|---|---|
-| Sensei Wesley | ✅ | ☐ | ☐ | ☐ |
-| Skylar | ☐ | ☐ | ☐ | ☐ |
-| Sensei Conchita | ☐ | ☐ | ☐ | ☐ |
-| Senpai Anjay | ☐ | ☐ | ☐ | ☐ |
-| Djordy | ☐ | ☐ | ☐ | ☐ |
-| Daan | ☐ | ☐ | ☐ | ☐ |
-| Roshni | ☐ | ☐ | ☐ | ☐ |
-| Niesje | ☐ | ☐ | ☐ | ☐ |
-| Gwenn | ☐ | ☐ | ☐ | ☐ |
-| Yassin | ☐ | ☐ | ☐ | ☐ |
-| Dave | ☐ | ☐ | ☐ | ☐ |
-| Seth | ☐ | ☐ | ☐ | ☐ |
-| James | ☐ | ☐ | ☐ | ☐ |
-| Raf | ☐ | ☐ | ☐ | ☐ |
-| Eli | ☐ | ☐ | ☐ | ☐ |
-| Rayaan | ☐ | ☐ | ☐ | ☐ |
-| Livia | ☐ | ☐ | ☐ | ☐ |
-| Senna | ☐ | ☐ | ☐ | ☐ |
-| Sophia | ☐ | ☐ | ☐ | ☐ |
-| Jailey | ☐ | ☐ | ☐ | ☐ |
-| Maylea | ☐ | ☐ | ☐ | ☐ |
-| Yi-En | ☐ | ☐ | ☐ | ☐ |
-| Ace | ☐ | ☐ | ☐ | ☐ |
-| Riley | ☐ | ☐ | ☐ | ☐ |
-| Azim | ☐ | ☐ | ☐ | ☐ |
-| Amir | ☐ | ☐ | ☐ | ☐ |
-| Nino | ☐ | ☐ | ☐ | ☐ |
-| Laura | ☐ | ☐ | ☐ | ☐ |
-| Jayh | ☐ | ☐ | ☐ | ☐ |
+| Vechter | Graad | Geslacht | Stijl & moves | Uiterlijk (huid, haar, kapsel) | Toestemming naam (bij kind: ouder) |
+|---|---|---|---|---|---|
+| Sensei Wesley | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Sensei Conchita | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Senpai Anjay | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Senpai Dave | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Senpai Ferry | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Senpai Daan | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Senpai Niesje | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Senpai Micha | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Gwenn | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Yassin | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Seth | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Roshni | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Skylar | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Djordy | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Jayh | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Laura | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Azad | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Eli | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Rayaan | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Livia | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Senna | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Sophia | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Jailey | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Yi-En | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Ace | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Riley | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Azim | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Amir | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Nino | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Mano | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Naotaka | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Niven | ✅ | ✅ | ☐ | ☐ | ☐ |
+| James | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Raf | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Maylea | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Leo | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Nina | ✅ | ✅ | ☐ | ☐ | ☐ |

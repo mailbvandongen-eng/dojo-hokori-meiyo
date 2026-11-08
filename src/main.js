@@ -1,6 +1,6 @@
 // Dojo Hokori Meiyo Fight Game: schermen, spelmodi, camera en hoofdlus.
 import * as THREE from '../lib/three.module.js';
-import { ROSTER, byId, beltOf } from './data/roster.js';
+import { ROSTER, byId, beltOf, graadNiveau } from './data/roster.js';
 import { MOVES, INPUT_MAP } from './data/moves.js';
 import { CALLS, COUNT_ROMAJI, TIPS } from './data/terms.js';
 import { profile, save as saveProfile, rankInfo, addResult, addBonus, COSTUMES, costumeUnlocked } from './data/profile.js';
@@ -292,11 +292,13 @@ let selCb = null, selId = null, vsP2 = 'cpu';
 function openSelect({ title, onPick, p2 = false }) {
   clearFight(); show('select'); $('#selTitle').textContent = title; selCb = onPick;
   const grid = $('#grid'); grid.innerHTML = '';
-  for (const f of ROSTER) {
+  // op graad gesorteerd: sensei, senpai, dan de kyu-graden (zoals de rij bij het groeten in de dojo)
+  const order = ROSTER.slice().sort((a, b) => graadNiveau(b.graad) - graadNiveau(a.graad));
+  for (const f of order) {
     const locked = f.eindbaas && !profile.unlocked.wesley;
     const belt = beltOf(f.graad);
     const c = document.createElement('div'); c.className = 'card' + (locked ? ' locked' : ''); c.dataset.id = f.id;
-    c.innerHTML = `${f.eindbaas ? '<span class="boss">EINDBAAS</span>' : ''}<b>${f.naam}</b><small>${f.stijl}</small><span class="belt" style="background:${belt.kleur}"></span>`;
+    c.innerHTML = `${f.eindbaas ? '<span class="boss">EINDBAAS</span>' : ''}<b>${f.naam}</b><small>${f.stijl}<br>${belt.kort} · ${f.geslacht === 'v' ? '♀' : '♂'}</small><span class="belt" style="background:${belt.kleur};${belt.streep ? `box-shadow:inset ${f.graad.dan ? -6 * belt.strepen : -12}px 0 0 ${belt.streep}` : ''}"></span>`;
     c.addEventListener('click', () => { sfx.block(); pickCard(f.id); });
     c.addEventListener('dblclick', () => confirmPick());
     grid.appendChild(c);
@@ -311,7 +313,7 @@ function pickCard(id) {
   const belt = beltOf(f.graad), st = f.stats;
   const bars = Object.entries({ Kracht: st.kracht, Snelheid: st.snelheid, Bereik: st.bereik, Conditie: st.conditie, Benen: st.benen }).map(([k, v]) => `<div class="stat">${k}<div class="bar"><i style="width:${v * 10}%"></i></div></div>`).join('');
   const dirs = ['', '→ + ', '↓ + '];
-  $('#detail').innerHTML = `<div class="sub">${f.titel || f.rol} · ${belt.naam}${f.bevestigd?.graad ? '' : ' (voorlopig)'}</div><h3>${f.naam}</h3>
+  $('#detail').innerHTML = `<div class="sub">${f.titel ? f.titel + ' · ' : ''}${belt.naam} · ${f.geslacht === 'v' ? 'vrouw' : 'man'}</div><h3>${f.naam}</h3>
     <div class="sub" style="color:#fff9">${f.stijl}</div><div class="quote">“${f.quote}”</div><div>${f.persoonlijkheid}</div><div style="margin:8px 0">${bars}</div>
     ${f.signatures.map((s, i) => `<div class="tech"><b>${s.naam}</b><em>${dirs[i]}KIAI</em><span>${s.jp}: ${s.uitleg}</span></div>`).join('')}
     <div class="tech" style="box-shadow:inset 0 0 0 1px #d9a44166"><b>${f.super.naam}</b> <span class="jp" style="display:inline;color:var(--gold)">${f.super.jp}</span><em>KIAI (vol)</em><span>${f.super.uitleg}</span></div>
@@ -373,11 +375,15 @@ function bump(level, n) { const ks = Object.keys(DIFFICULTY); return ks[Math.max
 
 // ── Story: klim door de dojo naar Sensei Wesley ──
 function startStory(playerId) {
-  const others = ROSTER.filter(f => f.id !== playerId && !f.eindbaas && f.id !== 'skylar');
-  const rankVal = f => f.graad?.dan ? 10 + f.graad.dan : 11 - (f.graad?.kyu || 11);
-  const picks = others.sort(() => Math.random() - 0.5).slice(0, 6).sort((a, b) => rankVal(a) - rankVal(b));
-  const ladder = [...picks.map(f => f.id), ...(playerId !== 'skylar' ? ['skylar'] : [others.find(f => f.id === 'conchita') ? 'conchita' : others[0].id]), playerId === 'wesley' ? 'conchita' : 'wesley'];
-  story = { player: playerId, ladder, i: 0 };
+  // Ladder: vier kyu-graden en Skylar (op graad), dan twee senpai, Sensei Conchita en als laatste Sensei Wesley.
+  const shuffle = arr => arr.sort(() => Math.random() - 0.5);
+  const kyu = shuffle(ROSTER.filter(f => f.graad.kyu && f.id !== playerId && f.id !== 'skylar')).slice(0, 4);
+  if (playerId !== 'skylar') kyu.push(byId.skylar);
+  kyu.sort((a, b) => graadNiveau(a.graad) - graadNiveau(b.graad));
+  const senpai = shuffle(ROSTER.filter(f => f.titel === 'Senpai' && f.id !== playerId)).slice(0, 2).sort((a, b) => graadNiveau(a.graad) - graadNiveau(b.graad));
+  const top = ['conchita', 'wesley'].filter(id => id !== playerId);
+  if (top.length < 2) top.unshift(ROSTER.find(f => f.titel === 'Senpai' && f.id !== playerId && !senpai.includes(f)).id);
+  story = { player: playerId, ladder: [...kyu.map(f => f.id), ...senpai.map(f => f.id), ...top], i: 0 };
   openStory();
 }
 const STORY_LINES = [
@@ -394,11 +400,16 @@ function openStory() {
   $('#ladder').innerHTML = s.ladder.map((id, i) => `<span class="${i < s.i ? 'done' : i === s.i ? 'now' : ''}">${byId[id].naam}</span>`).join('');
   $('#stA').textContent = me.naam; $('#stB').textContent = opp.naam;
   const last = s.i === s.ladder.length - 1;
-  $('#stLine').innerHTML = (last ? 'De eindbaas wacht op de mat. Iedereen in de dojo is stil.<br>' : opp.id === 'skylar' ? 'De dochter van de sensei staat tegenover je. Dit is persoonlijk.<br>' : STORY_LINES[s.i % STORY_LINES.length] + '<br>') + `<b>${opp.naam}:</b> “${opp.quote}”`;
+  const line = last ? 'De eindbaas wacht op de mat. Iedereen in de dojo is stil.'
+    : opp.id === 'skylar' ? 'De dochter van de sensei staat tegenover je. Dit is persoonlijk.'
+    : opp.id === 'conchita' ? 'Sensei Conchita, 4e dan. Wie hier wint, mag tegen Sensei Wesley.'
+    : opp.titel === 'Senpai' ? `${opp.naam}, ${beltOf(opp.graad).kort}. Nu wordt het echt zwaar.`
+    : STORY_LINES[s.i % STORY_LINES.length];
+  $('#stLine').innerHTML = `${line}<br><b>${opp.naam}</b> <span style="opacity:.7">(${beltOf(opp.graad).naam})</span>: “${opp.quote}”`;
 }
 $('#storyGo').addEventListener('click', () => {
-  const s = story, opp = s.ladder[s.i], last = s.i >= s.ladder.length - 2;
-  const diff = s.i < 2 ? bump(cfg.diff, -1) : last ? bump(cfg.diff, 1) : cfg.diff;
+  const s = story, opp = s.ladder[s.i], last = s.i >= s.ladder.length - 3;
+  const diff = s.i < 3 ? bump(cfg.diff, -1) : last ? bump(cfg.diff, 1) : cfg.diff;
   loadingThen(() => startFight({ mode: 'story', akaId: s.player, shiroId: opp, akaCtrl: 'solo', shiroCtrl: 'ai', diff, akaCostume: playerCostume(), shiroCostume: byId[opp].eindbaas ? { dogi: 'wit' } : {} }));
 });
 $('#storyQuit').addEventListener('click', openMenu);
@@ -410,7 +421,7 @@ function startTraining(id) {
   const partner = id === 'conchita' ? 'anjay' : 'conchita';
   startFight({ mode: 'training', training: true, akaId: id, shiroId: partner, akaCtrl: 'solo', shiroCtrl: 'dummy', akaCostume: playerCostume() });
   $('#trainBar').classList.add('on'); $('#trainInfo').classList.add('on');
-  $('#trainInfo').innerHTML = `<b>Sensei Conchita:</b> Osu! Probeer de technieken uit. Lage trap: <b>↓ + GERI</b>. Blokken: houd <b>UKE</b> vast, met ↓ voor sune uke.`;
+  $('#trainInfo').innerHTML = `<b>Sensei Conchita:</b> Osu! Probeer de technieken uit. Lage trap: <b>↓ + GERI</b>. Ushiro mawashi geri: <b>↖ + GERI</b>. Rol kick: <b>↙ + GERI</b>. Blokken: houd <b>UKE</b> vast, met ↓ voor sune uke.`;
   dummyMode = 0; $('#trDummy').textContent = DUMMY[0][1];
 }
 function dummyInput() {
@@ -427,7 +438,7 @@ $('#trReset').addEventListener('click', () => { if (!G) return; for (const f of 
 $('#trQuit').addEventListener('click', openMenu);
 
 // ── Technieken-overzicht ──
-const DIRSYM = { n: '', f: '→ + ', b: '← + ', d: '↓ + ', u: '↑ + ' };
+const DIRSYM = { n: '', f: '→ + ', b: '← + ', d: '↓ + ', u: '↑ + ', ub: '↖ + ', db: '↙ + ' };
 function openMoves() {
   paused = true;
   const f = G ? G.aka.data : byId[selId] || ROSTER[0];
@@ -437,7 +448,7 @@ function openMoves() {
   rows.push(`<tr><td class="k">↓ + UKE</td><td class="n"><b>${MOVES.sune_uke.jp}</b>${MOVES.sune_uke.nl}</td><td>${MOVES.sune_uke.uitleg}</td></tr>`);
   f.signatures.forEach((s, i) => rows.push(`<tr><td class="k">${['', '→ + ', '↓ + '][i]}KIAI</td><td class="n"><b>${s.naam}</b>${s.jp}</td><td>${s.uitleg} <i>(1/3 kiai-meter)</i></td></tr>`));
   rows.push(`<tr><td class="k">KIAI (vol)</td><td class="n"><b>${f.super.naam}</b>${f.super.jp}</td><td>${f.super.uitleg} Raakt de laatste techniek bij een uitgeputte tegenstander: <b>${f.finisher.naam}</b>.</td></tr>`);
-  $('#moveList').innerHTML = `<p style="font-size:12px;opacity:.8;margin:6px 0">Toetsenbord: A/D lopen, W/S omhoog/omlaag, J tsuki, K geri, L uke, I kiai. Combinaties: druk opnieuw tijdens een treffer (renzoku waza).</p><table>${rows.join('')}</table>`;
+  $('#moveList').innerHTML = `<p style="font-size:12px;opacity:.8;margin:6px 0">Toetsenbord: A/D lopen, W/S omhoog/omlaag, diagonaal naar achteren met W+A of S+A (↖ ↙), J tsuki, K geri, L uke, I kiai. Touch: joystick schuin naar achteren. Combinaties: druk opnieuw tijdens een treffer (renzoku waza).</p><table>${rows.join('')}</table>`;
   overlay('moves', true);
 }
 $('#movesClose').addEventListener('click', () => { overlay('moves', false); if (!$('#pause').classList.contains('on')) paused = false; });

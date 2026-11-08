@@ -58,6 +58,8 @@ export class AI {
             [{ btn: 'geri', dir: 'n' }, 0.5 + w.body * 0.3],
             [{ btn: 'geri', dir: 'u' }, w.head * (dist > 0.9 ? 1 : 0.4)],
             [{ btn: 'geri', dir: 'b' }, w.spin * 0.8],
+            [{ btn: 'geri', dir: 'ub' }, w.spin * w.head * 0.9 * (dist > 0.9 ? 1 : 0.3)],
+            [{ btn: 'geri', dir: 'db' }, (w.spin * 0.25 + w.head * 0.15) * (dist > 1.0 ? 1 : 0.2)],
           ]);
         }
       }

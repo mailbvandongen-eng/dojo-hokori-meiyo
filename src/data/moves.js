@@ -5,6 +5,7 @@
 // target: jodan (hoofd), chudan (romp), gedan (benen).
 // zone: welke schadeteller van de tegenstander oploopt (head/body/legs).
 // foul: in het toernooireglement verboden, levert een chui (waarschuwing) op.
+// travel: meters die de vechter tijdens de opbouw naar voren verplaatst (rol kick).
 // Poses staan in src/game/poses.js; frames verwijzen ernaar.
 
 export const MOVES = {
@@ -95,6 +96,13 @@ export const MOVES = {
     frames: [['guard', 0], ['kakatoUp', 0.24], ['kakatoDown', 0.34], ['kakatoDown', 0.44], ['guard', 0.84]],
     uitleg: 'Het been gaat hoog omhoog en de hiel valt neer op hoofd of sleutelbeen. Beroemd gemaakt door Kyokushin-kampioenen.',
   },
+  rol_kick: {
+    jp: 'Kaiten Kakato Geri', nl: 'Rol Kick: rollende hieltrap', type: 'geri',
+    target: 'jodan', zone: 'head', startup: 0.46, active: 0.1, recovery: 0.55,
+    reach: 1.2, dmg: 22, push: 0.3, meter: 12, kdChance: 0.5, travel: 0.7,
+    frames: [['guard', 0], ['rolPrep', 0.12], ['rolDive', 0.24], ['rolInvert', 0.36], ['rolStrike', 0.46], ['rolStrike', 0.56], ['rolUp', 0.85], ['guard', 1.11]],
+    uitleg: 'De rol kick: je rolt naar voren en de hiel valt van boven op hoofd of schouder. Spectaculair en verrassend, maar mis je, dan lig je voor de tegenstander.',
+  },
   hiza_geri: {
     jp: 'Hiza Geri', nl: 'Knie naar de romp', type: 'hiza',
     target: 'chudan', zone: 'body', startup: 0.17, active: 0.1, recovery: 0.3,
@@ -138,7 +146,10 @@ export const INPUT_MAP = {
   'geri.f': 'hiza_geri',      // op afstand wordt het mae geri, zie fighter.js
   'geri.b': 'ushiro_geri',
   'geri.u': 'jodan_mawashi',
+  'geri.ub': 'ushiro_mawashi', // ↖ = omhoog + weg van de tegenstander
+  'geri.db': 'rol_kick',       // ↙ = omlaag + weg van de tegenstander
 };
+// Valt een diagonale richting niet in de tabel, dan telt de verticale richting (d/u) en anders neutraal.
 
 // Combinaties (renzoku waza): na een treffer of blok kun je in het venster doorzetten.
 export const CHAINS = {

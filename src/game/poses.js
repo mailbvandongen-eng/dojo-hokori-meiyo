@@ -54,6 +54,12 @@ export const POSES = {
   tobiPrep: P({ root: [-0.2, 0, 0, 0], lKnee: [0.9, 0, 0], rKnee: [0.9, 0, 0], lHip: [-0.6, 0, 0.08], rHip: [-0.1, 0, 0] }),
   tobiHiza: P({ root: [0.35, 0.25, 0, 0], rHip: [-2.0, 0, 0.05], rKnee: [2.4, 0, 0], lHip: [0.3, 0, 0], lKnee: [1.6, 0, 0], spine: [-0.25, 0, 0], lSh: [-1.6, 0, -0.1], lEl: [-1.0, 0, 0], rSh: [-1.6, 0, 0.1], rEl: [-1.0, 0, 0] }),
 
+  // Rol kick (kaiten kakato geri): root-pitch draait een hele slag voorover (via 2π terug)
+  rolPrep: P({ root: [-0.25, 0.05, 0, 0.35], spine: [0.4, 0, 0], lKnee: [1.0, 0, 0], rKnee: [1.0, 0, 0], lHip: [-0.8, 0, 0.1], rHip: [-0.4, 0, -0.1] }),
+  rolDive: P({ root: [-0.15, 0.1, 0, 1.4], spine: [0.5, 0, 0], head: [0.6, 0, 0], lHip: [0.3, 0, 0.1], lKnee: [0.6, 0, 0], rHip: [0.5, 0, -0.1], rKnee: [0.3, 0, 0], lSh: [-2.6, 0, -0.2], rSh: [-2.6, 0, 0.2], lEl: [-0.3, 0, 0], rEl: [-0.3, 0, 0] }),
+  rolInvert: P({ root: [0.12, 0.15, 0, Math.PI], spine: [0.3, 0, 0], head: [0.5, 0, 0], lHip: [-1.2, 0, 0.15], lKnee: [1.6, 0, 0], rHip: [-0.4, 0, -0.1], rKnee: [0.1, 0, 0], lSh: [-2.9, 0, -0.3], rSh: [-2.9, 0, 0.3], lEl: [-0.2, 0, 0], rEl: [-0.2, 0, 0] }),
+  rolStrike: P({ root: [-0.42, 0.2, 0, Math.PI * 2 - 0.55], spine: [0.35, 0, 0], head: [0.3, 0, 0], rHip: [-2.2, 0, -0.05], rKnee: [0.05, 0, 0], lHip: [-1.4, 0, 0.15], lKnee: [1.9, 0, 0], lSh: [0.4, 0, 0.5], rSh: [0.4, 0, -0.5], lEl: [-0.3, 0, 0], rEl: [-0.3, 0, 0] }),
+  rolUp: P({ root: [-0.3, 0.12, 0, Math.PI * 2 - 0.1], spine: [0.35, 0, 0], lKnee: [1.2, 0, 0], rKnee: [0.9, 0, 0], lHip: [-0.9, 0, 0.1], rHip: [-0.6, 0, -0.1] }),
   hitBody: P({ spine: [0.55, 0.1, 0], head: [0.3, 0.3, 0], root: [-0.12, -0.12, 0, 0], lSh: [-0.7, 0, -0.5], rSh: [-0.6, 0, 0.5], lEl: [-1.9, 0, 0], rEl: [-1.9, 0, 0] }),
   hitHead: P({ spine: [-0.35, 0, 0.1], head: [-0.6, 0.6, 0.2], root: [-0.04, -0.15, 0, 0], lSh: [-0.5, 0, -0.1], rSh: [-0.3, 0, 0.3], lEl: [-1.0, 0, 0], rEl: [-1.0, 0, 0] }),
   hitLeg: P({ lKnee: [1.0, 0, 0], lHip: [-0.2, 0, 0.15], root: [-0.2, -0.05, 0, 0], spine: [0.25, -0.2, 0.15] }),

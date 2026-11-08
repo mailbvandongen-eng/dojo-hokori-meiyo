@@ -3,6 +3,7 @@
 import { MOVES, INPUT_MAP, CHAINS } from '../data/moves.js';
 import { POSES, GUARD, blendPose, clonePose, ease } from './poses.js';
 import { buildFighter } from './model.js';
+import { graadNiveau } from '../data/roster.js';
 
 const TAU = Math.PI * 2;
 const MIN_GAP = 0.62;
@@ -14,8 +15,10 @@ export class Fighter {
     this.model = buildFighter(data, corner, opts.costume || {});
     scene.add(this.model.group);
     const st = data.stats;
-    this.kiMax = 210 + st.conditie * 14;
-    this.dmgMul = 0.5 + st.kracht * 0.045;
+    // graad: een 10e kyu vecht op 88%, een 1e dan op 100%, een 4e dan op 104%
+    const lvl = 0.88 + Math.min(13, graadNiveau(data.graad)) * 0.012;
+    this.kiMax = (210 + st.conditie * 14) * lvl;
+    this.dmgMul = (0.5 + st.kracht * 0.045) * lvl;
     this.speed = 1.18 - st.snelheid * 0.03;       // < 1 = sneller
     this.reachAdd = (st.bereik - 7) * 0.035 + ((data.uiterlijk?.lengte || 1) - 1) * 0.5;
     this.legDef = 1.35 - st.benen * 0.065;
@@ -50,18 +53,18 @@ export class Fighter {
     if (inp.pressed.kiai) {
       if (this.meter >= 100 && inp.dir === 'n') return this.startSuper(match);
       if (this.meter >= 33) {
-        const i = inp.dir === 'f' ? 1 : (inp.dir === 'd' || inp.dir === 'b') ? 2 : 0;
+        const i = inp.dir === 'f' ? 1 : (inp.dir[0] === 'd' || inp.dir === 'b') ? 2 : 0;
         return this.startSignature(this.data.signatures[i], match);
       }
     }
     for (const btn of ['tsuki', 'geri']) {
       if (!inp.pressed[btn]) continue;
-      let id = INPUT_MAP[`${btn}.${inp.dir}`] || INPUT_MAP[`${btn}.n`];
+      let id = INPUT_MAP[`${btn}.${inp.dir}`] || INPUT_MAP[`${btn}.${inp.dir[0]}`] || INPUT_MAP[`${btn}.n`];
       if (id === 'hiza_geri' && Math.abs(opp.x - this.x) > 1.0) id = 'mae_geri';
-      if (match.rules === 'dojo' && btn === 'tsuki' && inp.dir === 'u') id = 'jodan_tsuki';
+      if (match.rules === 'dojo' && btn === 'tsuki' && inp.dir[0] === 'u') id = 'jodan_tsuki';
       return this.startMove(id, {});
     }
-    if (inp.uke) { this.state = inp.dir === 'd' ? 'lowblock' : 'block'; this.vx = 0; return; }
+    if (inp.uke) { this.state = inp.dir[0] === 'd' ? 'lowblock' : 'block'; this.vx = 0; return; }
     if (this.state === 'block' || this.state === 'lowblock') this.state = 'idle';
     // lopen; beenschade maakt je trager
     const legPen = 1 - Math.min(0.45, this.legs / (LEG_KD * 2.2));
@@ -166,7 +169,8 @@ export class Fighter {
         // stap in als de tegenstander net buiten bereik staat
         const reach = m.reach * (this.mod.reach || 1) + this.reachAdd;
         const gap = Math.abs(opp.x - this.x);
-        if (T < m.startup && gap > reach - 0.1) this.x += this.facing * Math.min(gap - reach + 0.1, (this.isSuper ? 3 : 1.2) * dt);
+        if (m.travel && T < m.startup) this.x += this.facing * Math.min(m.travel / m.startup * dt / this.scale, Math.max(0, gap - 0.7));
+        else if (T < m.startup && gap > reach - 0.1) this.x += this.facing * Math.min(gap - reach + 0.1, (this.isSuper ? 3 : 1.2) * dt);
         if (T >= m.startup + m.active + m.recovery * (this.queue.length ? 0.35 : 1)) {
           if (this.queue.length && this.state === 'attack') { const n = this.queue.shift(); this.startMove(n.id, n.mod, n.extra); }
           else { this.state = 'idle'; this.move = null; this.isSuper = false; this.armor = false; }
@@ -210,12 +214,18 @@ export class Fighter {
     const [na, ta] = fr[i], [nb, tb] = fr[Math.min(i + 1, fr.length - 1)];
     const a = i === 0 ? this.startPose : POSES[na], b = POSES[nb];
     const u = tb > ta ? Math.min(1, Math.max(0, (T - ta) / (tb - ta))) : 1;
-    // terugdraaien na een draaitrap via 2π, niet terug langs dezelfde kant
+    // terugdraaien na een draaitrap of rol via 2π, niet terug langs dezelfde kant
     let yb = b.root[2]; if (a.root[2] > Math.PI && yb === 0) yb = TAU;
+    let pb = b.root[3]; if (a.root[3] > Math.PI && pb <= 0.4) pb += TAU;
     blendPose(a, b, ease(u), this.cur);
     this.cur.root[2] = a.root[2] + (yb - a.root[2]) * ease(u);
+    this.cur.root[3] = a.root[3] + (pb - a.root[3]) * ease(u);
   }
-  wrapYaw() { if (this.cur.root[2] > Math.PI * 1.9 && this.state !== 'attack') this.cur.root[2] -= TAU; }
+  wrapYaw() {
+    if (this.state === 'attack') return;
+    if (this.cur.root[2] > Math.PI * 1.9) this.cur.root[2] -= TAU;
+    if (this.cur.root[3] > Math.PI * 1.9) this.cur.root[3] -= TAU;
+  }
 
   place() {
     const g = this.model.group;

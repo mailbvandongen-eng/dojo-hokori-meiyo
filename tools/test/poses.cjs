@@ -8,7 +8,7 @@ require('fs').mkdirSync(out, { recursive: true });
   const p = await b.newPage({ viewport: { width: 520, height: 400 }, deviceScaleFactor: 1 });
   const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(process.env.URL || 'http://127.0.0.1:8766/'); await p.waitForTimeout(1500);
-  await p.evaluate(([TH, R]) => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); __game.startFight({ mode: 'training', training: true, akaId: 'wesley', shiroId: 'daan', akaCtrl: 'solo', shiroCtrl: 'dummy' }); __game.pause(true); document.getElementById('hud').classList.remove('on'); __game.setCam('photo'); Object.assign(__game.photo, { theta: TH, phi: 1.35, r: R }); }, [Number(process.env.TH || 0.15), Number(process.env.R || 4.4)]);
+  await p.evaluate(([TH, R, AKA, SHIRO]) => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); __game.startFight({ mode: 'training', training: true, akaId: AKA, shiroId: SHIRO, akaCtrl: 'solo', shiroCtrl: 'dummy' }); __game.pause(true); document.getElementById('hud').classList.remove('on'); __game.setCam('photo'); Object.assign(__game.photo, { theta: TH, phi: 1.35, r: R }); }, [Number(process.env.TH || 0.15), Number(process.env.R || 4.4), process.env.AKA || 'wesley', process.env.SHIRO || 'daan']);
   const moves = process.env.MOVES ? process.env.MOVES.split(',') : ['seiken_jab', 'seiken_gyaku', 'shita_tsuki', 'hiji_ate', 'mae_geri', 'gedan_mawashi', 'chudan_mawashi', 'jodan_mawashi', 'ushiro_geri', 'ushiro_mawashi', 'kakato_otoshi', 'hiza_geri', 'tobi_hiza'];
   for (let i = 0; i < 40; i++) await p.evaluate(() => __game.step(1 / 30));
   await p.screenshot({ path: `${out}/00-guard.png` });

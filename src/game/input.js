@@ -1,5 +1,6 @@
 // Besturing: touch (virtuele joystick links, vier knoppen rechts) en toetsenbord.
-// Richtingen zijn relatief: f = naar de tegenstander, b = weg, d = omlaag, u = omhoog.
+// Richtingen zijn relatief: f = naar de tegenstander, b = weg, d = omlaag, u = omhoog,
+// ub/db = diagonaal omhoog/omlaag en weg van de tegenstander.
 // Knopdrukken worden 0,15 s gebufferd, zodat een druk tijdens herstel niet verloren gaat.
 
 const BUFFER = 0.15;
@@ -24,7 +25,7 @@ export class Controller {
     const m = this.map, t = this.touch;
     let x = (this.any(m.right) ? 1 : 0) - (this.any(m.left) ? 1 : 0);
     let up = this.any(m.up), down = this.any(m.down);
-    if (t) { if (Math.abs(t.jx) > 0.35) x = Math.sign(t.jx); if (t.jy < -0.55) up = true; if (t.jy > 0.55) down = true; }
+    if (t) { if (Math.abs(t.jx) > 0.35) x = Math.sign(t.jx); if (t.jy < -0.5) up = true; if (t.jy > 0.5) down = true; }
     for (const b of ['tsuki', 'geri', 'kiai']) {
       const now = this.any(m[b]) || (t && t.btn[b]);
       if (now && !this.prev[b]) this.buf[b] = this.clock;
@@ -37,7 +38,9 @@ export class Controller {
   // zet ruwe input om naar relatieve input voor een vechter met kijkrichting `facing`
   toFighter(raw, facing) {
     const move = raw.x * facing;
-    const dir = raw.down ? 'd' : raw.up ? 'u' : move > 0 ? 'f' : move < 0 ? 'b' : 'n';
+    // diagonaal naar achteren (↖ ub, ↙ db) is een eigen richting; diagonaal naar voren telt als omhoog/omlaag
+    const v = raw.down ? 'd' : raw.up ? 'u' : '';
+    const dir = v ? (move < 0 ? v + 'b' : v) : move > 0 ? 'f' : move < 0 ? 'b' : 'n';
     const pressed = {};
     for (const b in this.buf) if (this.clock - this.buf[b] <= BUFFER) pressed[b] = true;
     return { dir, move: raw.down || raw.up ? 0 : move, uke: raw.uke, pressed };
