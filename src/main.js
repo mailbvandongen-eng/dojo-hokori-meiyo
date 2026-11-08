@@ -241,9 +241,10 @@ function updateCamera(dt) {
     const a = G.aka, b = G.shiro, mid = (a.x + b.x) / 2, gap = Math.abs(a.x - b.x);
     switch (camMode) {
       case 'intro': { const ang = -1.0 + camT * 0.14; tmpV.set(Math.sin(ang) * 6.5, 2.8 - Math.min(1, camT * 0.12), Math.cos(ang) * 6.5); tmpL.set(0, 1.1, -0.4); k = 2; break; }
-      case 'fight': tmpV.set(mid * 0.85, 1.5, 3.2 + gap * 0.8); tmpL.set(mid, 1.0, 0); k = 5; break;
-      case 'kd': { const v = camFocus; tmpV.set(v.x - v.facing * 1.4, 0.75, 2.3); tmpL.set(v.x, 0.55, 0); k = 3; break; }
-      case 'super': { const f = camFocus, ang = 0.6 + camT * 0.9 * f.facing; tmpV.set(f.x + Math.sin(ang) * 2.6, 1.2, Math.cos(ang) * 2.6 + 0.4); tmpL.set(mid, 1.0, 0); k = 3; break; }
+      // vaste afstand; de camera zoomt alleen uit als de vechters ver uit elkaar staan, nooit in
+      case 'fight': tmpV.set(mid * 0.85, 1.55, Math.min(6.5, 4.4 + Math.max(0, gap - 1.6) * 0.9)); tmpL.set(mid, 1.0, 0); k = 2.5; break;
+      case 'kd': { const v = camFocus; tmpV.set(v.x - v.facing * 1.6, 1.1, 3.6); tmpL.set(v.x, 0.7, 0); k = 2; break; }
+      case 'super': { const f = camFocus, ang = 0.6 + camT * 0.9 * f.facing; tmpV.set(f.x + Math.sin(ang) * 3.8, 1.35, Math.cos(ang) * 3.8 + 0.4); tmpL.set(mid, 1.0, 0); k = 2; break; }
       case 'result': { const w = G.match.winner || a, ang = camT * 0.3; tmpV.set(w.x + Math.sin(ang) * 3.2, 1.6, Math.cos(ang) * 3.2); tmpL.set(w.x, 1.1, 0); k = 2; break; }
       case 'photo': tmpL.set(mid, 1.0, 0); tmpV.set(mid + Math.sin(photo.theta) * Math.sin(photo.phi) * photo.r, Math.max(0.2, Math.cos(photo.phi) * photo.r + 1.0), Math.cos(photo.theta) * Math.sin(photo.phi) * photo.r); k = 12; break;
     }
@@ -253,6 +254,25 @@ function updateCamera(dt) {
   camera.position.copy(camPos);
   if (fx.shake > 0) camera.position.add(tmpV.set((Math.random() - 0.5) * fx.shake, (Math.random() - 0.5) * fx.shake, 0));
   camera.lookAt(camLook);
+}
+
+// ── Geen browser-zoom tijdens het spelen ──
+// iOS negeert user-scalable=no; snel dubbel tikken of knijpen zoomt dan de hele pagina in.
+{
+  const block = e => e.preventDefault();
+  for (const ev of ['gesturestart', 'gesturechange', 'gestureend', 'dblclick']) document.addEventListener(ev, block, { passive: false });
+  document.addEventListener('touchmove', e => { if (e.touches.length > 1 || (e.scale && e.scale !== 1)) e.preventDefault(); }, { passive: false });
+  let lastEnd = 0;
+  document.addEventListener('touchend', e => {
+    const now = performance.now();
+    if (now - lastEnd < 350 && !e.target.closest('select,input')) e.preventDefault(); // tweede snelle tik: geen dubbeltik-zoom
+    lastEnd = now;
+  }, { passive: false });
+  // is er toch ingezoomd (bijvoorbeeld door de toegankelijkheidsinstelling), zet de viewport dan terug
+  const meta = document.querySelector('meta[name=viewport]'), base = meta.content;
+  window.visualViewport?.addEventListener('resize', () => {
+    if (visualViewport.scale > 1.01) { meta.content = base + ',minimum-scale=1'; requestAnimationFrame(() => (meta.content = base)); }
+  });
 }
 
 // ── Splash → menu ──

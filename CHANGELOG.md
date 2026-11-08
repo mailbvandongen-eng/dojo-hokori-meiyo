@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 (2026-11-08): geen zoom meer tijdens het spelen
+- Browser-zoom geblokkeerd: dubbel tikken, knijpen en iOS-gestures. Is er toch ingezoomd, dan springt de viewport terug. Keuzelijsten hebben 16 px tekst, want iOS zoomt in op kleinere velden.
+- Rustigere camera: in het gevecht een vaste afstand (zoomt alleen uit als de vechters ver uit elkaar staan, nooit in). De close-ups bij een knock-down en een super zijn minder dichtbij en minder snel.
+
 ## 0.3.0 (2026-11-08): roster volgens de dojo
 - 8 nieuwe vechters: Azad, Senpai Ferry, Senpai Micha, Mano, Leo, Nina, Naotaka en Niven (37 in totaal).
 - Senpai Dave (2e dan), Senpai Daan en Senpai Niesje (1e dan). Sensei Conchita is 4e dan, Senpai Anjay 2e dan.
