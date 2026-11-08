@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 (2026-11-08): campaign, vrijspelen en online leaderboard
+- **Campaign Mode (hoofdmodus).** Maak je vechter (meisje of jongen, kapsel, huid, haar) en begin als witte band.
+  - Om en om training en toernooi.
+  - Trainingen: bokszak (ritmespel met een echte, meezwaaiende zak) en gewichtheffen (timing, steeds zwaarder).
+  - Toernooien: club → regio → NK (kyu, open) → EK (kyu, open) → WK in Tokio, met Sensei Wesley in de finale. Winst geeft de zwarte band.
+  - Titels: Clubkampioen, Regiokampioen, Nederlands, Europees en Wereldkampioen. Ze staan in de hub, op de vechterkeuze en op het overwinningsscherm.
+  - Upgradepunten voor kracht, snelheid, techniek, uithouding en scheenharding (noob → legend).
+  - Technieken komen vrij met je graad.
+- **Vrijspelen.** Senpai en sensei zijn eerst niet speelbaar. Elke toernooizege speelt de volgende vrij: lagere senpai → hogere senpai → Sensei Conchita. Sensei Wesley pas door hem in een finale te verslaan.
+- **Graadcurve.** Witte band → 5e kyu normaal, → bruine band 2× zo langzaam, → zwarte band 4× zo langzaam.
+- **Online leaderboard** (meeste gevechten, meeste toernooizeges). Cloudflare Worker + D1 in `server/leaderboard`, lokaal getest. Online zetten vraagt nog een Cloudflare-account.
+- Toernooisysteem algemeen gemaakt (4 of 8 deelnemers, eindbaas in de andere helft van het schema).
+- Nieuwe tests: `campaign.cjs`, `unlocks.cjs`.
+
 ## 0.3.1 (2026-11-08): geen zoom meer tijdens het spelen
 - Browser-zoom geblokkeerd: dubbel tikken, knijpen en iOS-gestures. Is er toch ingezoomd, dan springt de viewport terug. Keuzelijsten hebben 16 px tekst, want iOS zoomt in op kleinere velden.
 - Rustigere camera: in het gevecht een vaste afstand (zoomt alleen uit als de vechters ver uit elkaar staan, nooit in). De close-ups bij een knock-down en een super zijn minder dichtbij en minder snel.

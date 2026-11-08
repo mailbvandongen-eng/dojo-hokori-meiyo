@@ -52,6 +52,7 @@ function addFlag(fist, color) {
 
 export function createArena(scene, renderer) {
   const S = MAT.half + MAT.safety;
+  const matchOnly = []; // verborgen tijdens trainingen (officials, jury, publiek)
   // ── Hal ──
   scene.background = new THREE.Color('#0b0b10');
   scene.fog = new THREE.Fog('#0b0b10', 16, 42);
@@ -86,9 +87,9 @@ export function createArena(scene, renderer) {
 
   // ── Jurytafel (kansa / tijdwaarneming) ──
   const table = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.75, 0.8), new THREE.MeshStandardMaterial({ color: '#1a1a1e' }));
-  table.position.set(0, 0.375, -S - 2.6); scene.add(table);
+  table.position.set(0, 0.375, -S - 2.6); scene.add(table); matchOnly.push(table);
   const tableFront = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 0.6), new THREE.MeshStandardMaterial({ map: bannerTexture('kanji'), roughness: 0.7 }));
-  tableFront.position.set(0, 0.4, -S - 2.19); scene.add(tableFront);
+  tableFront.position.set(0, 0.4, -S - 2.19); scene.add(tableFront); matchOnly.push(tableFront);
   tableFront.material.map.repeat.set(1, 0.3); tableFront.material.map.offset.set(0, 0.35);
 
   // ── Banners aan de achterwand en zijwanden ──
@@ -139,7 +140,7 @@ export function createArena(scene, renderer) {
   const shirt = ['#f4f1ea', '#b1101f', '#1d1d22', '#2f63c9', '#d9a441', '#5a5a64', '#e8e2d2', '#7b1820'];
   const m4 = new THREE.Matrix4(), col = new THREE.Color();
   seats.forEach((s, i) => { m4.makeTranslation(s.pos.x, s.pos.y, s.pos.z); crowd.setMatrixAt(i, m4); crowd.setColorAt(i, col.set(shirt[(Math.random() * shirt.length) | 0]).multiplyScalar(0.3 + Math.random() * 0.35)); heads.setMatrixAt(i, m4); heads.setColorAt(i, col.set(skins[(Math.random() * skins.length) | 0]).multiplyScalar(0.55)); });
-  scene.add(crowd, heads);
+  scene.add(crowd, heads); matchOnly.push(crowd, heads);
   const stepMat = new THREE.MeshStandardMaterial({ color: '#1c1a1f', roughness: 1 });
   for (let r = 0; r < 7; r++) { const st = new THREE.Mesh(new THREE.BoxGeometry(26, 0.55 * r + 0.4, 0.9), stepMat); st.position.set(0, (0.55 * r + 0.4) / 2, -S - 4.5 - r * 0.9); scene.add(st); }
   let crowdHype = 0;
@@ -164,7 +165,7 @@ export function createArena(scene, renderer) {
   for (const j of judges) {
     addFlag(j.m.joints.rFist, '#c8102e'); addFlag(j.m.joints.lFist, '#ffffff');
     const chair = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.46, 0.5), chairMat); chair.position.copy(j.m.group.position); chair.position.y = 0.23;
-    chair.rotation.y = j.m.group.rotation.y; scene.add(chair);
+    chair.rotation.y = j.m.group.rotation.y; scene.add(chair); matchOnly.push(chair);
     const backrest = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.06), chairMat); backrest.position.set(0, 0.5, -0.25); chair.add(backrest);
   }
 
@@ -187,6 +188,7 @@ export function createArena(scene, renderer) {
 
   return {
     update, ref, judges, bounds: MAT.half + 0.6,
+    setMode(mode) { const on = mode !== 'training'; for (const o of [...matchOnly, ref.m.group, ...judges.map(j => j.m.group)]) o.visible = on; },
     cheer(v = 1) { crowdHype = Math.min(1.5, crowdHype + v); },
     flags(votes) { judges.forEach((j, i) => j.pose(votes ? (votes[i] === 'aka' ? 'judgeAka' : votes[i] === 'shiro' ? 'judgeShiro' : 'judgeDraw') : 'judgeSit')); },
   };

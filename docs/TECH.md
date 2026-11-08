@@ -33,8 +33,11 @@ dojo-hokori-meiyo/
 │   │   ├── roster.js       37 vechters: geslacht, graad/bandkleur, stats, stijl, signatures, super, finisher, AI
 │   │   ├── moves.js        technieken-bibliotheek (timing, bereik, schade, poses, uitleg)
 │   │   ├── terms.js        scheidsrechterscommando's (romaji, kana, NL) + laadtips
-│   │   ├── profile.js      graden, keiko-punten, unlocks (localStorage)
-│   │   ├── online.js       leaderboard-interface (nu lokaal)
+│   │   ├── profile.js      keiko-punten, vrijgespeelde vechters, tellers voor het leaderboard
+│   │   ├── progress.js     graadcurve (normaal → 2× → 4× zo langzaam)
+│   │   ├── unlocks.js      volgorde van vrijspelen (senpai → sensei → eindbaas in de finale)
+│   │   ├── online.js       leaderboard-client (Cloudflare Worker)
+│   │   ├── config.js       adres van de leaderboard-server
 │   │   └── glyphs.js       penseelpaden voor de kanji (uit Yuji Boku)
 │   ├── game/
 │   │   ├── fighter.js      toestandsmachine, technieken, treffers, schademodel
@@ -46,7 +49,12 @@ dojo-hokori-meiyo/
 │   │   ├── arena.js        toernooihal, tatami, officials, publiek, banners, licht
 │   │   ├── textures.js     dogi-textuur met kanji, banners, tatami, boarding
 │   │   └── fx.js           particles, impact-ring, shake, hit-stop, slow motion
+│   ├── campaign/
+│   │   ├── career.js       loopbaan: XP, upgrades, toernooien (club → NK → EK → WK), titels, eigen vechter
+│   │   ├── campaign.js     schermen: vechter maken, hub, trainingen, toernooi-afloop
+│   │   └── training.js     minigames bokszak en gewichtheffen (3D)
 │   └── audio/audio.js      procedurele effecten, muziek, spraak/stemopnames
+├── server/leaderboard/     Cloudflare Worker + D1-schema voor het online leaderboard
 ├── tools/
 │   ├── logo/               bron van het logo + complete-logo.py (aanvullen en opschonen) + 2000 px master
 │   ├── extract-glyphs.py   haalt penseelpaden uit het font
@@ -135,10 +143,11 @@ npx cap open android|ios
 
 ## 6. Online
 
-### Leaderboards (fase 3a)
-- Backend: Supabase (Postgres + RLS) of Firebase (Firestore). Je gebruikt beide al in andere apps.
-- Anonieme login, een bijnaam, een **dojo-code** voor het dojo-bord.
-- Een server-side controle tegen valse scores: de server berekent de punten uit de wedstrijdresultaten, niet de client.
+### Leaderboard (gebouwd)
+- Cloudflare Worker + D1 in `server/leaderboard/`: `GET /top`, `POST /submit`. Anonieme UUID per toestel, zelfgekozen naam.
+- Bescherming: alleen stijgende waarden met een maximum per verzoek, een rate limit per speler, opgeschoonde namen en CORS alleen voor de game.
+- Online zetten: zie [server/leaderboard/README.md](../server/leaderboard/README.md). Daarna het adres in `src/data/config.js` zetten.
+- Fase 3: een dojo-code voor een eigen dojo-bord; de server berekent punten uit wedstrijdresultaten.
 
 ### Online versus (fase 3b)
 - **Rollback-netcode** (zoals GGPO): de input van beide spelers per frame uitwisselen en bij een late input terugspoelen en opnieuw simuleren.
@@ -156,6 +165,9 @@ npx cap open android|ios
 | Rooktest | `node tools/test/smoke.cjs` | splash → menu → toernooi → gevecht, screenshots, JS-fouten |
 | Posegalerij | `node tools/test/poses.cjs` | screenshot van elke techniek op het treffermoment |
 | Regels | `node tools/test/rules.cjs 8` | AI tegen AI: elke wedstrijd eindigt (ippon/hantei/encho) |
+| Campaign | `node tools/test/campaign.cjs` | vechter maken, bokszak, clubtoernooi (titel, vrijspelen), upgrade, gewichtheffen, online leaderboard, WK-finale tegen Sensei Wesley (zwarte band) |
+| Vrijspelen | `node tools/test/unlocks.cjs` | modus Toernooi: volgorde van vrijspelen, Sensei Wesley in de finale |
+| Zoom | `node tools/test/zoom.cjs` | snel tikken zoomt de pagina niet in |
 
 De browsertests verwachten een server op poort 8766 (`npm run serve`) en Playwright met Chromium (`NODE_PATH=/root/tools/pw/node_modules`). Headless draait het met SwiftShader op ongeveer 5 fps. Daarom stappen de regel- en posetests de simulatie zelf af via `window.__game.sim()` en `step()`.
 

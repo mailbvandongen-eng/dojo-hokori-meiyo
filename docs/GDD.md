@@ -1,6 +1,6 @@
 # Game Design Document: Dojo Hokori Meiyo Fight Game
 
-Versie 0.3 · 8 november 2026 · status: prototype (fase 1)
+Versie 0.4 · 8 november 2026 · status: prototype (fase 1)
 
 > **Eer & Trots (誇り名誉, Hokori Meiyo) · Osu no Seishin (押忍の精神)**
 > Een full-contact Kyokushin-vechtgame voor en over de vechters van Dojo Hokori Meiyo in Zoetermeer.
@@ -166,34 +166,80 @@ In de modus **Dojo (vrij)** mag de jodan-stoot (↑ + TSUKI) en zijn er geen chu
 
 ## 4. Spelmodi
 
-### 4.1 Toernooi (hoofdmodus)
+### 4.1 Campaign (hoofdmodus)
 
-- **Single elimination** met 8 vechters: kwartfinale, halve finale, finale. Later ook 16 vechters en categorieën (jeugd/senioren, gewichtsklassen).
-- Het schema laat de uitslagen van de andere partijen zien (gesimuleerd op stats).
-- In de finale is de tegenstander een niveau sterker.
-- Winst: +200 keiko-punten en een toernooititel in het profiel.
-- **Fase 2:** "Hokori Meiyo Cup" met een openingsceremonie, de vechters in een rij, een prijsuitreiking met podium en een dojo-foto (Photo Mode).
+De belangrijkste modus: je eigen loopbaan bij Dojo Hokori Meiyo, **van noob tot legend**.
 
-### 4.2 Story / Arcade
+**Begin.** Je maakt je eigen vechter: naam, **meisje of jongen** (dat bepaalt het figuur: bouw, kapsel, T-shirt onder de dogi), kapsel, huidskleur en haarkleur. Iedereen begint als **witte band (10e kyu)** met beginnersstats (2 van 10).
+
+**Ritme.** Altijd om en om: **training → toernooi → training → toernooi …** De hub laat zien wat de volgende stap is.
+
+**Trainingen** (punten naar prestatie, 40-150):
+
+| Training | Spel | Beloont |
+|---|---|---|
+| **Bokszak** | Ritmespel: technieken (TSUKI, GERI, ↓ GERI) schuiven naar de cirkel; raak de zak precies op tijd. Perfect/goed/ok, combo's, het tempo loopt op. Echte bokszak die meezwaait. | timing, combinaties |
+| **Gewichtheffen** | 8 herhalingen overhead press. Druk als de naald in het groen staat (goud = perfect). Het groen wordt smaller, de naald sneller en de halter zwaarder (30 → 82,5 kg). 3× te zwaar = klaar. | timing, concentratie |
+
+**Toernooien** (single elimination, met de echte wedstrijdregels, officials en vlaggen):
+
+| # | Toernooi | Plaats | Titel | Minimale graad | Tegenstanders |
+|---|---|---|---|---|---|
+| 1 | Hokori Meiyo Clubtoernooi | Zoetermeer | Clubkampioen | 10e kyu | 10e-9e kyu |
+| 2 | Regiotoernooi Zuid-Holland | Den Haag | Regiokampioen | 9e kyu | 10e-7e kyu |
+| 3 | **NK** Kyokushin · kyu-klasse | Utrecht | **Nederlands Kampioen** | 8e kyu | 9e-5e kyu |
+| 4 | **NK** Kyokushin · open klasse | Rotterdam | **Nederlands Kampioen** | 5e kyu | 7e kyu-1e dan |
+| 5 | **EK** Kyokushin · kyu-klasse | Boedapest | **Europees Kampioen** | 4e kyu | 6e kyu-2e dan |
+| 6 | **EK** Kyokushin · open klasse | Warschau | **Europees Kampioen** | 3e kyu | 4e kyu-4e dan |
+| 7 | **WK** Kyokushin | Tokio | **Wereldkampioen** | 1e kyu | 2e kyu-4e dan, **finale: Sensei Wesley** |
+
+- Is je graad nog te laag voor het volgende kampioenschap, dan speel je eerst een **open toernooi** (geen titel, wel punten).
+- Verlies je, dan train je en probeer je het opnieuw.
+- Elke gewonnen partij levert punten op, de toernooiwinst veel meer.
+- De **WK-finale tegen Sensei Wesley** is het einde van de campaign. Win je, dan word je **Wereldkampioen** en krijg je de **zwarte band (shodan)**. Daarna verdedig je je NK-, EK- en WK-titels.
+
+**Punten en upgrades.** Alles wat je verdient telt voor je graad (XP) én als upgradepunten. Er zijn 5 upgrades van 1 tot 10:
+
+| Upgrade | Effect |
+|---|---|
+| Kracht | meer schade |
+| Snelheid | snellere technieken en voetenwerk |
+| Techniek | snellere kiai-meter, meer kans op knock-down met hoofdtrappen |
+| Uithoudingsvermogen | meer ki |
+| Scheenharding | beter bestand tegen lage trappen |
+
+Een stap kost 40 × het huidige niveau. Niveaus: Noob (1-3) · Gevorderd (4-5) · Kampioen (6-7) · Elite (8-9) · Legend (10).
+
+**Technieken groeien mee met je graad.** Renzoku-combinatie vanaf de witte band, Jodan Mawashi Geri vanaf de blauwe band, de super "Hokori Meiyo" vanaf de 5e kyu, en de Rol Kick vanaf de groene band.
+
+**Titels** (Clubkampioen, Regiokampioen, Nederlands, Europees en Wereldkampioen) staan in de hub (profiel), op de vechterkeuze (jouw vechter staat bovenaan als "JIJ", met je hoogste titel) en groot op het overwinningsscherm. Meerdere keren gewonnen wordt bijvoorbeeld "2× Europees Kampioen".
+
+### 4.2 Toernooi
+
+- **Hokori Meiyo Cup:** single elimination met 8 vechters (kwartfinale, halve finale, finale). In de finale is de tegenstander een niveau sterker.
+- **Hier speel je senpai en sensei vrij** (zie §6.2): elke toernooizege speelt de volgende vrij. Zijn ze allemaal vrij, dan staat **Sensei Wesley in de finale**; versla hem en ook de eindbaas is speelbaar.
+- Winst: +200 keiko-punten, telt mee op het leaderboard.
+
+### 4.3 Story / Arcade
 
 - Je kiest een vechter en klimt door de dojo: vier kyu-graden plus **Skylar** (rivaal, de dochter van de sensei), op graad gesorteerd, dan twee **senpai** (dan-graden), **Sensei Conchita** (4e dan) en tot slot **Sensei Wesley** (4e dan).
 - Elke stap heeft een korte tekst en de quote van de tegenstander.
-- Sensei Wesley verslaan speelt Sensei Wesley vrij voor alle modi.
+- Senpai en sensei zijn hier tegenstanders; vrijspelen gaat via toernooien (§6.2).
 - **Fase 2:** een echte verhaallijn per vechter in stripstijl (stills), met momenten in de dojo: training, examen (graduatie), wintertraining aan het strand (*fuyu geiko*) en het eerste toernooi.
 
-### 4.3 Versus
+### 4.4 Versus
 
 - **Lokaal:** tegen de computer (4 niveaus: Kohai, Senpai, Sensei, Shihan) of met 2 spelers op één toetsenbord of met 2 controllers.
 - **Online (fase 3):** vrienden uitnodigen met een dojo-code, plus ranked. Dit vraagt rollback-netcode, zie [TECH.md](TECH.md#6-online).
 
-### 4.4 Training
+### 4.5 Training (vrij)
 
 - Sensei Conchita legt uit; een partner (de pop) die stil staat, hoog blokt, laag blokt of aanvalt.
 - Bij elke techniek verschijnt de Japanse naam, de vertaling, de schade en de uitleg.
 - Technieken-overzicht met alle inputs en uitleg (ook in het pauzemenu).
 - **Fase 2:** kihon-lessen ("doe 5× gedan mawashi geri"), een combo-uitdaging, een uitleg van de wedstrijdregels met de scheidsrechter, en een kata-modus op ritme (Taikyoku sono ichi, Pinan) als rustpunt.
 
-### 4.5 Photo Mode
+### 4.6 Photo Mode
 
 - Vanuit het pauzemenu: tijd bevroren, HUD weg, vrije camera (slepen = draaien, knijpen = zoomen).
 - Filters: normaal, zwart-wit, sepia, toernooi.
@@ -218,33 +264,47 @@ Het volledige roster met movesets staat in **[ROSTER.md](ROSTER.md)** (gegeneree
 
 ### 6.1 Graden (kyu/dan)
 
-De speler begint als **10e kyu (witte band)** en verdient **keiko-punten**:
+De speler begint als **10e kyu (witte band)**. In de campaign verdien je XP met trainingen en toernooien; in de andere modi keiko-punten met wedstrijden (winst 60, ippon +40, verlies 15, toernooi +200).
 
-| Actie | Punten |
-|---|---|
-| Wedstrijd gewonnen | 60 (+40 bij ippon, +20 in Story) |
-| Wedstrijd verloren | 15 (Osu no seishin: doorzetten loont) |
-| Toernooi gewonnen | +200 |
-| Story uitgespeeld | +300 |
+**Snelheid volgens de dojo:**
 
-Gradenreeks (bandkleuren van de dojo): 10e kyu wit → 9e rood → 8e blauw → 7e blauw (gele streep) → 6e geel → 5e geel (groene streep) → 4e groen → 3e groen (bruine streep) → 2e bruin → 1e bruin (gouden streep) → **shodan** (zwart) → 2e dan → 3e dan. Elke promotie wordt gevierd met "Osu!" en een promotiescherm. Fase 2: een **examen**-wedstrijd per promotie (bijvoorbeeld 3 partijen achter elkaar, net als bij een echt examen).
+| Traject | Snelheid | XP per stap | Totaal |
+|---|---|---|---|
+| witte band → 5e kyu | normaal | 100 · 150 · 200 · 250 · 300 | 1.000 |
+| 5e kyu → bruine band (2e kyu) | **2× zo langzaam** | 700 · 800 · 900 | 3.400 |
+| bruine band → zwarte band (1e dan) | **4× zo langzaam** | 2.000 · 2.400 | 7.800 |
+| 1e dan → 2e/3e dan | 4× | 2.800 · 3.200 | 13.800 |
+
+Gradenreeks (bandkleuren van de dojo): 10e kyu wit → 9e rood → 8e blauw → 7e blauw (gele streep) → 6e geel → 5e geel (groene streep) → 4e groen → 3e groen (bruine streep) → 2e bruin → 1e bruin (gouden streep) → **shodan** (zwart) → 2e dan → 3e dan. Elke promotie wordt gevierd met "Osu!" en een promotiemelding. Fase 2: een **examen**-wedstrijd per promotie.
 
 ### 6.2 Vrij te spelen
 
+**Senpai en sensei zijn in het begin niet speelbaar.** Je speelt ze vrij door toernooien te winnen (modus Toernooi én campaign tellen mee), in deze volgorde:
+
+1. de lagere senpai (1e dan): Senpai Daan → Senpai Niesje → Senpai Micha
+2. de hogere senpai (2e dan): Senpai Anjay → Senpai Dave → Senpai Ferry
+3. de sensei: Sensei Conchita
+4. **Sensei Wesley** (eindbaas) als allerlaatste: alleen door hem **in een finale** te verslaan (de finale van de Hokori Meiyo Cup zodra al het andere vrij is, of de WK-finale in de campaign)
+
+Als tegenstanders zijn ze er altijd. Op de vechterkeuze staat een slotje met de volgende in de rij.
+
 | Item | Hoe |
 |---|---|
-| Zwarte trainingsdogi | vanaf 5e kyu ✅ (in prototype) |
-| Sensei Wesley speelbaar | Story uitspelen ✅ |
+| Senpai en sensei | toernooien winnen (zie boven) ✅ |
+| Sensei Wesley | in een finale verslaan ✅ |
+| Zwarte trainingsdogi | vanaf 5e kyu ✅ |
 | Hokori Meiyo dojo-shirt (training) | 7e kyu (fase 2) |
 | Wedstrijddogi met bondsembleem | toernooi winnen (fase 2) |
 | Jubileumdogi / gouden band-borduursel | shodan (fase 2) |
 | Arena: Dojo Hokori Meiyo | 3 toernooizeges (fase 2) |
-| Arena: wintertraining strand | Story met 3 vechters (fase 2) |
 
-### 6.3 Leaderboards en online ranking
+### 6.3 Online leaderboard
 
-- Lokaal bord (prototype).
-- Fase 3: een **dojo-leaderboard** (alleen leden, via dojo-code), weekklassement en toernooiranking. Spelers verschijnen met een zelfgekozen bijnaam, niet automatisch met hun echte naam.
+- Twee ranglijsten: **meeste gevechten** en **meeste toernooizeges**. Alle modi tellen mee, behalve 2 spelers op één toestel.
+- Bijgewerkt na elk gevecht. Het bord toont de stand van de server, met je eigen rij gemarkeerd.
+- Spelers staan er met een **zelfgekozen naam** (de campaignnaam, of in te stellen op het bord). Er worden geen persoonsgegevens verzameld; elk toestel heeft een anonieme id.
+- Server: Cloudflare Worker + D1 ([server/leaderboard](../server/leaderboard/README.md)), met bescherming tegen onrealistische sprongen en spam.
+- Fase 3: een dojo-bord (alleen leden via een dojo-code) en een weekklassement.
 
 ---
 
@@ -346,10 +406,14 @@ Stemopnames zet je neer volgens [assets/voice/README.md](../assets/voice/README.
 
 ```
 Splash (logo, Osu) ─► Hoofdmenu (demo-gevecht op de achtergrond)
-   ├─ Toernooi ─► Vechterkeuze ─► Schema ─► Laden ─► Gevecht ─► Uitslag ─► Schema … ─► Kampioen
+   ├─ Campaign ─► Vechter maken (meisje/jongen) ─► Hub (profiel, upgrades, loopbaan)
+   │              ├─ Training: Bokszak / Gewichtheffen ─► Resultaat (punten) ─► Hub
+   │              └─ Toernooi: Schema ─► Gevecht ─► Uitslag ─► Schema … ─► Titel ─► Hub
+   ├─ Toernooi ─► Vechterkeuze ─► Schema ─► Laden ─► Gevecht ─► Uitslag ─► Schema … ─► Kampioen (vrijspelen)
    ├─ Story    ─► Vechterkeuze ─► Ladder/VS ─► Laden ─► Gevecht ─► Uitslag ─► Ladder … ─► Sensei Wesley
    ├─ Versus   ─► Speler 1 ─► Speler 2 (CPU/toetsenbord) ─► Laden ─► Gevecht ─► Uitslag
    ├─ Training ─► Vechterkeuze ─► Laden ─► Training (pop-instellingen, technieken)
+   ├─ Leaderboard (meeste gevechten / meeste toernooizeges)
    └─ Opties
 Gevecht ─► Pauze ─► Hervatten / Fotomodus / Technieken / Opties / Menu
 ```

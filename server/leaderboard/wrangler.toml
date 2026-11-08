@@ -1,0 +1,11 @@
+name = "dhm-leaderboard"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dhm-leaderboard"
+database_id = "VUL-IN-NA-wrangler-d1-create"
+
+[vars]
+ALLOWED_ORIGINS = "https://mailbvandongen-eng.github.io,http://127.0.0.1:8766,http://localhost:8766"

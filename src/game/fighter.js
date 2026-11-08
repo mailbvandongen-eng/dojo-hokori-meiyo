@@ -16,9 +16,14 @@ export class Fighter {
     scene.add(this.model.group);
     const st = data.stats;
     // graad: een 10e kyu vecht op 88%, een 1e dan op 100%, een 4e dan op 104%
-    const lvl = 0.88 + Math.min(13, graadNiveau(data.graad)) * 0.012;
+    // opts.scale: sterkte van de tegenstander (campaign: vroege toernooien zijn milder)
+    const lvl = (0.88 + Math.min(13, graadNiveau(data.graad)) * 0.012) * (opts.scale || 1);
     this.kiMax = (210 + st.conditie * 14) * lvl;
     this.dmgMul = (0.5 + st.kracht * 0.045) * lvl;
+    // techniek (campaign-upgrade; roster-vechters 7): kiai-meter en knock-downkans met hoofdtrappen
+    this.tech = st.techniek ?? 7;
+    this.meterMul = 0.7 + this.tech * 0.045;
+    this.kdMul = 0.75 + this.tech * 0.04;
     this.speed = 1.18 - st.snelheid * 0.03;       // < 1 = sneller
     this.reachAdd = (st.bereik - 7) * 0.035 + ((data.uiterlijk?.lengte || 1) - 1) * 0.5;
     this.legDef = 1.35 - st.benen * 0.065;
@@ -51,7 +56,7 @@ export class Fighter {
     }
     if (!this.canAct()) return;
     if (inp.pressed.kiai) {
-      if (this.meter >= 100 && inp.dir === 'n') return this.startSuper(match);
+      if (this.meter >= 100 && inp.dir === 'n' && this.data.super) return this.startSuper(match);
       if (this.meter >= 33) {
         const i = inp.dir === 'f' ? 1 : (inp.dir[0] === 'd' || inp.dir === 'b') ? 2 : 0;
         return this.startSignature(this.data.signatures[i], match);
@@ -129,7 +134,7 @@ export class Fighter {
     this.stats.dealt += dmg; this.stats.clean++;
     if (m.zone === 'legs') opp.legs += (m.legDmg || 0) * (mod.legDmg || 1) * opp.legDef;
     if (m.zone === 'body') opp.body += dmg * (mod.bodyBonus || m.bodyBonus || 1) * 1.15;
-    this.meter = Math.min(100, this.meter + m.meter * 0.6); opp.meter = Math.min(100, opp.meter + m.meter * 0.3);
+    this.meter = Math.min(100, this.meter + m.meter * 0.6 * this.meterMul); opp.meter = Math.min(100, opp.meter + m.meter * 0.3 * opp.meterMul);
     this.chainOk = true;
 
     // Knock-down volgens Kyokushin-logica: ki op, been geeft het op, romp klapt dicht of schone hoofdtrap.
@@ -139,7 +144,7 @@ export class Fighter {
     else if (opp.ki <= 0) kd = { type: m.zone === 'head' ? 'back' : 'knees' };
     else if (m.zone === 'legs' && opp.legs >= LEG_KD) kd = { type: 'knees', cause: 'legs' };
     else if (m.zone === 'body' && opp.body >= BODY_KD && dmg >= 8) kd = { type: 'knees', cause: 'body' };
-    else if (m.zone === 'head' && Math.random() < (mod.kdChance || m.kdChance || 0) * (0.08 + (1 - kiFrac) ** 2) * (counter ? 1.5 : 1)) kd = { type: 'back', cause: 'head' };
+    else if (m.zone === 'head' && Math.random() < (mod.kdChance || m.kdChance || 0) * this.kdMul * (0.08 + (1 - kiFrac) ** 2) * (counter ? 1.5 : 1)) kd = { type: 'back', cause: 'head' };
     if (opp.armor && !kd) { this.onEvent?.('hit', { fighter: this, target: opp, move: m, dmg, counter, armor: true }); return; }
 
     if (kd) { opp.knockdown(kd); match.knockdown(opp, this, kd); }
@@ -185,6 +190,7 @@ export class Fighter {
       case 'down': target = this.downType === 'back' ? POSES.downBack : POSES.downKnees; rate = this.downType === 'back' ? 7 : 9; break;
       case 'getup': target = GUARD; rate = 4; if (this.t > 0.8) this.state = 'idle'; break;
       case 'rei': target = POSES.rei; rate = 5; break;
+      case 'pose': target = POSES[this.poseName] || GUARD; rate = this.poseRate || 6; break; // vrije pose (trainingen)
       case 'stand': target = POSES.stand; rate = 6; break;
       case 'osu': target = POSES.osu; rate = 8; break;
       case 'victory': target = POSES.victory; rate = 5; break;

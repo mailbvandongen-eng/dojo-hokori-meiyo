@@ -4,6 +4,10 @@ import { ROSTER, byId, beltOf, graadNiveau } from './data/roster.js';
 import { MOVES, INPUT_MAP } from './data/moves.js';
 import { CALLS, COUNT_ROMAJI, TIPS } from './data/terms.js';
 import { profile, save as saveProfile, rankInfo, addResult, addBonus, COSTUMES, costumeUnlocked } from './data/profile.js';
+import { isLocked, nextUnlock, bossFinalDue, unlockAfterTournament, FINAL_BOSS, UNLOCK_ORDER } from './data/unlocks.js';
+import { buildFighter } from './game/model.js';
+import { POSES } from './game/poses.js';
+import { initCampaign } from './campaign/campaign.js';
 import { online } from './data/online.js';
 import { createArena } from './game/arena.js';
 import { Fighter, separate, LEG_KD, BODY_KD } from './game/fighter.js';
@@ -42,7 +46,7 @@ function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h
 addEventListener('resize', resize); resize(); applySettings();
 
 // ── Schermen ──
-const OVERLAYS = ['pause', 'options', 'moves', 'photo'];
+const OVERLAYS = ['pause', 'options', 'moves', 'photo', 'leaders'];
 function show(id) { $$('.screen').forEach(s => { if (!OVERLAYS.includes(s.id)) s.classList.toggle('on', s.id === id); }); }
 function overlay(id, on) { $('#' + id).classList.toggle('on', on); }
 
@@ -53,6 +57,10 @@ let camMode = 'menu', camFocus = null, camT = 0;
 const camPos = new THREE.Vector3(0, 3, 9), camLook = new THREE.Vector3(0, 1, 0);
 let tourney = null, story = null;
 const touch = new TouchPad($('#touch'));
+
+// 'me' = de campaign-vechter van de speler
+let meData = null;
+const fighterById = id => (id === 'me' ? meData : byId[id]);
 
 function clearFight() {
   if (!G) return;
@@ -65,9 +73,9 @@ function clearFight() {
 // opts: { mode, akaId, shiroId, akaCtrl: 'solo'|'p1'|'ai', shiroCtrl, diff, training, demo, costume }
 function startFight(opts) {
   clearFight();
-  const aData = byId[opts.akaId], bData = byId[opts.shiroId];
-  const aka = new Fighter(aData, 'aka', scene, { costume: opts.akaCostume || {} });
-  const shiro = new Fighter(bData, 'shiro', scene, { costume: opts.shiroCostume || {} });
+  const aData = opts.akaData || fighterById(opts.akaId), bData = opts.shiroData || fighterById(opts.shiroId);
+  const aka = new Fighter(aData, 'aka', scene, { costume: opts.akaCostume || {}, scale: opts.akaScale });
+  const shiro = new Fighter(bData, 'shiro', scene, { costume: opts.shiroCostume || {}, scale: opts.shiroScale });
   const match = new Match({ aka, shiro, arena, hooks, config: { roundTime: opts.roundTime || cfg.roundTime, rules: cfg.rules, training: !!(opts.training || opts.demo) } });
   G = { ...opts, aka, shiro, match, ctrl: {}, ai: {} };
   for (const [f, c] of [[aka, opts.akaCtrl], [shiro, opts.shiroCtrl]]) {
@@ -196,6 +204,20 @@ function updateHUD() {
 
 // ── Hoofdlus ──
 let last = performance.now();
+let ticker = null;                 // trainingen (campaign) draaien buiten een gevecht
+let previewModel = null;           // vechter in beeld bij het maken van je karateka en in de hub
+const camCustom = { pos: new THREE.Vector3(), look: new THREE.Vector3() };
+function preview(data, pose = 'stand', place = 'right') {
+  if (previewModel) scene.remove(previewModel.group);
+  previewModel = null; if (!data) return;
+  previewModel = buildFighter(data, 'aka', {});
+  previewModel.setPose(POSES[pose] || POSES.stand); previewModel.group.rotation.y = 0.5;
+  scene.add(previewModel.group);
+  // 'right': vechter rechts van een paneel links (vechter maken); 'center': tussen twee panelen (hub)
+  if (place === 'center') { camCustom.pos.set(0, 1.05, 4.0); camCustom.look.set(0, 0.95, 0); }
+  else { camCustom.pos.set(-1.0, 1.25, 3.1); camCustom.look.set(-0.95, 1.0, 0); }
+  camMode = 'custom';
+}
 function frame(now) {
   requestAnimationFrame(frame);
   const raw = Math.min(0.05, (now - last) / 1000); last = now;
@@ -203,7 +225,11 @@ function frame(now) {
     const dt = fx.step(raw); elapsed += dt;
     simulate(dt); fx.update(dt); arena.update(dt, elapsed);
     updateHUD();
-  } else if (!G) arena.update(raw, (elapsed += raw));
+  } else if (!G) {
+    arena.update(raw, (elapsed += raw));
+    if (ticker) { const dt = fx.step(raw); ticker(dt); fx.update(dt); }
+    if (previewModel) previewModel.group.rotation.y += raw * 0.35;
+  }
   updateCamera(raw);
   renderer.render(scene, camera);
 }
@@ -246,9 +272,11 @@ function updateCamera(dt) {
       case 'kd': { const v = camFocus; tmpV.set(v.x - v.facing * 1.6, 1.1, 3.6); tmpL.set(v.x, 0.7, 0); k = 2; break; }
       case 'super': { const f = camFocus, ang = 0.6 + camT * 0.9 * f.facing; tmpV.set(f.x + Math.sin(ang) * 3.8, 1.35, Math.cos(ang) * 3.8 + 0.4); tmpL.set(mid, 1.0, 0); k = 2; break; }
       case 'result': { const w = G.match.winner || a, ang = camT * 0.3; tmpV.set(w.x + Math.sin(ang) * 3.2, 1.6, Math.cos(ang) * 3.2); tmpL.set(w.x, 1.1, 0); k = 2; break; }
+      case 'custom': tmpV.copy(camCustom.pos); tmpL.copy(camCustom.look); k = 3; break;
       case 'photo': tmpL.set(mid, 1.0, 0); tmpV.set(mid + Math.sin(photo.theta) * Math.sin(photo.phi) * photo.r, Math.max(0.2, Math.cos(photo.phi) * photo.r + 1.0), Math.cos(photo.theta) * Math.sin(photo.phi) * photo.r); k = 12; break;
     }
-  } else { const ang = elapsed * 0.08; tmpV.set(Math.sin(ang) * 7.5 + 1.5, 2.6, Math.cos(ang) * 7.5); tmpL.set(0, 1.2, 0); k = 2; }
+  } else if (camMode === 'custom') { tmpV.copy(camCustom.pos); tmpL.copy(camCustom.look); k = 3; }
+  else { const ang = elapsed * 0.08; tmpV.set(Math.sin(ang) * 7.5 + 1.5, 2.6, Math.cos(ang) * 7.5); tmpL.set(0, 1.2, 0); k = 2; }
   const a = 1 - Math.exp(-dt * k);
   camPos.lerp(tmpV, a); camLook.lerp(tmpL, a);
   camera.position.copy(camPos);
@@ -282,7 +310,7 @@ $('#splash').addEventListener('pointerup', () => {
 }, { once: true });
 
 function openMenu() {
-  clearFight(); tourney = null; story = null;
+  clearFight(); tourney = null; story = null; ticker = null; preview(null); arena.setMode('match'); camMode = 'menu';
   show('menu'); renderRank();
   const pool = ROSTER.filter(f => !f.eindbaas);
   const a = pool[(Math.random() * pool.length) | 0], b = pool[(Math.random() * pool.length) | 0];
@@ -290,14 +318,21 @@ function openMenu() {
   music(true, 0.3);
 }
 function renderRank() {
-  const r = rankInfo();
-  $('#rankBox').innerHTML = `Jouw graad: <b>${r.belt.naam}</b> · ${profile.points} keiko-punten<br>${profile.wins} gewonnen · ${profile.ippons} ippon · ${profile.titles} toernooizeges
-    <div class="prog"><i style="width:${Math.round(r.progress * 100)}%;background:${r.belt.kleur === '#151515' ? '#d9a441' : r.belt.kleur}"></i></div>`;
+  const c = campaign.career, nu = nextUnlock();
+  const unl = nu ? `Volgende om vrij te spelen: <b>${byId[nu].naam}</b>${nu === FINAL_BOSS ? ' (versla hem in een finale)' : ' (win een toernooi)'}` : 'Alle senpai en sensei zijn vrijgespeeld!';
+  if (c) {
+    const r = campaign.me().graad, t = campaign.titles()[0];
+    $('#rankBox').innerHTML = `<b>${c.naam}</b> · ${beltOf(r).naam}${t ? ` · 🏆 ${t.label}` : ''}<br>${profile.fights} gevechten · ${profile.tWins} toernooizeges<br>${unl}`;
+  } else {
+    $('#rankBox').innerHTML = `Begin een <b>Campaign</b>: van witte band tot Wereldkampioen.<br>${profile.fights} gevechten · ${profile.tWins} toernooizeges<br>${unl}`;
+  }
 }
 
 $$('#menu [data-go]').forEach(b => b.addEventListener('click', () => {
   sfx.block();
   const go = b.dataset.go;
+  if (go === 'campaign') campaign.open();
+  if (go === 'leaders') openLeaders();
   if (go === 'tournament') openSelect({ title: 'Toernooi · kies je vechter', onPick: id => startTournament(id) });
   if (go === 'story') openSelect({ title: 'Story · kies je vechter', onPick: id => startStory(id) });
   if (go === 'versus') openSelect({ title: 'Versus · speler 1 (aka)', onPick: id => openSelect({ title: 'Versus · tegenstander (shiro)', p2: true, onPick: id2 => loadingThen(() => startFight({ mode: 'versus', akaId: id, shiroId: id2, akaCtrl: vsP2 === 'cpu' ? 'solo' : 'p1', shiroCtrl: vsP2 === 'cpu' ? 'ai' : 'p2', akaCostume: playerCostume() })) }) });
@@ -314,33 +349,41 @@ function openSelect({ title, onPick, p2 = false }) {
   const grid = $('#grid'); grid.innerHTML = '';
   // op graad gesorteerd: sensei, senpai, dan de kyu-graden (zoals de rij bij het groeten in de dojo)
   const order = ROSTER.slice().sort((a, b) => graadNiveau(b.graad) - graadNiveau(a.graad));
+  meData = campaign.me();
+  if (meData) order.unshift(meData);
   for (const f of order) {
-    const locked = f.eindbaas && !profile.unlocked.wesley;
+    const locked = isLocked(f.id);
     const belt = beltOf(f.graad);
     const c = document.createElement('div'); c.className = 'card' + (locked ? ' locked' : ''); c.dataset.id = f.id;
-    c.innerHTML = `${f.eindbaas ? '<span class="boss">EINDBAAS</span>' : ''}<b>${f.naam}</b><small>${f.stijl}<br>${belt.kort} · ${f.geslacht === 'v' ? '♀' : '♂'}</small><span class="belt" style="background:${belt.kleur};${belt.streep ? `box-shadow:inset ${f.graad.dan ? -6 * belt.strepen : -12}px 0 0 ${belt.streep}` : ''}"></span>`;
+    const tt = f.speler ? campaign.titles()[0] : null;
+    if (f.speler) c.classList.add('me');
+    c.innerHTML = `${f.eindbaas && !locked ? '<span class="boss">EINDBAAS</span>' : f.eindbaas ? '<span class="boss">🔒 EINDBAAS</span>' : f.speler ? '<span class="boss">JIJ</span>' : locked ? '<span class="boss">🔒</span>' : ''}${tt ? `<span class="ttl">🏆 ${tt.titel}</span>` : ''}<b>${f.naam}</b><small>${f.stijl}<br>${belt.kort} · ${f.geslacht === 'v' ? '♀' : '♂'}</small><span class="belt" style="background:${belt.kleur};${belt.streep ? `box-shadow:inset ${f.graad.dan ? -6 * belt.strepen : -12}px 0 0 ${belt.streep}` : ''}"></span>`;
     c.addEventListener('click', () => { sfx.block(); pickCard(f.id); });
     c.addEventListener('dblclick', () => confirmPick());
     grid.appendChild(c);
   }
-  $('#selInfo').innerHTML = p2 ? `Speler 2: <button class="btn ghost" id="p2toggle" style="padding:6px 10px">${vsP2 === 'cpu' ? 'Computer' : 'Toetsenbord (pijltjes + J K L I)'}</button>` : (profile.unlocked.wesley ? '' : 'Versla Sensei Wesley in Story om de eindbaas vrij te spelen.');
+  const nu = nextUnlock();
+  $('#selInfo').innerHTML = p2 ? `Speler 2: <button class="btn ghost" id="p2toggle" style="padding:6px 10px">${vsP2 === 'cpu' ? 'Computer' : 'Toetsenbord (pijltjes + J K L I)'}</button>`
+    : nu ? `🔒 Senpai en sensei speel je vrij door toernooien te winnen. Volgende: <b>${byId[nu].naam}</b>${nu === FINAL_BOSS ? ' (versla hem in de finale)' : ''}.` : '';
   $('#p2toggle')?.addEventListener('click', e => { vsP2 = vsP2 === 'cpu' ? 'kb' : 'cpu'; e.target.textContent = vsP2 === 'cpu' ? 'Computer' : 'Toetsenbord (pijltjes + J K L I)'; });
-  pickCard(selId && byId[selId] && !(byId[selId].eindbaas && !profile.unlocked.wesley) ? selId : ROSTER[1].id);
+  pickCard(selId && fighterById(selId) && !isLocked(selId) ? selId : meData ? 'me' : 'skylar');
 }
 function pickCard(id) {
-  selId = id; const f = byId[id];
+  selId = id; const f = fighterById(id);
   $$('#grid .card').forEach(c => c.classList.toggle('sel', c.dataset.id === id));
   const belt = beltOf(f.graad), st = f.stats;
   const bars = Object.entries({ Kracht: st.kracht, Snelheid: st.snelheid, Bereik: st.bereik, Conditie: st.conditie, Benen: st.benen }).map(([k, v]) => `<div class="stat">${k}<div class="bar"><i style="width:${v * 10}%"></i></div></div>`).join('');
   const dirs = ['', '→ + ', '↓ + '];
-  $('#detail').innerHTML = `<div class="sub">${f.titel ? f.titel + ' · ' : ''}${belt.naam} · ${f.geslacht === 'v' ? 'vrouw' : 'man'}</div><h3>${f.naam}</h3>
+  const lockTxt = isLocked(id) ? `<div class="lockNote">🔒 Nog niet speelbaar. ${id === FINAL_BOSS ? 'Versla Sensei Wesley in een toernooifinale om hem vrij te spelen.' : `Win toernooien om vrij te spelen (plek ${UNLOCK_ORDER.indexOf(id) + 1} van ${UNLOCK_ORDER.length + 1}).`}</div>` : '';
+  const titles = f.speler ? campaign.titles().map(t => `<span class="badge">🏆 ${t.label}</span>`).join('') : '';
+  $('#detail').innerHTML = `${lockTxt}<div class="sub">${f.titel ? f.titel + ' · ' : ''}${belt.naam} · ${f.geslacht === 'v' ? 'vrouw' : 'man'}</div><h3>${f.naam}</h3>${titles ? `<div class="badges">${titles}</div>` : ''}
     <div class="sub" style="color:#fff9">${f.stijl}</div><div class="quote">“${f.quote}”</div><div>${f.persoonlijkheid}</div><div style="margin:8px 0">${bars}</div>
-    ${f.signatures.map((s, i) => `<div class="tech"><b>${s.naam}</b><em>${dirs[i]}KIAI</em><span>${s.jp}: ${s.uitleg}</span></div>`).join('')}
-    <div class="tech" style="box-shadow:inset 0 0 0 1px #d9a44166"><b>${f.super.naam}</b> <span class="jp" style="display:inline;color:var(--gold)">${f.super.jp}</span><em>KIAI (vol)</em><span>${f.super.uitleg}</span></div>
+    ${f.signatures.map((s, i) => s ? `<div class="tech"><b>${s.naam}</b><em>${dirs[i]}KIAI</em><span>${s.jp}: ${s.uitleg}</span></div>` : `<div class="tech" style="opacity:.5"><b>🔒 Nog geen techniek</b><em>${dirs[i]}KIAI</em><span>Komt vrij met een hogere graad.</span></div>`).join('')}
+    ${f.super ? `<div class="tech" style="box-shadow:inset 0 0 0 1px #d9a44166"><b>${f.super.naam}</b> <span class="jp" style="display:inline;color:var(--gold)">${f.super.jp}</span><em>KIAI (vol)</em><span>${f.super.uitleg}</span></div>` : '<div class="tech" style="opacity:.5"><b>🔒 Super</b><em>KIAI (vol)</em><span>Komt vrij vanaf de 5e kyu.</span></div>'}
     <div class="tech"><b>Finisher: ${f.finisher.naam}</b><span>${f.finisher.uitleg}</span></div>`;
 }
 function confirmPick() {
-  const f = byId[selId]; if (!f || (f.eindbaas && !profile.unlocked.wesley)) { sfx.block(); return; }
+  const f = fighterById(selId); if (!f || isLocked(selId)) { sfx.block(); return; }
   sfx.kiai(1); say('osu');
   const cb = selCb; selCb = null; cb && cb(selId);
 }
@@ -353,42 +396,57 @@ function loadingThen(fn) {
   setTimeout(() => { show('none'); fn(); }, 1300);
 }
 
-// ── Toernooi (single elimination, 8 vechters) ──
-const ROUND_NAMES = ['Kwartfinale', 'Halve finale', 'Finale'];
+// ── Toernooi (single elimination) ──
+// Gebruikt door de modus Toernooi en door de campaign (NK/EK/WK).
+const ROUND_SETS = { 1: ['Finale'], 2: ['Halve finale', 'Finale'], 3: ['Kwartfinale', 'Halve finale', 'Finale'] };
 function startTournament(playerId) {
-  const pool = ROSTER.filter(f => f.id !== playerId && (!f.eindbaas || profile.unlocked.wesley)).sort(() => Math.random() - 0.5).slice(0, 7);
-  const entrants = [playerId, ...pool.map(f => f.id)].sort(() => Math.random() - 0.5);
-  tourney = { player: playerId, rounds: [pairUp(entrants)], r: 0, out: false };
+  // De eindbaas staat pas in de finale als alle senpai en sensei vrijgespeeld zijn.
+  const boss = bossFinalDue() && playerId !== FINAL_BOSS ? FINAL_BOSS : null;
+  const field = ROSTER.filter(f => f.id !== playerId && !f.eindbaas).sort(() => Math.random() - 0.5).map(f => f.id);
+  startBracket({ player: playerId, field, size: 8, boss, meta: { naam: 'Hokori Meiyo Cup' } });
+}
+// boss: staat in de andere helft van het schema en wint tot de finale
+function startBracket({ player, playerData = null, field, size = 8, boss = null, meta = {} }) {
+  const half = size / 2, others = field.filter(id => id !== player && id !== boss).slice(0, size - 1 - (boss ? 1 : 0));
+  const top = [player, ...others.slice(0, half - 1)].sort(() => Math.random() - 0.5);
+  const bottom = [...others.slice(half - 1), ...(boss ? [boss] : [])].sort(() => Math.random() - 0.5);
+  if (playerData) meData = playerData;
+  tourney = { player, rounds: [pairUp([...top, ...bottom])], r: 0, out: false, size, names: ROUND_SETS[Math.log2(size)], boss, meta };
   openBracket();
 }
 function pairUp(ids) { const out = []; for (let i = 0; i < ids.length; i += 2) out.push({ a: ids[i], b: ids[i + 1], w: null }); return out; }
 function simulateBout(m) {
-  const pw = id => { const s = byId[id].stats; return s.kracht + s.snelheid + s.bereik + s.conditie + s.benen + (byId[id].eindbaas ? 8 : 0) + Math.random() * 14; };
+  const t = tourney;
+  if (t.boss && (m.a === t.boss || m.b === t.boss)) { m.w = t.boss; m.how = 'ippon'; return; }
+  const pw = id => { const f = fighterById(id), s = f.stats; return s.kracht + s.snelheid + s.bereik + s.conditie + s.benen + graadNiveau(f.graad) * 1.5 + Math.random() * 14; };
   m.w = pw(m.a) >= pw(m.b) ? m.a : m.b; m.how = ['ippon', 'hantei', 'waza-ari', 'hantei'][(Math.random() * 4) | 0];
 }
 function openBracket() {
   show('bracket');
-  const t = tourney;
-  $('#bracketTitle').textContent = t.out ? 'UITGESCHAKELD' : t.champion ? 'KAMPIOEN!' : `${ROUND_NAMES[t.r]}`.toUpperCase();
-  $('#bracketView').innerHTML = t.rounds.map((round, ri) => `<div class="round"><div style="font-size:10px;letter-spacing:.15em;color:var(--gold)">${ROUND_NAMES[ri].toUpperCase()}</div>${round.map(m => `<div class="bm">${[m.a, m.b].map(id => `<div class="${m.w === id ? 'w' : ''} ${id === t.player ? 'me' : ''}">${byId[id].naam}</div>`).join('')}</div>`).join('')}</div>`).join('');
-  $('#bracketGo').textContent = t.out || t.champion ? 'Naar het menu' : 'Naar de mat';
+  const t = tourney, final = t.r === t.names.length - 1;
+  $('#bracketTitle').innerHTML = `${t.meta.naam ? `<small>${t.meta.naam.toUpperCase()}</small><br>` : ''}${t.out ? 'UITGESCHAKELD' : t.champion ? 'KAMPIOEN!' : t.names[t.r].toUpperCase()}`;
+  $('#bracketView').innerHTML = t.rounds.map((round, ri) => `<div class="round"><div style="font-size:10px;letter-spacing:.15em;color:var(--gold)">${t.names[ri].toUpperCase()}</div>${round.map(m => `<div class="bm">${[m.a, m.b].map(id => `<div class="${m.w === id ? 'w' : ''} ${id === t.player ? 'me' : ''}">${fighterById(id).naam}${id === t.boss ? ' 👑' : ''}</div>`).join('')}</div>`).join('')}</div>`).join('');
+  $('#bracketGo').textContent = t.out || t.champion ? (t.meta.campaign ? 'Naar de hub' : 'Naar het menu') : final && t.boss ? 'Finale tegen Sensei Wesley' : 'Naar de mat';
 }
 $('#bracketGo').addEventListener('click', () => {
   const t = tourney; if (!t) return;
-  if (t.out || t.champion) return openMenu();
+  if (t.out || t.champion) return t.meta.campaign ? campaign.tournamentOver() : openMenu();
   const round = t.rounds[t.r];
   const mine = round.find(m => m.a === t.player || m.b === t.player);
   const opp = mine.a === t.player ? mine.b : mine.a;
   t.current = mine;
-  loadingThen(() => startFight({ mode: 'tournament', akaId: t.player, shiroId: opp, akaCtrl: 'solo', shiroCtrl: 'ai', diff: t.r === 2 ? bump(cfg.diff, 1) : cfg.diff, akaCostume: playerCostume() }));
+  const final = t.r === t.names.length - 1;
+  const diff = t.meta.diff ? t.meta.diff[Math.min(t.r, t.meta.diff.length - 1)] : final ? bump(cfg.diff, 1) : cfg.diff;
+  loadingThen(() => startFight({ mode: t.meta.campaign ? 'campaign' : 'tournament', akaId: t.player, shiroId: opp, akaCtrl: 'solo', shiroCtrl: 'ai', diff, shiroScale: opp === FINAL_BOSS ? Math.max(1, t.meta.scale || 1) : t.meta.scale, akaCostume: t.meta.campaign ? {} : playerCostume() }));
 });
-$('#bracketQuit').addEventListener('click', openMenu);
+$('#bracketQuit').addEventListener('click', () => (tourney?.meta.campaign ? campaign.tournamentOver() : openMenu()));
 function advanceTournament(won, how) {
   const t = tourney, round = t.rounds[t.r];
-  t.current.w = won ? t.player : (t.current.a === t.player ? t.current.b : t.current.a); t.current.how = how;
+  const opp = t.current.a === t.player ? t.current.b : t.current.a;
+  t.current.w = won ? t.player : opp; t.current.how = how;
   round.filter(m => !m.w).forEach(simulateBout);
   if (!won) { t.out = true; return; }
-  if (t.r === 2) { t.champion = true; profile.titles++; saveProfile(); return addBonus(200); }
+  if (t.r === t.names.length - 1) { t.champion = true; t.finalOpp = opp; return; }
   t.r++; t.rounds.push(pairUp(round.map(m => m.w)));
 }
 function bump(level, n) { const ks = Object.keys(DIFFICULTY); return ks[Math.max(0, Math.min(ks.length - 1, ks.indexOf(level) + n))]; }
@@ -537,48 +595,102 @@ function onFightEnd(winner, how) {
   const g = G; lastFight = { ...g, aka: undefined, shiro: undefined, match: undefined, ctrl: undefined, ai: undefined, hud: undefined };
   const twoP = g.mode === 'versus' && vsP2 !== 'cpu';
   const won = winner.corner === 'aka';
-  let rankLine = '';
-  if (!twoP) {
+  let rankLine = '', titleWon = null, extra = [];
+  if (g.mode === 'tournament' || g.mode === 'campaign') advanceTournament(won, how);
+  if (g.mode === 'campaign') {
+    const r = campaign.fightEnded({ won, how, tourney });
+    rankLine = campaign.rankLine(r.rw); titleWon = r.titleWon; extra = r.extra;
+  } else if (!twoP) {
     const r = addResult({ won, how, mode: g.mode });
     let bonus = null;
-    if (g.mode === 'tournament') bonus = advanceTournament(won, how);
+    if (g.mode === 'tournament' && tourney.champion) {
+      profile.titles++; profile.tWins++; saveProfile(); bonus = addBonus(200);
+      const un = unlockAfterTournament({ beatBossInFinal: tourney.finalOpp === FINAL_BOSS });
+      if (un) extra.push(`Vrijgespeeld: <b>${un.naam}</b> (${beltOf(un.graad).naam})${un.id === FINAL_BOSS ? ' · de eindbaas!' : ''}`);
+    }
     if (g.mode === 'story' && won) {
       story.i++;
-      if (story.i >= story.ladder.length) { profile.storyBest = Math.max(profile.storyBest, story.i); profile.unlocked.wesley = true; saveProfile(); bonus = addBonus(300); story.done = true; }
+      if (story.i >= story.ladder.length) { profile.storyBest = Math.max(profile.storyBest, story.i); saveProfile(); bonus = addBonus(300); story.done = true; }
     }
     const ri = rankInfo();
-    rankLine = `+${r.pts + (bonus?.pts || 0)} keiko-punten · ${ri.belt.naam}<div class="prog"><i style="width:${Math.round(ri.progress * 100)}%"></i></div>` + ((r.promoted || bonus?.promoted) ? `<div style="color:var(--gold);font-weight:900;margin-top:6px">PROMOTIE! Je bent nu ${ri.belt.naam}. Osu!</div>` : '');
-    online.submit({ naam: 'Ik', vechter: g.akaId, punten: profile.points, graad: ri.belt.naam });
+    rankLine = `+${r.pts + (bonus?.pts || 0)} keiko-punten · ${ri.belt.naam}<div class="prog"><i style="width:${Math.round(ri.progress * 100)}%"></i></div>` + ((r.promoted || bonus?.promoted) ? `<div class="promo">PROMOTIE! Je bent nu ${ri.belt.naam}. Osu!</div>` : '');
   }
+  if (!twoP) submitStats();
   const title = twoP ? `${winner.data.naam.toUpperCase()} WINT` : won ? 'OVERWINNING' : 'NEDERLAAG';
   let text = twoP ? '' : won ? `${winner.data.naam} wint van ${g.shiro.data.naam}.` : `${g.shiro.data.naam} was vandaag sterker. Osu: buigen, leren, terugkomen.`;
-  if (g.mode === 'tournament' && tourney?.champion) text = `${byId[tourney.player].naam} is toernooikampioen van Dojo Hokori Meiyo!`;
-  if (g.mode === 'story' && story?.done) text = 'Je hebt Sensei Wesley verslagen. Sensei Wesley is nu speelbaar. Eer &amp; Trots!';
+  if (tourney?.champion) text = `${fighterById(tourney.player).naam} wint het ${tourney.meta.naam || 'toernooi'}!`;
+  else if (tourney?.out) text += ` Uitgeschakeld in de ${tourney.names[tourney.r].toLowerCase()}.`;
+  if (g.mode === 'story' && story?.done) text = 'Je hebt de hele dojo verslagen, tot en met Sensei Wesley. Eer &amp; Trots!';
+  if (extra.length) text += '<br>' + extra.join('<br>');
   setTimeout(() => {
     show('result'); $('#hud').classList.remove('on'); $('#touch').classList.remove('on');
     const h = $('#resTitle'); h.textContent = title; h.className = won || twoP ? 'win' : 'lose';
     $('#resHow').textContent = HOW[how] || how; $('#resText').innerHTML = text; $('#resRank').innerHTML = rankLine;
+    $('#resTitle2').innerHTML = titleWon ? `<span class="jp">🏆</span> ${titleWon.toUpperCase()}` : '';
+    if (titleWon) { sfx.roar(); fx.flash(0.4, '#ffe7a8'); }
+    resultNext = null;
+    const inBracket = g.mode === 'tournament' || g.mode === 'campaign';
     $('#resNext').style.display = g.mode === 'versus' || (g.mode === 'story' && (!won || story?.done)) ? 'none' : '';
-    $('#resNext').textContent = g.mode === 'tournament' ? 'Naar het schema' : 'Volgende tegenstander';
-    $('#resAgain').style.display = g.mode === 'tournament' ? 'none' : '';
+    $('#resNext').textContent = inBracket ? (tourney.out || tourney.champion ? (g.mode === 'campaign' ? 'Naar de hub' : 'Naar het schema') : 'Naar het schema') : 'Volgende tegenstander';
+    $('#resAgain').style.display = inBracket ? 'none' : '';
     music(true, 0.3);
   }, 600);
 }
-$('#resMenu').addEventListener('click', openMenu);
+let resultNext = null; // eigen vervolg (campaign-training)
+$('#resMenu').addEventListener('click', () => { resultNext = null; openMenu(); });
 $('#resAgain').addEventListener('click', () => {
   if (!lastFight) return;
   if (lastFight.mode === 'story') return openStory();
   const lf = lastFight; loadingThen(() => startFight({ ...lf }));
 });
 $('#resNext').addEventListener('click', () => {
+  if (resultNext) { const f = resultNext; resultNext = null; return f(); }
   if (!lastFight) return;
+  if (lastFight.mode === 'campaign') { clearFight(); return tourney.out || tourney.champion ? campaign.tournamentOver() : openBracket(); }
   if (lastFight.mode === 'tournament') { clearFight(); return openBracket(); }
   if (lastFight.mode === 'story') { clearFight(); return openStory(); }
 });
 
+// ── Online leaderboard ──
+function playerName() { return campaign.career?.naam || profile.naam || ''; }
+function submitStats() {
+  const naam = playerName(); if (!naam) return;
+  const c = campaign.career;
+  online.submit({ naam, fights: profile.fights, twins: profile.tWins, graad: c ? beltOf(campaign.me().graad).kort : '', titels: c ? c.titles.length : profile.titles });
+}
+let leadersBy = 'fights';
+async function openLeaders() {
+  overlay('leaders', true);
+  $('#ldName').value = playerName();
+  $$('#leaders [data-by]').forEach(b => b.classList.toggle('ghost', b.dataset.by !== leadersBy));
+  $('#ldList').innerHTML = '<div class="muted">Laden…</div>';
+  const res = await online.top(leadersBy, 25);
+  $('#ldStatus').innerHTML = res.online ? `🟢 Online · bijgewerkt ${new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}` : `🟠 ${res.reason || 'Offline'}: alleen jouw eigen stand`;
+  $('#ldList').innerHTML = res.rows.length ? `<table><tr><th>#</th><th>Naam</th><th>Graad</th><th>${leadersBy === 'fights' ? 'Gevechten' : 'Toernooizeges'}</th><th>${leadersBy === 'fights' ? 'Toernooizeges' : 'Gevechten'}</th></tr>${res.rows.map((r, i) => `<tr class="${r.me ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.naam)}${r.titels ? ` <small>🏆${r.titels}</small>` : ''}</td><td>${esc(r.graad || '')}</td><td><b>${leadersBy === 'fights' ? r.fights : r.twins}</b></td><td>${leadersBy === 'fights' ? r.twins : r.fights}</td></tr>`).join('')}</table>` : '<div class="muted">Nog niemand op het bord. Speel een gevecht!</div>';
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+$$('#leaders [data-by]').forEach(b => b.addEventListener('click', () => { leadersBy = b.dataset.by; openLeaders(); }));
+$('#ldSave').addEventListener('click', () => {
+  const n = $('#ldName').value.trim().slice(0, 16); if (!n) return;
+  profile.naam = n; saveProfile(); submitStats(); setTimeout(openLeaders, 600);
+});
+$('#ldClose').addEventListener('click', () => overlay('leaders', false));
+
+// ── Campaign ──
+const campaign = initCampaign({
+  show, overlay, scene, arena, fx, sfx, say, touch, isTouch, music, preview, openMenu, openLeaders, startBracket,
+  clearFight: () => { clearFight(); tourney = null; },
+  camera: (pos, look) => { camCustom.pos.copy(pos); camCustom.look.copy(look); camMode = 'custom'; },
+  setTicker: fn => (ticker = fn),
+  setMe: d => (meData = d),
+  setResultNext: fn => (resultNext = fn),
+  onName: n => { if (!profile.naam) { profile.naam = n; saveProfile(); } },
+  onStats: () => submitStats(),
+});
+
 // Testhaak voor de Playwright-tests (tools/test)
 window.__game = {
-  get G() { return G; }, startFight, openMenu, cfg, profile, fx, photo,
+  get G() { return G; }, startFight, openMenu, cfg, profile, fx, photo, campaign, get tourney() { return tourney; }, openLeaders,
   setCam: m => (camMode = m), pause: v => (paused = v),
   step(dt) { simulate(dt); fx.update(dt); updateCamera(dt); renderer.render(scene, camera); },
   sim(dt, n = 1) { for (let i = 0; i < n && G; i++) { simulate(dt); fx.update(dt); } },

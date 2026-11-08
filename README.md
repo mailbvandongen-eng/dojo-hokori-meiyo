@@ -26,12 +26,14 @@ npm run serve        # python3 -m http.server 8766
 
 ## Wat zit erin
 
-- **Toernooi** (single elimination, 8 vechters), **Story** (naar Sensei Wesley), **Versus** (CPU of 2 spelers), **Training** (met uitleg), **Photo Mode**.
+- **Campaign (hoofdmodus):** maak je eigen vechter (meisje of jongen) en groei van witte band naar zwarte band. Om en om trainen (bokszak, gewichtheffen) en toernooien (club → regio → **NK → EK → WK**), met titels als Nederlands, Europees en Wereldkampioen, upgrades van noob tot legend, en Sensei Wesley in de WK-finale.
+- **Toernooi** (Hokori Meiyo Cup: speel senpai en sensei vrij), **Story**, **Versus** (CPU of 2 spelers), **Training** (met uitleg), **Photo Mode**.
+- **Online leaderboard:** meeste gevechten en meeste toernooizeges (Cloudflare Worker, zie `server/leaderboard`).
 - Kyokushin-wedstrijdregels: rei-ceremonie, Hajime/Yame, waza-ari, ippon, awasete ippon, knock-down-telling, hantei met de vlaggen van de hoekscheidsrechters, encho-sen, chui/genten/hansoku, jogai.
 - 37 vechters (mannen en vrouwen, met de echte graden en bandkleuren van de dojo), elk met stats, 3 signatures, een super en een finisher. 18 technieken met Japanse naam en uitleg, waaronder Ushiro Mawashi Geri en de Rol Kick.
 - Schademodel met beenschade (lage trappen), rompschade en hoofdtreffers.
 - Toernooihal met tatami, scheidsrechter, 2 hoekscheidsrechters met rode en witte vlaggen, publiek, banners en wapperende Hokori Meiyo-vlaggen.
-- Graden van 10e kyu tot 3e dan, keiko-punten en vrij te spelen dogi.
+- Graden van 10e kyu tot 3e dan: tot de 5e kyu normaal, tot bruin 2× en tot zwart 4× zo langzaam. Senpai en sensei speel je vrij door toernooien te winnen.
 - Logo op het splash-scherm, in het menu, de pauze, de opties, het laden, de uitslag, de HUD, de arena, op de dogi en als watermerk op foto's.
 
 ## Documentatie
@@ -53,6 +55,8 @@ node tools/test/data.mjs
 NODE_PATH=/root/tools/pw/node_modules node tools/test/smoke.cjs
 NODE_PATH=/root/tools/pw/node_modules node tools/test/rules.cjs 8
 NODE_PATH=/root/tools/pw/node_modules node tools/test/poses.cjs
+NODE_PATH=/root/tools/pw/node_modules node tools/test/unlocks.cjs
+NODE_PATH=/root/tools/pw/node_modules node tools/test/campaign.cjs   # met lokale leaderboard-server, zie server/leaderboard
 ```
 
 ## Licenties
