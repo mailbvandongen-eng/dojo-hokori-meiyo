@@ -1,0 +1,8 @@
+{
+  "appId": "nl.hokorimeiyo.fightgame",
+  "appName": "Hokori Meiyo Fight",
+  "webDir": "www",
+  "backgroundColor": "#0b0b10",
+  "ios": { "contentInset": "never" },
+  "android": { "allowMixedContent": false }
+}

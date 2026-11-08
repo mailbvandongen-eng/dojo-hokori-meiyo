@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/logo.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Dojo Hokori Meiyo Fight Game</title>
+<style>
+@font-face{font-family:"Yuji Boku";src:url(assets/fonts/yuji-boku-subset.woff2) format("woff2");font-display:swap}
+:root{--red:#b1101f;--red2:#7d0a14;--gold:#d9a441;--ink:#0b0b10;--paper:#fbf7ee;--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{position:fixed;inset:0;margin:0;overflow:hidden;background:var(--ink);touch-action:none;overscroll-behavior:none;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--paper)}
+canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:block}
+.jp{font-family:"Yuji Boku","Hiragino Mincho ProN","Yu Mincho",serif}
+.screen{position:fixed;inset:0;z-index:10;display:none;padding:max(14px,var(--sat)) max(16px,var(--sar)) max(14px,var(--sab)) max(16px,var(--sal))}
+.screen.on{display:flex}
+.btn{font:inherit;font-weight:900;letter-spacing:.06em;text-transform:uppercase;border:0;border-radius:10px;padding:12px 22px;color:var(--paper);background:linear-gradient(#c3182a,#860b16);box-shadow:0 3px 0 #4a050b,inset 0 1px 0 #ff6b7a66;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #4a050b}
+.btn.ghost{background:#ffffff14;box-shadow:inset 0 0 0 1px #ffffff30}
+.btn.gold{background:linear-gradient(#e8b85a,#a87522);color:#1a1006;box-shadow:0 3px 0 #5a3d0f}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.panel{background:#0c0c12d9;border:1px solid #ffffff1c;border-radius:14px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.logo{display:block;max-width:100%;height:auto}
+
+/* splash */
+#splash{background:radial-gradient(ellipse at center,#2a0509 0%,#000 70%);flex-direction:column;align-items:center;justify-content:center;gap:2vh;cursor:pointer}
+#splash .logo{width:min(56vh,70vw);opacity:0;transform:scale(.86);animation:logoIn 2.2s .3s cubic-bezier(.2,.8,.2,1) forwards;filter:drop-shadow(0 0 40px #b1101f88)}
+#splash .tag{opacity:0;animation:fadeIn 1s 2.2s forwards;font-weight:900;letter-spacing:.4em;color:var(--gold);font-size:clamp(12px,2.2vh,18px)}
+#splash .tap{opacity:0;animation:fadeIn 1s 2.8s forwards,pulse 1.6s 3.8s infinite;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#fff9}
+@keyframes logoIn{to{opacity:1;transform:scale(1)}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes pulse{50%{opacity:.35}}
+
+/* menu */
+#menu{background:linear-gradient(90deg,#000000e6 0%,#000000a0 45%,#0000 75%);align-items:center;gap:4vw}
+#menu .col{display:flex;flex-direction:column;gap:10px;width:min(340px,44vw)}
+#menu .wordmark{width:auto;max-width:100%;height:min(19vh,110px);object-fit:contain;object-position:left;margin-bottom:4px}
+#menu .col{max-height:100%;overflow:auto}
+#menu .btn{text-align:left;padding:clamp(7px,1.8vh,13px) 18px;font-size:clamp(12px,2.4vh,17px)}
+#menu .btn small{display:block;font-size:10px;letter-spacing:.08em;opacity:.7;font-weight:600;text-transform:none}
+#rankBox{padding:10px 14px;font-size:12px}
+#rankBox b{color:var(--gold)}
+.prog{height:6px;border-radius:9px;background:#ffffff20;overflow:hidden;margin-top:6px}.prog i{display:block;height:100%;background:var(--gold)}
+#menu .emblem{margin-left:auto;width:min(46vh,34vw);opacity:.95;filter:drop-shadow(0 0 30px #000)}
+
+/* selectie */
+#select{background:#000000c8;flex-direction:column;gap:10px}
+#select header{display:flex;align-items:center;gap:12px}
+#select header h2{margin:0;font-size:clamp(15px,2.8vh,22px);letter-spacing:.12em;text-transform:uppercase}
+#select header img{height:42px}
+#select .body{display:flex;gap:12px;flex:1;min-height:0}
+#grid{flex:1.2;display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:7px;overflow:auto;align-content:start;padding:2px}
+.card{position:relative;border-radius:10px;padding:8px 8px 9px;background:linear-gradient(#1c1c24,#121218);border:2px solid #ffffff14;cursor:pointer;min-height:66px}
+.card.sel{border-color:var(--gold);box-shadow:0 0 0 2px #d9a44155}
+.card.locked{opacity:.4}
+.card b{display:block;font-size:12.5px;line-height:1.15}
+.card small{font-size:10px;opacity:.65}
+.card .belt{position:absolute;left:8px;right:8px;bottom:5px;height:4px;border-radius:2px}
+.card .boss{position:absolute;top:4px;right:6px;font-size:9px;color:var(--gold);font-weight:900}
+#detail{flex:1;padding:14px;overflow:auto;font-size:13px;line-height:1.4}
+#detail h3{margin:0;font-size:22px}
+#detail .sub{color:var(--gold);font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+#detail .quote{font-style:italic;opacity:.85;margin:8px 0}
+.stat{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:8px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:3px 0}
+.stat .bar{height:7px;background:#ffffff1a;border-radius:9px;overflow:hidden}.stat .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--gold))}
+.tech{margin:6px 0;padding:6px 8px;background:#ffffff0c;border-radius:8px}
+.tech b{color:var(--paper)}.tech em{color:var(--gold);font-style:normal;font-size:11px;margin-left:6px}
+.tech span{display:block;opacity:.75;font-size:12px}
+#select footer{display:flex;gap:10px;justify-content:flex-end;align-items:center}
+#select footer .info{margin-right:auto;font-size:12px;opacity:.75}
+
+/* bracket / story / loading */
+#bracket,#story,#loading{background:radial-gradient(ellipse at center,#1a0306f0,#000f);flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+#bracketView{display:flex;gap:18px;align-items:center;overflow:auto;max-width:100%}
+.round{display:flex;flex-direction:column;gap:10px;justify-content:space-around}
+.bm{min-width:130px;padding:6px 10px;border-radius:8px;background:#ffffff10;font-size:12px;text-align:left}
+.bm div{padding:2px 0}.bm .w{color:var(--gold);font-weight:900}.bm .me{text-decoration:underline}
+#loading .logo{width:min(34vh,40vw);animation:spinIn 1.2s ease-out}
+@keyframes spinIn{from{opacity:0;transform:scale(.8) rotate(-8deg)}}
+#loading .tip{max-width:560px;font-size:14px;opacity:.85;line-height:1.45}
+#loading .bar2{width:240px;height:4px;background:#ffffff22;border-radius:9px;overflow:hidden}#loading .bar2 i{display:block;height:100%;width:0;background:var(--gold);transition:width 1.1s linear}
+#story .vs{display:flex;align-items:center;gap:20px;font-size:clamp(18px,4vh,30px);font-weight:900}
+#story .line{max-width:600px;font-style:italic;opacity:.9}
+#story .ladder{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:90vw}
+#story .ladder span{font-size:10px;padding:3px 7px;border-radius:6px;background:#ffffff12}
+#story .ladder span.done{background:#2e8b3e88}#story .ladder span.now{background:var(--red);font-weight:900}
+
+/* HUD */
+#hud{z-index:5;pointer-events:none;display:none;flex-direction:column}
+#hud.on{display:block}
+.hudTop{position:absolute;left:max(12px,var(--sal));right:max(12px,var(--sar));top:max(8px,var(--sat));display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start}
+.side{display:flex;flex-direction:column;gap:4px}.side.r{align-items:flex-end}
+.nm{font-weight:900;font-size:clamp(12px,2.4vh,16px);text-shadow:0 1px 3px #000;display:flex;gap:8px;align-items:center}
+.nm .corner{font-size:10px;padding:1px 6px;border-radius:4px;font-weight:900}
+.aka .corner{background:#c8102e}.shiro .corner{background:#fff;color:#111}
+.ki{width:min(38vw,420px);height:14px;background:#000a;border-radius:3px;overflow:hidden;box-shadow:inset 0 0 0 1px #fff4;position:relative}
+.ki i{position:absolute;inset:0;transform-origin:left;background:linear-gradient(#ffe08a,#d9a441);transition:transform .15s}
+.ki u{position:absolute;inset:0;transform-origin:left;background:#c8102e;transition:transform .8s .25s}
+.side.r .ki i,.side.r .ki u{transform-origin:right}
+.marks{display:flex;gap:6px;font-size:10px;font-weight:900;align-items:center;text-shadow:0 1px 2px #000}
+.wz{display:inline-block;width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--gold)}.wz.on{background:var(--gold)}
+.pen{color:#ffb3b3}
+.dmg{display:flex;gap:6px;font-size:9px;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+.dmg span{display:flex;align-items:center;gap:3px}.dmg i{display:inline-block;width:34px;height:4px;background:#ffffff22;border-radius:2px;overflow:hidden}.dmg i b{display:block;height:100%;background:#ff7a5c}
+.clock{text-align:center;text-shadow:0 2px 6px #000}
+.clock .t{font-size:clamp(22px,5vh,38px);font-weight:900;font-variant-numeric:tabular-nums;line-height:1}
+.clock .r{font-size:10px;letter-spacing:.2em;color:var(--gold);font-weight:900}
+.clock img{height:28px;opacity:.9;margin-top:2px}
+.meterRow{position:absolute;bottom:max(10px,var(--sab));left:max(12px,var(--sal));right:max(12px,var(--sar));display:flex;justify-content:space-between}
+.meter{width:min(26vw,240px)}.meter .lbl{font-size:9px;font-weight:900;letter-spacing:.15em;color:var(--gold);text-shadow:0 1px 2px #000}
+.meter .seg{display:flex;gap:3px;margin-top:3px}.meter .seg i{flex:1;height:8px;background:#0008;border-radius:2px;box-shadow:inset 0 0 0 1px #fff3;overflow:hidden;position:relative}
+.meter .seg i b{position:absolute;inset:0;background:linear-gradient(90deg,#c8102e,#ff9a3c);transform-origin:left}
+.meter.full .seg i b{background:linear-gradient(90deg,#ffd76a,#fff);animation:pulse .6s infinite}
+#callout{position:absolute;left:0;right:0;top:30%;text-align:center;pointer-events:none;opacity:0;transition:opacity .2s}
+#callout.on{opacity:1}
+#callout .big{font-size:clamp(34px,10vh,86px);font-weight:900;font-style:italic;letter-spacing:.02em;text-shadow:0 4px 0 #000,0 0 30px #000;transform:skewX(-6deg)}
+#callout .big.aka{color:#ff4057}#callout .big.shiro{color:#fff}
+#callout .sub{font-size:clamp(12px,2.4vh,18px);font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 2px 4px #000;opacity:.9}
+#callout .kanji{font-size:clamp(20px,5vh,44px);color:var(--gold);text-shadow:0 2px 6px #000}
+#special{position:absolute;top:22%;width:100%;text-align:center;font-weight:900;font-size:clamp(14px,3vh,24px);letter-spacing:.15em;opacity:0;transition:opacity .2s;text-shadow:0 2px 6px #000}
+#special.on{opacity:1}#special .jp{display:block;color:var(--gold);font-size:1.6em}
+#votes{position:absolute;top:56%;left:0;right:0;display:flex;justify-content:center;gap:14px;opacity:0;transition:opacity .3s}
+#votes.on{opacity:1}#votes div{width:38px;height:30px;border-radius:3px;box-shadow:0 2px 8px #000}
+#pauseBtn{position:absolute;top:max(8px,var(--sat));right:50%;transform:translateX(130%);pointer-events:auto;width:34px;height:34px;padding:0;border-radius:50%;font-size:13px}
+
+/* touch */
+#touch{position:fixed;inset:0;z-index:6;display:none;pointer-events:none}
+#touch.on{display:block}
+#touch .stick{position:absolute;left:0;top:18%;bottom:0;width:48%;pointer-events:auto}
+#touch .ring{position:fixed;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;box-shadow:inset 0 0 0 3px #fff4;background:#0003;opacity:0;pointer-events:none;transition:opacity .15s}
+#touch .knob{position:absolute;left:28px;top:28px;width:54px;height:54px;border-radius:50%;background:#fff7}
+#touch .pad{position:absolute;right:max(14px,var(--sar));bottom:max(30px,calc(var(--sab) + 26px));width:200px;height:170px;pointer-events:auto}
+#touch [data-btn]{position:absolute;width:74px;height:74px;border-radius:50%;border:0;font:inherit;font-weight:900;font-size:11px;letter-spacing:.04em;color:#fff;background:#00000070;box-shadow:inset 0 0 0 2px #ffffff60;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;touch-action:none}
+#touch [data-btn] .jp{font-size:20px}
+#touch [data-btn].on{background:#ffffff40;transform:scale(.94)}
+#touch [data-btn=tsuki]{right:96px;bottom:0;box-shadow:inset 0 0 0 2px #ff8a8a}
+#touch [data-btn=geri]{right:0;bottom:30px;box-shadow:inset 0 0 0 2px #8ab6ff}
+#touch [data-btn=uke]{right:150px;bottom:84px;width:60px;height:60px;box-shadow:inset 0 0 0 2px #9be39b}
+#touch [data-btn=kiai]{right:40px;bottom:112px;width:62px;height:62px;box-shadow:inset 0 0 0 2px var(--gold)}
+#touch [data-btn=kiai].ready{background:#d9a44188;animation:pulse .8s infinite}
+
+/* pauze / opties / resultaat */
+#pause,#options,#result,#moves{background:#000000d0;align-items:center;justify-content:center;z-index:20}
+#pause .panel,#options .panel,#result .panel,#moves .panel{padding:clamp(10px,3vh,20px) 24px;display:flex;flex-direction:column;gap:clamp(5px,1.6vh,10px);align-items:stretch;min-width:min(380px,90vw);max-height:92vh;overflow:auto}
+#pause .logo,#options .logo{width:min(120px,16vh);align-self:center}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:13px}
+.opt select,.opt input{font:inherit;background:#1d1d25;color:var(--paper);border:1px solid #ffffff30;border-radius:8px;padding:6px 8px}
+#result .panel{align-items:center;text-align:center;min-width:min(460px,92vw)}
+#result .logo{width:min(150px,20vh)}
+#result h2{margin:0;font-size:clamp(24px,7vh,54px);font-style:italic;letter-spacing:.04em}
+#result h2.win{color:var(--gold)}#result h2.lose{color:#ddd}
+#result .how{font-weight:900;letter-spacing:.2em;color:#ff6b7a}
+#result .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#moves .panel{max-width:min(720px,94vw)}
+#moves table{border-collapse:collapse;font-size:12.5px}#moves td{padding:5px 6px;border-bottom:1px solid #ffffff12;vertical-align:top}
+#moves td.k{white-space:nowrap;color:var(--gold);font-weight:800}
+#moves td.n b{display:block}
+
+/* training */
+#trainBar{position:fixed;left:50%;transform:translateX(-50%);bottom:max(12px,var(--sab));z-index:7;display:none;gap:8px;padding:8px}
+#trainBar.on{display:flex}#trainBar .btn{padding:8px 12px;font-size:11px}
+#trainInfo{position:fixed;left:max(12px,var(--sal));top:42%;z-index:7;display:none;padding:10px 12px;font-size:12px;max-width:260px;line-height:1.4}
+#trainInfo.on{display:block}#trainInfo b{color:var(--gold)}
+
+/* fotomodus */
+#photo{z-index:20;pointer-events:none;align-items:flex-end;justify-content:center}
+#photo .panel{pointer-events:auto;display:flex;gap:8px;padding:8px;align-items:center}
+#photo .hint{font-size:11px;opacity:.7;margin:0 6px}
+#flash{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;background:#fff}
+#vignette{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,#000a 100%)}
+#rotate{position:fixed;inset:0;z-index:99;display:none;background:#000;align-items:center;justify-content:center;text-align:center;padding:30px;font-weight:800}
+@media (orientation:portrait) and (max-width:700px){#rotate{display:flex}}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="vignette"></div>
+<div id="flash"></div>
+
+<div id="splash" class="screen on">
+  <img class="logo" src="assets/logo.svg" alt="Dojo Hokori Meiyo">
+  <div class="tag">EER &amp; TROTS · OSU NO SEISHIN</div>
+  <div class="tap">Tik om te beginnen</div>
+</div>
+
+<div id="menu" class="screen">
+  <div class="col">
+    <img class="wordmark logo" src="assets/logo-wordmark.svg" alt="Dojo Hokori Meiyo">
+    <button class="btn" data-go="tournament">Toernooi<small>Single elimination, echte Kyokushin-wedstrijdregels</small></button>
+    <button class="btn ghost" data-go="story">Story<small>Klim naar de top van de dojo</small></button>
+    <button class="btn ghost" data-go="versus">Versus<small>Tegen de computer of lokaal met 2 spelers</small></button>
+    <button class="btn ghost" data-go="training">Training<small>Technieken met uitleg</small></button>
+    <button class="btn ghost" data-go="options">Opties</button>
+    <div id="rankBox" class="panel"></div>
+  </div>
+  <img class="emblem logo" src="assets/logo.svg" alt="">
+</div>
+
+<div id="select" class="screen">
+  <header><img class="logo" src="assets/logo.svg" alt=""><h2 id="selTitle">Kies je vechter</h2></header>
+  <div class="body"><div id="grid"></div><div id="detail" class="panel"></div></div>
+  <footer><span class="info" id="selInfo"></span><button class="btn ghost" id="selBack">Terug</button><button class="btn" id="selOk">Osu! Kies</button></footer>
+</div>
+
+<div id="bracket" class="screen">
+  <img class="logo" src="assets/logo-wordmark.svg" style="width:min(320px,60vw)" alt="">
+  <h2 id="bracketTitle" style="margin:0;letter-spacing:.15em">TOERNOOI</h2>
+  <div id="bracketView"></div>
+  <div style="display:flex;gap:10px"><button class="btn ghost" id="bracketQuit">Stoppen</button><button class="btn" id="bracketGo">Naar de mat</button></div>
+</div>
+
+<div id="story" class="screen">
+  <div class="ladder" id="ladder"></div>
+  <div class="vs"><span id="stA"></span><span class="jp" style="color:var(--gold)">対</span><span id="stB"></span></div>
+  <div class="line" id="stLine"></div>
+  <div style="display:flex;gap:10px"><button class="btn ghost" id="storyQuit">Stoppen</button><button class="btn" id="storyGo">Hajime</button></div>
+</div>
+
+<div id="loading" class="screen">
+  <img class="logo" src="assets/logo.svg" alt="">
+  <div class="bar2"><i></i></div>
+  <div class="tip" id="tip"></div>
+</div>
+
+<div id="hud">
+  <div class="hudTop">
+    <div class="side aka" id="hudA"></div>
+    <div class="clock"><div class="r" id="hudRound">HON-SEN</div><div class="t" id="hudTime">2:00</div><img class="logo" src="assets/logo.svg" alt=""></div>
+    <div class="side r shiro" id="hudB"></div>
+  </div>
+  <button class="btn ghost" id="pauseBtn" aria-label="Pauze">II</button>
+  <div id="special"></div>
+  <div id="callout"></div>
+  <div id="votes"></div>
+  <div class="meterRow"><div class="meter" id="meterA"></div><div class="meter" id="meterB"></div></div>
+</div>
+
+<div id="touch">
+  <div class="stick"><div class="ring"><div class="knob"></div></div></div>
+  <div class="pad">
+    <button data-btn="uke"><span class="jp">受</span>UKE</button>
+    <button data-btn="kiai"><span class="jp">気</span>KIAI</button>
+    <button data-btn="tsuki"><span class="jp">突</span>TSUKI</button>
+    <button data-btn="geri"><span class="jp">蹴</span>GERI</button>
+  </div>
+</div>
+
+<div id="trainBar" class="panel">
+  <button class="btn ghost" id="trDummy">Pop: stil</button>
+  <button class="btn ghost" id="trMoves">Technieken</button>
+  <button class="btn ghost" id="trReset">Reset</button>
+  <button class="btn" id="trQuit">Klaar</button>
+</div>
+<div id="trainInfo" class="panel"></div>
+
+<div id="pause" class="screen">
+  <div class="panel">
+    <img class="logo" src="assets/logo.svg" alt="">
+    <button class="btn" id="pResume">Hervatten</button>
+    <button class="btn ghost" id="pPhoto">Fotomodus</button>
+    <button class="btn ghost" id="pMoves">Technieken</button>
+    <button class="btn ghost" id="pOptions">Opties</button>
+    <button class="btn ghost" id="pQuit">Naar het hoofdmenu</button>
+  </div>
+</div>
+
+<div id="moves" class="screen"><div class="panel"><h3 style="margin:0">Technieken · Kihon &amp; Kumite</h3><div id="moveList"></div><button class="btn" id="movesClose">Sluiten</button></div></div>
+
+<div id="options" class="screen">
+  <div class="panel">
+    <img class="logo" src="assets/logo.svg" alt="">
+    <label class="opt">Rondetijd <select id="oTime"><option value="120">2 minuten</option><option value="180">3 minuten</option><option value="60">1 minuut (snel)</option></select></label>
+    <label class="opt">Regels <select id="oRules"><option value="toernooi">Toernooi (authentiek)</option><option value="dojo">Dojo (vrij, met specials)</option></select></label>
+    <label class="opt">Tegenstander <select id="oDiff"></select></label>
+    <label class="opt">Stem <select id="oVoice"><option value="ja">Japans (scheidsrechter)</option><option value="nl">Japans + Nederlands</option><option value="off">Uit (alleen tekst)</option></select></label>
+    <label class="opt">Effecten <input id="oSfx" type="range" min="0" max="1" step="0.05"></label>
+    <label class="opt">Muziek <input id="oMusic" type="range" min="0" max="1" step="0.05"></label>
+    <label class="opt">Graphics <select id="oGfx"><option value="hoog">Hoog</option><option value="laag">Laag (zuiniger)</option></select></label>
+    <label class="opt">Kostuum <select id="oCostume"></select></label>
+    <button class="btn" id="oClose">Osu</button>
+  </div>
+</div>
+
+<div id="result" class="screen">
+  <div class="panel">
+    <img class="logo" src="assets/logo.svg" alt="">
+    <h2 id="resTitle"></h2>
+    <div class="how" id="resHow"></div>
+    <div id="resText" style="font-size:13px;opacity:.85;max-width:380px"></div>
+    <div id="resRank" style="width:100%;font-size:12px"></div>
+    <div class="row"><button class="btn ghost" id="resMenu">Menu</button><button class="btn ghost" id="resAgain">Opnieuw</button><button class="btn" id="resNext">Doorgaan</button></div>
+  </div>
+</div>
+
+<div id="photo" class="screen">
+  <div class="panel">
+    <span class="hint">Sleep om te draaien · knijp/scroll om te zoomen</span>
+    <select id="phFilter" class="btn ghost" style="padding:8px"><option value="none">Normaal</option><option value="grayscale(1) contrast(1.2)">Zwart-wit</option><option value="sepia(.8) contrast(1.1)">Sepia</option><option value="contrast(1.3) saturate(1.3)">Toernooi</option></select>
+    <button class="btn gold" id="phShot">Foto opslaan</button>
+    <button class="btn ghost" id="phBack">Terug</button>
+  </div>
+</div>
+
+<div id="rotate">Draai je telefoon een kwartslag.<br>Osu!</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

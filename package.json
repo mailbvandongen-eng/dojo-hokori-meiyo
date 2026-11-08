@@ -1,0 +1,12 @@
+{
+  "name": "dojo-hokori-meiyo-fight-game",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Kyokushin full-contact fighting game voor Dojo Hokori Meiyo (Zoetermeer)",
+  "scripts": {
+    "serve": "python3 -m http.server 8766 --bind 127.0.0.1",
+    "test:data": "node tools/test/data.mjs",
+    "docs:roster": "node tools/gen-roster-md.mjs"
+  }
+}

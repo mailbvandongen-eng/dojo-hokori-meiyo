@@ -1,0 +1,556 @@
+// Dojo Hokori Meiyo Fight Game: schermen, spelmodi, camera en hoofdlus.
+import * as THREE from '../lib/three.module.js';
+import { ROSTER, byId, beltOf } from './data/roster.js';
+import { MOVES, INPUT_MAP } from './data/moves.js';
+import { CALLS, COUNT_ROMAJI, TIPS } from './data/terms.js';
+import { profile, save as saveProfile, rankInfo, addResult, addBonus, COSTUMES, costumeUnlocked } from './data/profile.js';
+import { online } from './data/online.js';
+import { createArena } from './game/arena.js';
+import { Fighter, separate, LEG_KD, BODY_KD } from './game/fighter.js';
+import { Match } from './game/match.js';
+import { AI, DIFFICULTY } from './game/ai.js';
+import { Controller, TouchPad } from './game/input.js';
+import { FX } from './game/fx.js';
+import { getLogo } from './game/textures.js';
+import { unlockAudio, sfx, music, say, sayCount, settings as audioSettings, setVolumes } from './audio/audio.js';
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+
+// ── Instellingen ──
+const cfg = Object.assign({ roundTime: 120, rules: 'toernooi', diff: 'senpai', voice: 'ja', sfx: 0.8, music: 0.45, gfx: 'hoog' }, JSON.parse(localStorage.getItem('dhm-settings') || '{}'));
+function applySettings() {
+  audioSettings.sfx = cfg.sfx; audioSettings.music = cfg.music; audioSettings.voice = cfg.voice !== 'off'; audioSettings.voiceLang = cfg.voice === 'nl' ? 'nl' : 'ja';
+  setVolumes();
+  renderer.setPixelRatio(Math.min(devicePixelRatio, cfg.gfx === 'hoog' ? 2 : 1));
+  renderer.shadowMap.enabled = cfg.gfx === 'hoog';
+  localStorage.setItem('dhm-settings', JSON.stringify(cfg));
+}
+
+// ── Renderer en scène ──
+const canvas = $('#gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 120);
+const arena = createArena(scene, renderer);
+const fx = new FX(scene);
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 1.5 ? 48 : 40; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize(); applySettings();
+
+// ── Schermen ──
+const OVERLAYS = ['pause', 'options', 'moves', 'photo'];
+function show(id) { $$('.screen').forEach(s => { if (!OVERLAYS.includes(s.id)) s.classList.toggle('on', s.id === id); }); }
+function overlay(id, on) { $('#' + id).classList.toggle('on', on); }
+
+// ── Spelstatus ──
+let G = null;            // lopend gevecht
+let paused = false, elapsed = 0;
+let camMode = 'menu', camFocus = null, camT = 0;
+const camPos = new THREE.Vector3(0, 3, 9), camLook = new THREE.Vector3(0, 1, 0);
+let tourney = null, story = null;
+const touch = new TouchPad($('#touch'));
+
+function clearFight() {
+  if (!G) return;
+  for (const f of [G.aka, G.shiro]) scene.remove(f.model.group);
+  G = null;
+  $('#hud').classList.remove('on'); $('#touch').classList.remove('on');
+  $('#trainBar').classList.remove('on'); $('#trainInfo').classList.remove('on');
+}
+
+// opts: { mode, akaId, shiroId, akaCtrl: 'solo'|'p1'|'ai', shiroCtrl, diff, training, demo, costume }
+function startFight(opts) {
+  clearFight();
+  const aData = byId[opts.akaId], bData = byId[opts.shiroId];
+  const aka = new Fighter(aData, 'aka', scene, { costume: opts.akaCostume || {} });
+  const shiro = new Fighter(bData, 'shiro', scene, { costume: opts.shiroCostume || {} });
+  const match = new Match({ aka, shiro, arena, hooks, config: { roundTime: opts.roundTime || cfg.roundTime, rules: cfg.rules, training: !!(opts.training || opts.demo) } });
+  G = { ...opts, aka, shiro, match, ctrl: {}, ai: {} };
+  for (const [f, c] of [[aka, opts.akaCtrl], [shiro, opts.shiroCtrl]]) {
+    if (c === 'ai') G.ai[f.corner] = new AI(f, opts.diff || cfg.diff);
+    else if (c && c !== 'dummy') G.ctrl[f.corner] = new Controller(c, f.corner === 'aka' && isTouch ? touch : null);
+    f.onEvent = (type, d) => onFighterEvent(type, d);
+  }
+  match.start();
+  elapsed = 0; paused = false;
+  if (opts.demo) { camMode = 'menu'; return; }
+  buildHUD(); $('#hud').classList.add('on');
+  if (isTouch && G.ctrl.aka) $('#touch').classList.add('on');
+  camMode = opts.training ? 'fight' : 'intro'; camT = 0;
+  music(true, 0.6);
+  sfx.crowd(0.4);
+}
+
+// ── Match-hooks: scheidsrechter, publiek, camera ──
+const hooks = {
+  call(key, o = {}) {
+    if (!G || G.demo) return;
+    const c = CALLS[key];
+    callout(c.romaji, o.sub || c.nl, o.side, o.big !== false);
+    say(key);
+    if (key === 'hajime' || key === 'tsuzukete') { sfx.taiko(true); camMode = 'fight'; }
+    if (key === 'ippon' || key === 'awasete') { sfx.roar(); sfx.taiko(true); }
+  },
+  shout(f) { if (G && !G.demo) sfx.kiai(f.data.uiterlijk?.lengte > 1 ? 0.85 : 1.1); },
+  knockdown(v, a, kd) {
+    if (G.demo) return;
+    fx.slowmo(kd.finisher ? 0.15 : 0.3, kd.finisher ? 1.6 : 0.8);
+    const p = v.model.partWorld('pelvis'); p.y = 0.1; fx.dust(p);
+    sfx.thud(); sfx.roar(); arena.cheer(1.3);
+    camMode = 'kd'; camFocus = v; camT = 0;
+    if (kd.finisher) { showSpecial(a.data.finisher.naam, 'FINISHER', 2.2); fx.flash(0.6, '#ffe7a8'); }
+  },
+  count(n) { callout(COUNT_ROMAJI[n - 1], '', null, false); sayCount(n); },
+  score() { updateScore(); },
+  timeUp() { sfx.taiko(true); setTimeout(() => sfx.taiko(false), 260); },
+  votes(v) {
+    const el = $('#votes'); el.innerHTML = v.map(x => `<div style="background:${x === 'aka' ? '#c8102e' : x === 'shiro' ? '#fff' : 'linear-gradient(135deg,#c8102e 50%,#fff 50%)'}"></div>`).join('');
+    el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 2600);
+  },
+  end(winner, how) { onFightEnd(winner, how); },
+};
+
+function onFighterEvent(type, d) {
+  if (!G) return;
+  const demo = G.demo;
+  switch (type) {
+    case 'swing': if (!demo) { sfx.whoosh(d.move.type === 'geri' ? 0.3 : 0.16); if (d.move.dmg >= 12 && Math.random() < 0.5) sfx.kiai(1 + Math.random() * 0.2); } break;
+    case 'hit': {
+      const t = d.target, z = d.move.zone;
+      const at = t.model.partWorld(z === 'head' ? 'head' : z === 'legs' ? 'lKnee' : 'spine');
+      if (z === 'head') at.y += 0.12; if (z === 'body') at.y += 0.25; if (z === 'legs') at.y += 0.18;
+      at.x -= d.fighter.facing * 0.12;
+      fx.impact(at, d.fighter.facing, d.dmg, z, d.counter);
+      if (!demo) { sfx.hit(Math.min(1.6, d.dmg / 9), z); arena.cheer(d.dmg / 40); if (d.counter) showSpecial('COUNTER', '', 0.6); }
+      if (G.mode === 'training' && d.fighter === G.aka) trainInfo(d.move, d.dmg, d.counter);
+      break;
+    }
+    case 'block':
+      if (!demo) sfx.block();
+      fx.burst(d.target.model.partWorld(d.low ? 'lKnee' : 'lEl'), { n: 8, color: [0.7, 0.85, 1], speed: 1.5, size: 0.05 });
+      if (d.parry && !demo) showSpecial('KAESHI', 'Counter', 0.8);
+      if (G.mode === 'training' && d.fighter === G.aka) trainInfo(d.move, 0, false, d.low ? 'Geblokt met sune uke' : 'Geblokt');
+      break;
+    case 'special': if (!demo) { showSpecial(d.name, d.jp, 1.1); sfx.kiai(1.05); } break;
+    case 'super':
+      if (demo) break;
+      showSpecial(d.name, d.jp, 1.8); fx.slowmo(0.45, 0.6); fx.flash(0.45, '#ffd76a'); sfx.kiai(0.95); sfx.taiko(true);
+      camMode = 'super'; camFocus = d.fighter; camT = 0;
+      break;
+  }
+}
+
+// ── HUD ──
+let calloutTimer = 0, specialTimer = 0;
+function callout(big, sub, side, isBig = true) {
+  const el = $('#callout');
+  el.innerHTML = `<div class="big ${side || ''}" style="font-size:${isBig ? '' : 'clamp(26px,7vh,60px)'}">${big}</div>${sub ? `<div class="sub">${sub}</div>` : ''}`;
+  el.classList.add('on'); clearTimeout(calloutTimer); calloutTimer = setTimeout(() => el.classList.remove('on'), isBig ? 1400 : 800);
+}
+function showSpecial(name, jp, dur = 1.2) {
+  const el = $('#special'); el.innerHTML = `${jp ? `<span class="jp">${jp}</span>` : ''}${name}`;
+  el.classList.add('on'); clearTimeout(specialTimer); specialTimer = setTimeout(() => el.classList.remove('on'), dur * 1000);
+}
+function sideHTML(f) {
+  return `<div class="nm">${f.corner === 'aka' ? '<span class="corner">AKA</span>' : ''}${f.data.naam}${f.corner === 'shiro' ? '<span class="corner">SHIRO</span>' : ''}</div>
+    <div class="ki"><u></u><i></i></div>
+    <div class="marks"></div>
+    <div class="dmg"><span>Benen <i><b class="lg"></b></i></span><span>Romp <i><b class="bd"></b></i></span></div>`;
+}
+function buildHUD() {
+  $('#hudA').innerHTML = sideHTML(G.aka); $('#hudB').innerHTML = sideHTML(G.shiro);
+  for (const [id, f] of [['#meterA', G.aka], ['#meterB', G.shiro]]) $(id).innerHTML = `<div class="lbl">KIAI · ${f.data.naam.toUpperCase()}</div><div class="seg"><i><b></b></i><i><b></b></i><i><b></b></i></div>`;
+  G.hud = {};
+  for (const [k, sel] of [['aka', '#hudA'], ['shiro', '#hudB']]) {
+    const r = $(sel); G.hud[k] = { ki: r.querySelector('.ki i'), lag: r.querySelector('.ki u'), lg: r.querySelector('.lg'), bd: r.querySelector('.bd'), marks: r.querySelector('.marks'), meter: $(k === 'aka' ? '#meterA' : '#meterB') };
+  }
+  updateScore();
+}
+function updateScore() {
+  if (!G || !G.hud) return;
+  for (const f of [G.aka, G.shiro]) {
+    const s = f.score, m = G.hud[f.corner].marks;
+    m.innerHTML = `<span class="wz ${s.wazaari >= 1 ? 'on' : ''}"></span><span class="wz ${s.wazaari >= 2 ? 'on' : ''}"></span>
+      ${s.wazaari ? '<span>WAZA-ARI</span>' : ''}${s.chui ? `<span class="pen">CHUI ${s.chui}</span>` : ''}${s.genten ? `<span class="pen">GENTEN ${s.genten}</span>` : ''}`;
+  }
+}
+function updateHUD() {
+  if (!G || !G.hud) return;
+  for (const f of [G.aka, G.shiro]) {
+    const h = G.hud[f.corner], k = Math.max(0, f.ki / f.kiMax);
+    h.ki.style.transform = `scaleX(${k})`; h.lag.style.transform = `scaleX(${k})`;
+    h.lg.style.width = Math.min(100, f.legs / LEG_KD * 100) + '%'; h.bd.style.width = Math.min(100, f.body / BODY_KD * 100) + '%';
+    const segs = h.meter.querySelectorAll('.seg b');
+    segs.forEach((b, i) => { b.style.transform = `scaleX(${Math.max(0, Math.min(1, (f.meter - i * 33.34) / 33.33))})`; });
+    h.meter.classList.toggle('full', f.meter >= 100);
+  }
+  const btn = $('[data-btn=kiai]'); btn.classList.toggle('ready', G.aka.meter >= 33);
+  const m = G.match, t = m.timer;
+  $('#hudTime').textContent = t === Infinity ? '∞' : `${Math.floor(Math.ceil(t) / 60)}:${String(Math.ceil(t) % 60).padStart(2, '0')}`;
+  $('#hudRound').textContent = G.mode === 'training' ? 'KEIKO' : m.round === 0 ? 'HON-SEN' : `ENCHO-SEN ${m.round}`;
+}
+
+// ── Hoofdlus ──
+let last = performance.now();
+function frame(now) {
+  requestAnimationFrame(frame);
+  const raw = Math.min(0.05, (now - last) / 1000); last = now;
+  if (G && !paused) {
+    const dt = fx.step(raw); elapsed += dt;
+    simulate(dt); fx.update(dt); arena.update(dt, elapsed);
+    updateHUD();
+  } else if (!G) arena.update(raw, (elapsed += raw));
+  updateCamera(raw);
+  renderer.render(scene, camera);
+}
+
+function simulate(dt) {
+  const { aka, shiro, match } = G;
+  match.update(dt);
+  for (const [f, o] of [[aka, shiro], [shiro, aka]]) {
+    const c = G.ctrl[f.corner], ai = G.ai[f.corner];
+    if (c) {
+      const raw = c.read(dt);
+      if (match.fighting) {
+        const q0 = f.queue.length;
+        f.handleInput(c.toFighter(raw, f.facing), o, match);
+        if ((f.state === 'attack' && f.t === 0) || f.queue.length > q0 || f.state === 'parry') c.consume();
+      } else c.consume();
+    } else if (ai && match.fighting) f.handleInput(ai.input(dt, o), o, match);
+    else if (G.mode === 'training' && f === shiro && match.fighting) f.handleInput(dummyInput(), o, match);
+  }
+  aka.update(dt, shiro, match); shiro.update(dt, aka, match);
+  separate(aka, shiro, arena.bounds + 0.3);
+  // herstel tijdens het gevecht: ki en romp herstellen langzaam, benen nauwelijks (zoals echt)
+  for (const f of [aka, shiro]) if (f.state !== 'down' && match.fighting) { f.ki = Math.min(f.kiMax, f.ki + dt * 1.2); f.body = Math.max(0, f.body - dt * 0.8); f.legs = Math.max(0, f.legs - dt * 0.15); }
+  if (G.training || G.demo) for (const f of [aka, shiro]) if (f.ki < f.kiMax * 0.15) { f.ki = f.kiMax; f.legs = f.body = 0; }
+  if (G.demo) for (const f of [aka, shiro]) if (Math.abs(f.x) > 3.5) f.x *= 0.98;
+  if ((camMode === 'kd' && match.fighting) || (camMode === 'super' && !(camFocus?.isSuper))) camMode = 'fight';
+}
+
+const tmpV = new THREE.Vector3(), tmpL = new THREE.Vector3();
+const photo = { theta: 0.4, phi: 1.25, r: 4.2 };
+function updateCamera(dt) {
+  camT += dt;
+  let k = 4;
+  if (G && camMode !== 'menu') {
+    const a = G.aka, b = G.shiro, mid = (a.x + b.x) / 2, gap = Math.abs(a.x - b.x);
+    switch (camMode) {
+      case 'intro': { const ang = -1.0 + camT * 0.14; tmpV.set(Math.sin(ang) * 6.5, 2.8 - Math.min(1, camT * 0.12), Math.cos(ang) * 6.5); tmpL.set(0, 1.1, -0.4); k = 2; break; }
+      case 'fight': tmpV.set(mid * 0.85, 1.5, 3.2 + gap * 0.8); tmpL.set(mid, 1.0, 0); k = 5; break;
+      case 'kd': { const v = camFocus; tmpV.set(v.x - v.facing * 1.4, 0.75, 2.3); tmpL.set(v.x, 0.55, 0); k = 3; break; }
+      case 'super': { const f = camFocus, ang = 0.6 + camT * 0.9 * f.facing; tmpV.set(f.x + Math.sin(ang) * 2.6, 1.2, Math.cos(ang) * 2.6 + 0.4); tmpL.set(mid, 1.0, 0); k = 3; break; }
+      case 'result': { const w = G.match.winner || a, ang = camT * 0.3; tmpV.set(w.x + Math.sin(ang) * 3.2, 1.6, Math.cos(ang) * 3.2); tmpL.set(w.x, 1.1, 0); k = 2; break; }
+      case 'photo': tmpL.set(mid, 1.0, 0); tmpV.set(mid + Math.sin(photo.theta) * Math.sin(photo.phi) * photo.r, Math.max(0.2, Math.cos(photo.phi) * photo.r + 1.0), Math.cos(photo.theta) * Math.sin(photo.phi) * photo.r); k = 12; break;
+    }
+  } else { const ang = elapsed * 0.08; tmpV.set(Math.sin(ang) * 7.5 + 1.5, 2.6, Math.cos(ang) * 7.5); tmpL.set(0, 1.2, 0); k = 2; }
+  const a = 1 - Math.exp(-dt * k);
+  camPos.lerp(tmpV, a); camLook.lerp(tmpL, a);
+  camera.position.copy(camPos);
+  if (fx.shake > 0) camera.position.add(tmpV.set((Math.random() - 0.5) * fx.shake, (Math.random() - 0.5) * fx.shake, 0));
+  camera.lookAt(camLook);
+}
+
+// ── Splash → menu ──
+$('#splash').addEventListener('pointerup', () => {
+  unlockAudio(); sfx.taiko(true); setTimeout(() => sfx.kiai(1), 150); say('osu');
+  openMenu();
+}, { once: true });
+
+function openMenu() {
+  clearFight(); tourney = null; story = null;
+  show('menu'); renderRank();
+  const pool = ROSTER.filter(f => !f.eindbaas);
+  const a = pool[(Math.random() * pool.length) | 0], b = pool[(Math.random() * pool.length) | 0];
+  startFight({ mode: 'demo', demo: true, akaId: a.id, shiroId: b.id === a.id ? 'wesley' : b.id, akaCtrl: 'ai', shiroCtrl: 'ai', diff: 'sensei' });
+  music(true, 0.3);
+}
+function renderRank() {
+  const r = rankInfo();
+  $('#rankBox').innerHTML = `Jouw graad: <b>${r.belt.naam}</b> · ${profile.points} keiko-punten<br>${profile.wins} gewonnen · ${profile.ippons} ippon · ${profile.titles} toernooizeges
+    <div class="prog"><i style="width:${Math.round(r.progress * 100)}%;background:${r.belt.kleur === '#151515' ? '#d9a441' : r.belt.kleur}"></i></div>`;
+}
+
+$$('#menu [data-go]').forEach(b => b.addEventListener('click', () => {
+  sfx.block();
+  const go = b.dataset.go;
+  if (go === 'tournament') openSelect({ title: 'Toernooi · kies je vechter', onPick: id => startTournament(id) });
+  if (go === 'story') openSelect({ title: 'Story · kies je vechter', onPick: id => startStory(id) });
+  if (go === 'versus') openSelect({ title: 'Versus · speler 1 (aka)', onPick: id => openSelect({ title: 'Versus · tegenstander (shiro)', p2: true, onPick: id2 => loadingThen(() => startFight({ mode: 'versus', akaId: id, shiroId: id2, akaCtrl: vsP2 === 'cpu' ? 'solo' : 'p1', shiroCtrl: vsP2 === 'cpu' ? 'ai' : 'p2', akaCostume: playerCostume() })) }) });
+  if (go === 'training') openSelect({ title: 'Training · kies je vechter', onPick: id => loadingThen(() => startTraining(id)) });
+  if (go === 'options') openOptions();
+}));
+
+function playerCostume() { return { dogi: profile.costume }; }
+
+// ── Vechterkeuze ──
+let selCb = null, selId = null, vsP2 = 'cpu';
+function openSelect({ title, onPick, p2 = false }) {
+  clearFight(); show('select'); $('#selTitle').textContent = title; selCb = onPick;
+  const grid = $('#grid'); grid.innerHTML = '';
+  for (const f of ROSTER) {
+    const locked = f.eindbaas && !profile.unlocked.wesley;
+    const belt = beltOf(f.graad);
+    const c = document.createElement('div'); c.className = 'card' + (locked ? ' locked' : ''); c.dataset.id = f.id;
+    c.innerHTML = `${f.eindbaas ? '<span class="boss">EINDBAAS</span>' : ''}<b>${f.naam}</b><small>${f.stijl}</small><span class="belt" style="background:${belt.kleur}"></span>`;
+    c.addEventListener('click', () => { sfx.block(); pickCard(f.id); });
+    c.addEventListener('dblclick', () => confirmPick());
+    grid.appendChild(c);
+  }
+  $('#selInfo').innerHTML = p2 ? `Speler 2: <button class="btn ghost" id="p2toggle" style="padding:6px 10px">${vsP2 === 'cpu' ? 'Computer' : 'Toetsenbord (pijltjes + J K L I)'}</button>` : (profile.unlocked.wesley ? '' : 'Versla Sensei Wesley in Story om de eindbaas vrij te spelen.');
+  $('#p2toggle')?.addEventListener('click', e => { vsP2 = vsP2 === 'cpu' ? 'kb' : 'cpu'; e.target.textContent = vsP2 === 'cpu' ? 'Computer' : 'Toetsenbord (pijltjes + J K L I)'; });
+  pickCard(selId && byId[selId] && !(byId[selId].eindbaas && !profile.unlocked.wesley) ? selId : ROSTER[1].id);
+}
+function pickCard(id) {
+  selId = id; const f = byId[id];
+  $$('#grid .card').forEach(c => c.classList.toggle('sel', c.dataset.id === id));
+  const belt = beltOf(f.graad), st = f.stats;
+  const bars = Object.entries({ Kracht: st.kracht, Snelheid: st.snelheid, Bereik: st.bereik, Conditie: st.conditie, Benen: st.benen }).map(([k, v]) => `<div class="stat">${k}<div class="bar"><i style="width:${v * 10}%"></i></div></div>`).join('');
+  const dirs = ['', '→ + ', '↓ + '];
+  $('#detail').innerHTML = `<div class="sub">${f.titel || f.rol} · ${belt.naam}${f.bevestigd?.graad ? '' : ' (voorlopig)'}</div><h3>${f.naam}</h3>
+    <div class="sub" style="color:#fff9">${f.stijl}</div><div class="quote">“${f.quote}”</div><div>${f.persoonlijkheid}</div><div style="margin:8px 0">${bars}</div>
+    ${f.signatures.map((s, i) => `<div class="tech"><b>${s.naam}</b><em>${dirs[i]}KIAI</em><span>${s.jp}: ${s.uitleg}</span></div>`).join('')}
+    <div class="tech" style="box-shadow:inset 0 0 0 1px #d9a44166"><b>${f.super.naam}</b> <span class="jp" style="display:inline;color:var(--gold)">${f.super.jp}</span><em>KIAI (vol)</em><span>${f.super.uitleg}</span></div>
+    <div class="tech"><b>Finisher: ${f.finisher.naam}</b><span>${f.finisher.uitleg}</span></div>`;
+}
+function confirmPick() {
+  const f = byId[selId]; if (!f || (f.eindbaas && !profile.unlocked.wesley)) { sfx.block(); return; }
+  sfx.kiai(1); say('osu');
+  const cb = selCb; selCb = null; cb && cb(selId);
+}
+$('#selOk').addEventListener('click', confirmPick);
+$('#selBack').addEventListener('click', openMenu);
+
+function loadingThen(fn) {
+  show('loading'); $('#tip').textContent = TIPS[(Math.random() * TIPS.length) | 0];
+  const bar = $('#loading .bar2 i'); bar.style.transition = 'none'; bar.style.width = '0'; requestAnimationFrame(() => { bar.style.transition = ''; bar.style.width = '100%'; });
+  setTimeout(() => { show('none'); fn(); }, 1300);
+}
+
+// ── Toernooi (single elimination, 8 vechters) ──
+const ROUND_NAMES = ['Kwartfinale', 'Halve finale', 'Finale'];
+function startTournament(playerId) {
+  const pool = ROSTER.filter(f => f.id !== playerId && (!f.eindbaas || profile.unlocked.wesley)).sort(() => Math.random() - 0.5).slice(0, 7);
+  const entrants = [playerId, ...pool.map(f => f.id)].sort(() => Math.random() - 0.5);
+  tourney = { player: playerId, rounds: [pairUp(entrants)], r: 0, out: false };
+  openBracket();
+}
+function pairUp(ids) { const out = []; for (let i = 0; i < ids.length; i += 2) out.push({ a: ids[i], b: ids[i + 1], w: null }); return out; }
+function simulateBout(m) {
+  const pw = id => { const s = byId[id].stats; return s.kracht + s.snelheid + s.bereik + s.conditie + s.benen + (byId[id].eindbaas ? 8 : 0) + Math.random() * 14; };
+  m.w = pw(m.a) >= pw(m.b) ? m.a : m.b; m.how = ['ippon', 'hantei', 'waza-ari', 'hantei'][(Math.random() * 4) | 0];
+}
+function openBracket() {
+  show('bracket');
+  const t = tourney;
+  $('#bracketTitle').textContent = t.out ? 'UITGESCHAKELD' : t.champion ? 'KAMPIOEN!' : `${ROUND_NAMES[t.r]}`.toUpperCase();
+  $('#bracketView').innerHTML = t.rounds.map((round, ri) => `<div class="round"><div style="font-size:10px;letter-spacing:.15em;color:var(--gold)">${ROUND_NAMES[ri].toUpperCase()}</div>${round.map(m => `<div class="bm">${[m.a, m.b].map(id => `<div class="${m.w === id ? 'w' : ''} ${id === t.player ? 'me' : ''}">${byId[id].naam}</div>`).join('')}</div>`).join('')}</div>`).join('');
+  $('#bracketGo').textContent = t.out || t.champion ? 'Naar het menu' : 'Naar de mat';
+}
+$('#bracketGo').addEventListener('click', () => {
+  const t = tourney; if (!t) return;
+  if (t.out || t.champion) return openMenu();
+  const round = t.rounds[t.r];
+  const mine = round.find(m => m.a === t.player || m.b === t.player);
+  const opp = mine.a === t.player ? mine.b : mine.a;
+  t.current = mine;
+  loadingThen(() => startFight({ mode: 'tournament', akaId: t.player, shiroId: opp, akaCtrl: 'solo', shiroCtrl: 'ai', diff: t.r === 2 ? bump(cfg.diff, 1) : cfg.diff, akaCostume: playerCostume() }));
+});
+$('#bracketQuit').addEventListener('click', openMenu);
+function advanceTournament(won, how) {
+  const t = tourney, round = t.rounds[t.r];
+  t.current.w = won ? t.player : (t.current.a === t.player ? t.current.b : t.current.a); t.current.how = how;
+  round.filter(m => !m.w).forEach(simulateBout);
+  if (!won) { t.out = true; return; }
+  if (t.r === 2) { t.champion = true; profile.titles++; saveProfile(); return addBonus(200); }
+  t.r++; t.rounds.push(pairUp(round.map(m => m.w)));
+}
+function bump(level, n) { const ks = Object.keys(DIFFICULTY); return ks[Math.max(0, Math.min(ks.length - 1, ks.indexOf(level) + n))]; }
+
+// ── Story: klim door de dojo naar Sensei Wesley ──
+function startStory(playerId) {
+  const others = ROSTER.filter(f => f.id !== playerId && !f.eindbaas && f.id !== 'skylar');
+  const rankVal = f => f.graad?.dan ? 10 + f.graad.dan : 11 - (f.graad?.kyu || 11);
+  const picks = others.sort(() => Math.random() - 0.5).slice(0, 6).sort((a, b) => rankVal(a) - rankVal(b));
+  const ladder = [...picks.map(f => f.id), ...(playerId !== 'skylar' ? ['skylar'] : [others.find(f => f.id === 'conchita') ? 'conchita' : others[0].id]), playerId === 'wesley' ? 'conchita' : 'wesley'];
+  story = { player: playerId, ladder, i: 0 };
+  openStory();
+}
+const STORY_LINES = [
+  'De dojo in Zoetermeer is vol. Vandaag laat je zien wat je waard bent.',
+  'Elke tegenstander is een les. Osu!',
+  'Je benen branden van de lage trappen. Doorzetten: Osu no seishin.',
+  'De senpai kijken mee vanaf de kant.',
+  'Het publiek begint je naam te kennen.',
+  'Nog een paar gevechten tot de top.',
+];
+function openStory() {
+  const s = story, opp = byId[s.ladder[s.i]], me = byId[s.player];
+  show('story');
+  $('#ladder').innerHTML = s.ladder.map((id, i) => `<span class="${i < s.i ? 'done' : i === s.i ? 'now' : ''}">${byId[id].naam}</span>`).join('');
+  $('#stA').textContent = me.naam; $('#stB').textContent = opp.naam;
+  const last = s.i === s.ladder.length - 1;
+  $('#stLine').innerHTML = (last ? 'De eindbaas wacht op de mat. Iedereen in de dojo is stil.<br>' : opp.id === 'skylar' ? 'De dochter van de sensei staat tegenover je. Dit is persoonlijk.<br>' : STORY_LINES[s.i % STORY_LINES.length] + '<br>') + `<b>${opp.naam}:</b> “${opp.quote}”`;
+}
+$('#storyGo').addEventListener('click', () => {
+  const s = story, opp = s.ladder[s.i], last = s.i >= s.ladder.length - 2;
+  const diff = s.i < 2 ? bump(cfg.diff, -1) : last ? bump(cfg.diff, 1) : cfg.diff;
+  loadingThen(() => startFight({ mode: 'story', akaId: s.player, shiroId: opp, akaCtrl: 'solo', shiroCtrl: 'ai', diff, akaCostume: playerCostume(), shiroCostume: byId[opp].eindbaas ? { dogi: 'wit' } : {} }));
+});
+$('#storyQuit').addEventListener('click', openMenu);
+
+// ── Training ──
+const DUMMY = [['stil', 'Pop: stil'], ['hoog', 'Pop: blokt hoog'], ['laag', 'Pop: blokt laag'], ['aanval', 'Pop: valt aan']];
+let dummyMode = 0;
+function startTraining(id) {
+  const partner = id === 'conchita' ? 'anjay' : 'conchita';
+  startFight({ mode: 'training', training: true, akaId: id, shiroId: partner, akaCtrl: 'solo', shiroCtrl: 'dummy', akaCostume: playerCostume() });
+  $('#trainBar').classList.add('on'); $('#trainInfo').classList.add('on');
+  $('#trainInfo').innerHTML = `<b>Sensei Conchita:</b> Osu! Probeer de technieken uit. Lage trap: <b>↓ + GERI</b>. Blokken: houd <b>UKE</b> vast, met ↓ voor sune uke.`;
+  dummyMode = 0; $('#trDummy').textContent = DUMMY[0][1];
+}
+function dummyInput() {
+  const m = DUMMY[dummyMode][0];
+  if (m === 'aanval') { G.ai.shiro = G.ai.shiro || new AI(G.shiro, 'kohai'); return G.ai.shiro.input(1 / 60, G.aka); }
+  return { dir: m === 'laag' ? 'd' : 'n', move: 0, uke: m === 'hoog' || m === 'laag', pressed: {} };
+}
+function trainInfo(move, dmg, counter, note) {
+  $('#trainInfo').innerHTML = `<b>${move.jp}</b><br>${move.nl}<br>${note || `Schade ${dmg.toFixed(1)}${counter ? ' · <b>counter</b>' : ''}`}<br><span style="opacity:.75">${move.uitleg}</span>`;
+}
+$('#trDummy').addEventListener('click', () => { dummyMode = (dummyMode + 1) % DUMMY.length; $('#trDummy').textContent = DUMMY[dummyMode][1]; if (G) delete G.ai.shiro; });
+$('#trMoves').addEventListener('click', () => openMoves());
+$('#trReset').addEventListener('click', () => { if (!G) return; for (const f of [G.aka, G.shiro]) { f.ki = f.kiMax; f.legs = f.body = 0; f.meter = 100; } G.aka.reset(-1.5, 1); G.shiro.reset(1.5, -1); });
+$('#trQuit').addEventListener('click', openMenu);
+
+// ── Technieken-overzicht ──
+const DIRSYM = { n: '', f: '→ + ', b: '← + ', d: '↓ + ', u: '↑ + ' };
+function openMoves() {
+  paused = true;
+  const f = G ? G.aka.data : byId[selId] || ROSTER[0];
+  const rows = Object.entries(INPUT_MAP).filter(([k]) => k !== 'tsuki.u').map(([k, id]) => { const [btn, d] = k.split('.'), m = MOVES[id]; return `<tr><td class="k">${DIRSYM[d]}${btn.toUpperCase()}</td><td class="n"><b>${m.jp}</b>${m.nl}</td><td>${m.uitleg}</td></tr>`; });
+  rows.splice(9, 0, `<tr><td class="k">→ + GERI (veraf)</td><td class="n"><b>${MOVES.mae_geri.jp}</b>${MOVES.mae_geri.nl}</td><td>${MOVES.mae_geri.uitleg}</td></tr>`);
+  rows.push(`<tr><td class="k">UKE</td><td class="n"><b>${MOVES.uke.jp}</b>${MOVES.uke.nl}</td><td>${MOVES.uke.uitleg}</td></tr>`);
+  rows.push(`<tr><td class="k">↓ + UKE</td><td class="n"><b>${MOVES.sune_uke.jp}</b>${MOVES.sune_uke.nl}</td><td>${MOVES.sune_uke.uitleg}</td></tr>`);
+  f.signatures.forEach((s, i) => rows.push(`<tr><td class="k">${['', '→ + ', '↓ + '][i]}KIAI</td><td class="n"><b>${s.naam}</b>${s.jp}</td><td>${s.uitleg} <i>(1/3 kiai-meter)</i></td></tr>`));
+  rows.push(`<tr><td class="k">KIAI (vol)</td><td class="n"><b>${f.super.naam}</b>${f.super.jp}</td><td>${f.super.uitleg} Raakt de laatste techniek bij een uitgeputte tegenstander: <b>${f.finisher.naam}</b>.</td></tr>`);
+  $('#moveList').innerHTML = `<p style="font-size:12px;opacity:.8;margin:6px 0">Toetsenbord: A/D lopen, W/S omhoog/omlaag, J tsuki, K geri, L uke, I kiai. Combinaties: druk opnieuw tijdens een treffer (renzoku waza).</p><table>${rows.join('')}</table>`;
+  overlay('moves', true);
+}
+$('#movesClose').addEventListener('click', () => { overlay('moves', false); if (!$('#pause').classList.contains('on')) paused = false; });
+
+// ── Pauze ──
+function pause(on) { if (!G || G.demo) return; paused = on; overlay('pause', on); if (on) speechSynthesis?.cancel?.(); }
+$('#pauseBtn').addEventListener('click', () => pause(true));
+addEventListener('keydown', e => { if ((e.code === 'Escape' || e.code === 'KeyP') && G && !G.demo) { if ($('#photo').classList.contains('on')) return exitPhoto(); pause(!paused); } });
+$('#pResume').addEventListener('click', () => pause(false));
+$('#pQuit').addEventListener('click', () => { overlay('pause', false); paused = false; openMenu(); });
+$('#pMoves').addEventListener('click', () => openMoves());
+$('#pOptions').addEventListener('click', () => openOptions());
+document.addEventListener('visibilitychange', () => { if (document.hidden && G && !G.demo && !paused) pause(true); });
+
+// ── Fotomodus ──
+let prevCam = 'fight';
+$('#pPhoto').addEventListener('click', () => { overlay('pause', false); overlay('photo', true); $('#hud').classList.remove('on'); $('#touch').classList.remove('on'); prevCam = camMode; camMode = 'photo'; });
+function exitPhoto() { overlay('photo', false); overlay('pause', true); $('#hud').classList.add('on'); if (isTouch && G?.ctrl.aka) $('#touch').classList.add('on'); camMode = prevCam; }
+$('#phBack').addEventListener('click', exitPhoto);
+{
+  const pts = new Map(); let pinch = 0;
+  canvas.addEventListener('pointerdown', e => { if (camMode === 'photo') { pts.set(e.pointerId, [e.clientX, e.clientY]); canvas.setPointerCapture(e.pointerId); } });
+  canvas.addEventListener('pointermove', e => {
+    if (camMode !== 'photo' || !pts.has(e.pointerId)) return;
+    const [px, py] = pts.get(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 1) { photo.theta -= (e.clientX - px) * 0.008; photo.phi = Math.max(0.35, Math.min(1.65, photo.phi - (e.clientY - py) * 0.006)); }
+    else { const [a, b] = [...pts.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pinch) photo.r = Math.max(1.4, Math.min(9, photo.r * pinch / d)); pinch = d; }
+  });
+  const up = e => { pts.delete(e.pointerId); pinch = 0; };
+  canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+  canvas.addEventListener('wheel', e => { if (camMode === 'photo') photo.r = Math.max(1.4, Math.min(9, photo.r * (1 + e.deltaY * 0.001))); }, { passive: true });
+}
+$('#phShot').addEventListener('click', async () => {
+  renderer.render(scene, camera);
+  const w = canvas.width, h = canvas.height, c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d'); g.filter = $('#phFilter').value; g.drawImage(canvas, 0, 0); g.filter = 'none';
+  const logo = getLogo(), s = Math.round(h * 0.16);
+  if (logo) g.drawImage(logo, w - s - h * 0.03, h - s - h * 0.03, s, s);
+  g.fillStyle = '#fbf7ee'; g.font = `900 ${Math.round(h * 0.03)}px Arial`; g.textAlign = 'right'; g.fillText('DOJO HOKORI MEIYO · EER & TROTS', w - s - h * 0.05, h - h * 0.05);
+  fx.flash(0.8); sfx.bell();
+  const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
+  const file = new File([blob], `hokori-meiyo-${Date.now()}.jpg`, { type: 'image/jpeg' });
+  if (navigator.canShare?.({ files: [file] })) { try { await navigator.share({ files: [file], title: 'Dojo Hokori Meiyo' }); return; } catch { } }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+});
+
+// ── Opties ──
+function openOptions() {
+  overlay('options', true);
+  $('#oTime').value = cfg.roundTime; $('#oRules').value = cfg.rules; $('#oVoice').value = cfg.voice; $('#oSfx').value = cfg.sfx; $('#oMusic').value = cfg.music; $('#oGfx').value = cfg.gfx;
+  $('#oDiff').innerHTML = Object.entries(DIFFICULTY).map(([k, d]) => `<option value="${k}">${d.label}</option>`).join(''); $('#oDiff').value = cfg.diff;
+  $('#oCostume').innerHTML = COSTUMES.map(c => `<option value="${c.id}" ${costumeUnlocked(c) ? '' : 'disabled'}>${c.naam}${costumeUnlocked(c) ? '' : ' (vanaf ' + beltOf({ kyu: 10 - c.rank }).naam + ')'}</option>`).join('');
+  $('#oCostume').value = profile.costume;
+}
+$('#oClose').addEventListener('click', () => {
+  cfg.roundTime = +$('#oTime').value; cfg.rules = $('#oRules').value; cfg.voice = $('#oVoice').value; cfg.sfx = +$('#oSfx').value; cfg.music = +$('#oMusic').value; cfg.gfx = $('#oGfx').value; cfg.diff = $('#oDiff').value;
+  profile.costume = $('#oCostume').value; saveProfile();
+  applySettings(); overlay('options', false); sfx.block();
+});
+
+// ── Einde van een gevecht ──
+const HOW = { ippon: 'IPPON', awasete: 'AWASETE IPPON', hantei: 'HANTEI · beslissing', 'wazaari-yusei': 'WAZA-ARI · beslissing', hansoku: 'HANSOKU' };
+let lastFight = null;
+function onFightEnd(winner, how) {
+  camMode = 'result'; camT = 0;
+  const g = G; lastFight = { ...g, aka: undefined, shiro: undefined, match: undefined, ctrl: undefined, ai: undefined, hud: undefined };
+  const twoP = g.mode === 'versus' && vsP2 !== 'cpu';
+  const won = winner.corner === 'aka';
+  let rankLine = '';
+  if (!twoP) {
+    const r = addResult({ won, how, mode: g.mode });
+    let bonus = null;
+    if (g.mode === 'tournament') bonus = advanceTournament(won, how);
+    if (g.mode === 'story' && won) {
+      story.i++;
+      if (story.i >= story.ladder.length) { profile.storyBest = Math.max(profile.storyBest, story.i); profile.unlocked.wesley = true; saveProfile(); bonus = addBonus(300); story.done = true; }
+    }
+    const ri = rankInfo();
+    rankLine = `+${r.pts + (bonus?.pts || 0)} keiko-punten · ${ri.belt.naam}<div class="prog"><i style="width:${Math.round(ri.progress * 100)}%"></i></div>` + ((r.promoted || bonus?.promoted) ? `<div style="color:var(--gold);font-weight:900;margin-top:6px">PROMOTIE! Je bent nu ${ri.belt.naam}. Osu!</div>` : '');
+    online.submit({ naam: 'Ik', vechter: g.akaId, punten: profile.points, graad: ri.belt.naam });
+  }
+  const title = twoP ? `${winner.data.naam.toUpperCase()} WINT` : won ? 'OVERWINNING' : 'NEDERLAAG';
+  let text = twoP ? '' : won ? `${winner.data.naam} wint van ${g.shiro.data.naam}.` : `${g.shiro.data.naam} was vandaag sterker. Osu: buigen, leren, terugkomen.`;
+  if (g.mode === 'tournament' && tourney?.champion) text = `${byId[tourney.player].naam} is toernooikampioen van Dojo Hokori Meiyo!`;
+  if (g.mode === 'story' && story?.done) text = 'Je hebt Sensei Wesley verslagen. Sensei Wesley is nu speelbaar. Eer &amp; Trots!';
+  setTimeout(() => {
+    show('result'); $('#hud').classList.remove('on'); $('#touch').classList.remove('on');
+    const h = $('#resTitle'); h.textContent = title; h.className = won || twoP ? 'win' : 'lose';
+    $('#resHow').textContent = HOW[how] || how; $('#resText').innerHTML = text; $('#resRank').innerHTML = rankLine;
+    $('#resNext').style.display = g.mode === 'versus' || (g.mode === 'story' && (!won || story?.done)) ? 'none' : '';
+    $('#resNext').textContent = g.mode === 'tournament' ? 'Naar het schema' : 'Volgende tegenstander';
+    $('#resAgain').style.display = g.mode === 'tournament' ? 'none' : '';
+    music(true, 0.3);
+  }, 600);
+}
+$('#resMenu').addEventListener('click', openMenu);
+$('#resAgain').addEventListener('click', () => {
+  if (!lastFight) return;
+  if (lastFight.mode === 'story') return openStory();
+  const lf = lastFight; loadingThen(() => startFight({ ...lf }));
+});
+$('#resNext').addEventListener('click', () => {
+  if (!lastFight) return;
+  if (lastFight.mode === 'tournament') { clearFight(); return openBracket(); }
+  if (lastFight.mode === 'story') { clearFight(); return openStory(); }
+});
+
+// Testhaak voor de Playwright-tests (tools/test)
+window.__game = {
+  get G() { return G; }, startFight, openMenu, cfg, profile, fx, photo,
+  setCam: m => (camMode = m), pause: v => (paused = v),
+  step(dt) { simulate(dt); fx.update(dt); updateCamera(dt); renderer.render(scene, camera); },
+  sim(dt, n = 1) { for (let i = 0; i < n && G; i++) { simulate(dt); fx.update(dt); } },
+};
+
+requestAnimationFrame(frame);
