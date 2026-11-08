@@ -22,17 +22,12 @@ function noise(ctx, w, h, amount, alpha) {
 }
 
 // ── Logo ──
-// Gebruikt assets/logo-officieel.png als die bestaat, anders de SVG-benadering.
-let logoImg = null;
-export const logoReady = (async () => {
-  for (const src of ['assets/logo-officieel.png', 'assets/logo.svg']) {
-    try {
-      const img = new Image(); img.decoding = 'async'; img.src = src;
-      await img.decode(); logoImg = img; return src;
-    } catch { /* volgende proberen */ }
-  }
-  return null;
-})();
+// Het officiële logo (aangevuld en opgeschoond met tools/logo/complete-logo.py).
+// logo-officieel.png heeft een wit plaatje; logo-officieel-vrij.png is transparant.
+let logoImg = null, logoFree = null;
+const load = src => { const img = new Image(); img.decoding = 'async'; img.src = src; return img.decode().then(() => img).catch(() => null); };
+export const logoReady = Promise.all([load('assets/logo-officieel.png'), load('assets/logo-officieel-vrij.png')]).then(([a, b]) => { logoImg = a; logoFree = b; return !!a; });
+export function getLogoFree() { return logoFree || logoImg; }
 export function getLogo() { return logoImg; }
 
 // ── Dogi-jas ──
@@ -61,16 +56,21 @@ export function dogiTexture({ variant = 'wit' } = {}) {
   // Kyokushin-kanji op de linkerborst (verticaal, zoals op een echte dogi)
   const kx = W * 0.63, ky = H * 0.12, ks = 74;
   drawGlyph(g, '極', kx, ky, ks, ink); drawGlyph(g, '真', kx, ky + ks * 0.98, ks, ink);
-  // Hokori Meiyo-badge onder de kanji
-  const bx = kx - 6, by = ky + ks * 2.1;
-  g.fillStyle = '#b1101f'; g.fillRect(bx, by, ks + 12, 26);
-  g.fillStyle = '#fbf7ee'; g.font = '900 13px Arial, sans-serif'; g.textAlign = 'center';
-  g.fillText('HOKORI MEIYO', bx + (ks + 12) / 2, by + 18);
+  // Hokori Meiyo-logo onder de kanji (zolang het logo laadt: tekstbadge)
+  const bx = kx - 6, by = ky + ks * 2.05, bs = ks + 12;
+  const badge = () => {
+    const lg = getLogoFree();
+    if (lg) { g.fillStyle = base; g.fillRect(bx - 2, by - 2, bs + 4, bs + 4); g.drawImage(lg, bx, by, bs, bs); }
+    else { g.fillStyle = '#b1101f'; g.fillRect(bx, by, bs, 26); g.fillStyle = '#fbf7ee'; g.font = '900 13px Arial, sans-serif'; g.textAlign = 'center'; g.fillText('HOKORI MEIYO', bx + bs / 2, by + 18); }
+  };
+  badge();
   // rug: dojonaam
   g.fillStyle = variant === 'zwart' ? '#d9a441' : '#b1101f'; g.font = '900 34px Arial, sans-serif';
   g.save(); g.translate(W * 0.0, 0); g.fillText('DOJO HOKORI MEIYO', 0, H * 0.3); g.fillText('DOJO HOKORI MEIYO', W, H * 0.3); g.restore();
   noise(g, W, H, 10, 1);
-  return tex(c);
+  const t = tex(c);
+  if (!getLogoFree()) logoReady.then(() => { badge(); t.needsUpdate = true; });
+  return t;
 }
 
 // ── Tatami ──

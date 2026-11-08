@@ -103,7 +103,7 @@ export function createArena(scene, renderer) {
   }
   // groot logo boven de hal
   const bigLogoMat = new THREE.MeshBasicMaterial({ transparent: true, toneMapped: false });
-  const bigLogo = new THREE.Mesh(new THREE.CircleGeometry(2.6, 48), bigLogoMat); bigLogo.position.set(0, 11.6, -14.8); scene.add(bigLogo);
+  const bigLogo = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), bigLogoMat); bigLogo.position.set(0, 11.4, -14.8); scene.add(bigLogo);
   logoReady.then(() => { const lg = getLogo(); if (lg) { const t = new THREE.Texture(lg); t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true; bigLogoMat.map = t; bigLogoMat.needsUpdate = true; } });
 
   // ── Wapperende Hokori Meiyo-vlaggen op masten ──

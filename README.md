@@ -41,7 +41,7 @@ npm run serve        # python3 -m http.server 8766
 
 ## Eerst regelen met de dojo
 
-1. **Officieel logo**: zet het neer als `assets/logo-officieel.png`. Het logo in het prototype is een benadering.
+1. **Logo**: het officiële logo zit erin (aangevuld waar de uitsnede het afsneed). Een origineel vectorbestand van de ontwerper is welkom; zie `tools/logo/`.
 2. **Toestemming** van de vechters (bij kinderen: ouders) voor het gebruik van hun naam, en hun eigen keuze van stijl en moves.
 3. **Reglement** van de bond (ellebogen, yuko, aantal hoekscheidsrechters, rondetijden).
 

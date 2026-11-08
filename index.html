@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="assets/logo.svg">
+<link rel="icon" href="assets/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-512.png">
 <link rel="manifest" href="manifest.webmanifest">
 <title>Dojo Hokori Meiyo Fight Game</title>
 <style>
@@ -30,7 +30,7 @@ canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:
 
 /* splash */
 #splash{background:radial-gradient(ellipse at center,#2a0509 0%,#000 70%);flex-direction:column;align-items:center;justify-content:center;gap:2vh;cursor:pointer}
-#splash .logo{width:min(56vh,70vw);opacity:0;transform:scale(.86);animation:logoIn 2.2s .3s cubic-bezier(.2,.8,.2,1) forwards;filter:drop-shadow(0 0 40px #b1101f88)}
+#splash .logo{width:min(62vh,70vw);border-radius:12%;opacity:0;transform:scale(.86);animation:logoIn 2.2s .3s cubic-bezier(.2,.8,.2,1) forwards;filter:drop-shadow(0 0 40px #b1101f88)}
 #splash .tag{opacity:0;animation:fadeIn 1s 2.2s forwards;font-weight:900;letter-spacing:.4em;color:var(--gold);font-size:clamp(12px,2.2vh,18px)}
 #splash .tap{opacity:0;animation:fadeIn 1s 2.8s forwards,pulse 1.6s 3.8s infinite;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#fff9}
 @keyframes logoIn{to{opacity:1;transform:scale(1)}}
@@ -40,7 +40,8 @@ canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:
 /* menu */
 #menu{background:linear-gradient(90deg,#000000e6 0%,#000000a0 45%,#0000 75%);align-items:center;gap:4vw}
 #menu .col{display:flex;flex-direction:column;gap:10px;width:min(340px,44vw)}
-#menu .wordmark{width:auto;max-width:100%;height:min(19vh,110px);object-fit:contain;object-position:left;margin-bottom:4px}
+#menu .brand{display:flex;align-items:center;gap:12px;margin-bottom:4px}#menu .brand img{height:min(17vh,96px);width:auto;border-radius:12%}
+#menu .brand b{display:block;font-size:clamp(15px,3.4vh,24px);letter-spacing:.06em;line-height:1.1}#menu .brand span{font-size:clamp(9px,1.8vh,12px);letter-spacing:.25em;color:var(--gold);font-weight:900}
 #menu .col{max-height:100%;overflow:auto}
 #menu .btn{text-align:left;padding:clamp(7px,1.8vh,13px) 18px;font-size:clamp(12px,2.4vh,17px)}
 #menu .btn small{display:block;font-size:10px;letter-spacing:.08em;opacity:.7;font-weight:600;text-transform:none}
@@ -184,14 +185,14 @@ canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:
 <div id="flash"></div>
 
 <div id="splash" class="screen on">
-  <img class="logo" src="assets/logo.svg" alt="Dojo Hokori Meiyo">
+  <img class="logo" src="assets/logo-officieel.png" alt="Dojo Hokori Meiyo">
   <div class="tag">EER &amp; TROTS · OSU NO SEISHIN</div>
   <div class="tap">Tik om te beginnen</div>
 </div>
 
 <div id="menu" class="screen">
   <div class="col">
-    <img class="wordmark logo" src="assets/logo-wordmark.svg" alt="Dojo Hokori Meiyo">
+    <div class="brand"><img class="logo" src="assets/logo-officieel.png" alt="Dojo Hokori Meiyo"><div><b>DOJO HOKORI MEIYO</b><span>EER &amp; TROTS · ZOETERMEER</span></div></div>
     <button class="btn" data-go="tournament">Toernooi<small>Single elimination, echte Kyokushin-wedstrijdregels</small></button>
     <button class="btn ghost" data-go="story">Story<small>Klim naar de top van de dojo</small></button>
     <button class="btn ghost" data-go="versus">Versus<small>Tegen de computer of lokaal met 2 spelers</small></button>
@@ -199,17 +200,17 @@ canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:
     <button class="btn ghost" data-go="options">Opties</button>
     <div id="rankBox" class="panel"></div>
   </div>
-  <img class="emblem logo" src="assets/logo.svg" alt="">
+  <img class="emblem logo" src="assets/logo-officieel.png" alt="">
 </div>
 
 <div id="select" class="screen">
-  <header><img class="logo" src="assets/logo.svg" alt=""><h2 id="selTitle">Kies je vechter</h2></header>
+  <header><img class="logo" src="assets/logo-officieel.png" alt=""><h2 id="selTitle">Kies je vechter</h2></header>
   <div class="body"><div id="grid"></div><div id="detail" class="panel"></div></div>
   <footer><span class="info" id="selInfo"></span><button class="btn ghost" id="selBack">Terug</button><button class="btn" id="selOk">Osu! Kies</button></footer>
 </div>
 
 <div id="bracket" class="screen">
-  <img class="logo" src="assets/logo-wordmark.svg" style="width:min(320px,60vw)" alt="">
+  <img class="logo" src="assets/logo-officieel.png" style="width:min(150px,24vh)" alt="Dojo Hokori Meiyo">
   <h2 id="bracketTitle" style="margin:0;letter-spacing:.15em">TOERNOOI</h2>
   <div id="bracketView"></div>
   <div style="display:flex;gap:10px"><button class="btn ghost" id="bracketQuit">Stoppen</button><button class="btn" id="bracketGo">Naar de mat</button></div>
@@ -223,7 +224,7 @@ canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:
 </div>
 
 <div id="loading" class="screen">
-  <img class="logo" src="assets/logo.svg" alt="">
+  <img class="logo" src="assets/logo-officieel.png" alt="">
   <div class="bar2"><i></i></div>
   <div class="tip" id="tip"></div>
 </div>
@@ -231,7 +232,7 @@ canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:
 <div id="hud">
   <div class="hudTop">
     <div class="side aka" id="hudA"></div>
-    <div class="clock"><div class="r" id="hudRound">HON-SEN</div><div class="t" id="hudTime">2:00</div><img class="logo" src="assets/logo.svg" alt=""></div>
+    <div class="clock"><div class="r" id="hudRound">HON-SEN</div><div class="t" id="hudTime">2:00</div><img class="logo" src="assets/logo-officieel.png" alt=""></div>
     <div class="side r shiro" id="hudB"></div>
   </div>
   <button class="btn ghost" id="pauseBtn" aria-label="Pauze">II</button>
@@ -261,7 +262,7 @@ canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:
 
 <div id="pause" class="screen">
   <div class="panel">
-    <img class="logo" src="assets/logo.svg" alt="">
+    <img class="logo" src="assets/logo-officieel.png" alt="">
     <button class="btn" id="pResume">Hervatten</button>
     <button class="btn ghost" id="pPhoto">Fotomodus</button>
     <button class="btn ghost" id="pMoves">Technieken</button>
@@ -274,7 +275,7 @@ canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:
 
 <div id="options" class="screen">
   <div class="panel">
-    <img class="logo" src="assets/logo.svg" alt="">
+    <img class="logo" src="assets/logo-officieel.png" alt="">
     <label class="opt">Rondetijd <select id="oTime"><option value="120">2 minuten</option><option value="180">3 minuten</option><option value="60">1 minuut (snel)</option></select></label>
     <label class="opt">Regels <select id="oRules"><option value="toernooi">Toernooi (authentiek)</option><option value="dojo">Dojo (vrij, met specials)</option></select></label>
     <label class="opt">Tegenstander <select id="oDiff"></select></label>
@@ -289,7 +290,7 @@ canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:
 
 <div id="result" class="screen">
   <div class="panel">
-    <img class="logo" src="assets/logo.svg" alt="">
+    <img class="logo" src="assets/logo-officieel.png" alt="">
     <h2 id="resTitle"></h2>
     <div class="how" id="resHow"></div>
     <div id="resText" style="font-size:13px;opacity:.85;max-width:380px"></div>

@@ -321,9 +321,10 @@ Stemopnames zet je neer volgens [assets/voice/README.md](../assets/voice/README.
 | Arena: banners, groot logo aan de wand, boarding, wapperende vlaggen, jurytafel | ✅ |
 | Dogi: badge onder de kanji, dojonaam op de rug | ✅ |
 | Photo Mode-watermerk | ✅ |
-| App-icoon | ✅ (SVG); PNG-sets per platform in fase 2 |
+| App-icoon | ✅ (192 en 512 px); iOS/Android-sets in fase 2 |
 
-> **Het logo in het prototype is een benadering** (embleem met 極真, "DOJO HOKORI MEIYO", "EER & TROTS" en 誇り名誉). Het officiële logo was niet beschikbaar. Zet het echte logo neer als `assets/logo-officieel.png` (vierkant, transparant, minstens 1024 px). De game gebruikt het dan automatisch overal: menu's, banners, vlaggen, boarding en watermerk. De SVG's zijn opnieuw te maken met `python3 tools/make-logo.py`.
+> **Het logo** is het officiële logo van de dojo: de Kanku-vorm in rood, de penseelkanji links, 誇り名誉 in het midden, de trappende vechter en "Dojo Hokori Meiyo" in penseelschrift. De aangeleverde versie was aan de linkerkant afgesneden. `tools/logo/complete-logo.py` maakt het scherp (alleen de drie logokleuren, 8× vergroot), geeft het meer ruimte en vult de drie afgesneden penseelstreken aan. Die aanvulling is een reconstructie. Heeft de ontwerper het originele bestand, dan gaat dat voor: vervang `tools/logo/logo-bron.png` en draai het script opnieuw.
+> "Eer & Trots" staat niet in het logo zelf. De game gebruikt het als ondertitel naast het logo.
 
 ---
 
@@ -398,7 +399,7 @@ Gevecht ─► Pauze ─► Hervatten / Fotomodus / Technieken / Opties / Menu
 
 ## 16. Open vragen voor de dojo
 
-1. Wat is het officiële logo-bestand? Zijn er huisstijlkleuren?
+1. ~~Officieel logo~~ ✅ ontvangen. Heeft de ontwerper een vectorbestand of een niet-afgesneden origineel? Zijn er huisstijlkleuren?
 2. Bij welke bond is de dojo aangesloten, en welk reglement geldt (ellebogen, yuko, 2 of 4 hoekscheidsrechters, rondetijden per leeftijd)?
 3. Mogen de dojoleden (en ouders) meedoen met hun naam? Willen ze zelf hun moves kiezen?
 4. Willen Sensei Wesley en Sensei Conchita de scheidsrechterscommando's inspreken?

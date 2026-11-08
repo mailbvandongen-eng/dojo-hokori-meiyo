@@ -22,8 +22,9 @@ dojo-hokori-meiyo/
 ├── manifest.webmanifest    PWA (liggend, fullscreen)
 ├── lib/three.module.js     Three.js r187 (MIT)
 ├── assets/
-│   ├── logo.svg            embleem (benadering; vervang door logo-officieel.png)
-│   ├── logo-wordmark.svg   woordmerk voor het menu
+│   ├── logo-officieel.png  officieel logo, aangevuld en opgeschoond (wit plaatje, 1024 px)
+│   ├── logo-officieel-vrij.png  idem, transparant
+│   ├── icon-192/512.png    app-iconen
 │   ├── fonts/              Yuji Boku-subset (OFL) voor kanji in de UI
 │   └── voice/              stemopnames ja/ en nl/ + index.json
 ├── src/
@@ -47,7 +48,7 @@ dojo-hokori-meiyo/
 │   │   └── fx.js           particles, impact-ring, shake, hit-stop, slow motion
 │   └── audio/audio.js      procedurele effecten, muziek, spraak/stemopnames
 ├── tools/
-│   ├── make-logo.py        maakt de logo-SVG's
+│   ├── logo/               bron van het logo + complete-logo.py (aanvullen en opschonen) + 2000 px master
 │   ├── extract-glyphs.py   haalt penseelpaden uit het font
 │   ├── gen-roster-md.mjs   maakt docs/ROSTER.md uit de data
 │   ├── build-www.sh        kopieert de game naar www/ voor Capacitor
