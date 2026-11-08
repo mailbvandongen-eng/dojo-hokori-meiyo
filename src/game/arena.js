@@ -25,9 +25,10 @@ export const OFFICIAL_POSES = {
   refHikiwake: P({ lSh: [-1.0, 0, -0.7], lEl: [-0.2, 0, 0], rSh: [-1.0, 0, 0.7], rEl: [-0.2, 0, 0] }),
   refRei: { ...POSES.rei },
   judgeSit: P({ ...SIT, lSh: [-0.55, 0, 0.05], lEl: [-0.9, 0, 0], rSh: [-0.55, 0, -0.05], rEl: [-0.9, 0, 0] }),
-  judgeAka: P({ ...SIT, rSh: [-2.85, 0, -0.15], rEl: [0, 0, 0], lSh: [-0.55, 0, 0.05], lEl: [-0.9, 0, 0] }),
-  judgeShiro: P({ ...SIT, lSh: [-2.85, 0, 0.15], lEl: [0, 0, 0], rSh: [-0.55, 0, -0.05], rEl: [-0.9, 0, 0] }),
-  judgeDraw: P({ ...SIT, lSh: [-0.75, 0, -0.75], lEl: [-0.1, 0, 0], rSh: [-0.75, 0, 0.75], rEl: [-0.1, 0, 0] }),
+  // bij een stem staan de hoekscheidsrechters op en steken de vlag recht omhoog (goed zichtbaar)
+  judgeAka: P({ root: [0.02, 0, 0, 0], rSh: [-3.05, 0, -0.12], rEl: [0, 0, 0], lSh: [0.05, 0, 0.1], lEl: [-0.1, 0, 0], spine: [-0.05, 0, 0.08] }),
+  judgeShiro: P({ root: [0.02, 0, 0, 0], lSh: [-3.05, 0, 0.12], lEl: [0, 0, 0], rSh: [0.05, 0, -0.1], rEl: [-0.1, 0, 0], spine: [-0.05, 0, -0.08] }),
+  judgeDraw: P({ root: [0, 0, 0, 0], lSh: [-0.6, 0, -0.85], lEl: [-0.1, 0, 0], rSh: [-0.6, 0, 0.85], rEl: [-0.1, 0, 0] }),
 };
 
 class Official {
@@ -43,11 +44,16 @@ class Official {
   }
 }
 
+// Grote hata (vlag) met een donkere rand voor contrast, licht zelf iets op zodat hij ook in de schaduw opvalt.
 function addFlag(fist, color) {
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.5, 6), new THREE.MeshStandardMaterial({ color: '#8a6a3a' }));
-  pole.position.y = -0.2; pole.rotation.x = Math.PI; fist.add(pole);
-  const cloth = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.3), flagMaterial(color));
-  cloth.position.set(0, -0.08, 0.16); cloth.rotation.y = Math.PI / 2; pole.add(cloth);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.9, 8), new THREE.MeshStandardMaterial({ color: '#2a1d10' }));
+  pole.position.y = -0.38; pole.rotation.x = Math.PI; fist.add(pole);
+  const geo = new THREE.PlaneGeometry(0.68, 0.52, 10, 2); geo.translate(0.34, 0, 0);
+  const cloth = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: color === '#ffffff' ? 0.35 : 0.45, roughness: 0.7, side: THREE.DoubleSide }));
+  cloth.position.set(0, -0.2, 0.01); cloth.rotation.y = Math.PI / 2; pole.add(cloth);
+  const rim = new THREE.Mesh(new THREE.PlaneGeometry(0.73, 0.57), new THREE.MeshBasicMaterial({ color: '#111', side: THREE.DoubleSide }));
+  rim.position.set(0.34, 0, -0.004); cloth.add(rim);
+  return { cloth, base: geo.attributes.position.array.slice() };
 }
 
 export function createArena(scene, renderer) {
@@ -162,8 +168,10 @@ export function createArena(scene, renderer) {
     new Official(scene, { naam: 'Fukushin 2', uiterlijk: { lengte: 1.02, haar: '#3a2a1a' } }, S + 0.5, -S + 0.6, -Math.PI * 0.25, 'judgeSit'),
   ];
   const chairMat = new THREE.MeshStandardMaterial({ color: '#202024' });
+  const handFlags = [];
   for (const j of judges) {
-    addFlag(j.m.joints.rFist, '#c8102e'); addFlag(j.m.joints.lFist, '#ffffff');
+    j.flagR = addFlag(j.m.joints.rFist, '#e0102e'); j.flagL = addFlag(j.m.joints.lFist, '#ffffff');
+    handFlags.push(j.flagR, j.flagL);
     const chair = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.46, 0.5), chairMat); chair.position.copy(j.m.group.position); chair.position.y = 0.23;
     chair.rotation.y = j.m.group.rotation.y; scene.add(chair); matchOnly.push(chair);
     const backrest = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.06), chairMat); backrest.position.set(0, 0.5, -0.25); chair.add(backrest);
@@ -171,6 +179,12 @@ export function createArena(scene, renderer) {
 
   function update(dt, t) {
     ref.update(dt); judges.forEach(j => j.update(dt));
+    // vlaggen wapperen; een omhooggestoken vlag wappert hard
+    for (const j of judges) for (const [f, up] of [[j.flagR, j.to === OFFICIAL_POSES.judgeAka], [j.flagL, j.to === OFFICIAL_POSES.judgeShiro]]) {
+      const arr = f.cloth.geometry.attributes.position.array, b = f.base, amp = up ? 0.09 : 0.015;
+      for (let i = 0; i < arr.length; i += 3) arr[i + 2] = Math.sin(t * (up ? 11 : 3) + b[i] * 9) * amp * (b[i] / 0.68);
+      f.cloth.geometry.attributes.position.needsUpdate = true;
+    }
     for (const f of flags) {
       const arr = f.mesh.geometry.attributes.position.array, b = f.base;
       for (let i = 0; i < arr.length; i += 3) { const x = b[i]; arr[i + 2] = Math.sin(t * 3 + x * 3 + f.phase) * 0.08 * x; }

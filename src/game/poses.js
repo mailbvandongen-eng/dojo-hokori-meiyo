@@ -33,22 +33,31 @@ export const POSES = {
   hiji: P({ rSh: [-1.35, 0, 0.6], rEl: [-2.5, 0, 0], spine: [0.15, 0.7, 0], pelvis: [0, 0.25, 0], root: [-0.1, 0.12, 0, 0] }),
 
   maeChamber: P({ rHip: [-1.55, 0, 0], rKnee: [1.9, 0, 0], spine: [-0.05, 0, 0], root: [0, 0.02, 0, 0] }),
-  maeExt: P({ rHip: [-1.5, 0, 0], rKnee: [0.12, 0, 0], spine: [-0.25, 0, 0], head: [0.15, 0.3, 0], root: [0, 0.12, 0, 0], lKnee: [0.15, 0, 0] }),
+  maeExt: P({ rHip: [-1.7, 0, 0], rKnee: [0.12, 0, 0], spine: [-0.25, 0, 0], head: [0.15, 0.3, 0], root: [0, 0.12, 0, 0], lKnee: [0.15, 0, 0] }),
 
-  gedanChamber: P({ pelvis: [0, 0.6, 0], spine: [0.05, -0.5, 0.1], rHip: [-0.3, 0, -0.65], rKnee: [1.5, 0, 0], root: [-0.04, 0.05, 0, 0] }),
-  gedanExt: P({ pelvis: [0, 1.05, 0], spine: [0.05, -0.8, 0.2], rHip: [-0.15, 0, -0.85], rKnee: [0.25, 0, 0], lKnee: [0.3, 0, 0], rSh: [-0.2, 0, 0.6], rEl: [-0.5, 0, 0], root: [-0.06, 0.12, 0, 0] }),
-  chudanChamber: P({ pelvis: [0, 0.75, 0], spine: [0, -0.6, 0.15], rHip: [-0.35, 0, -1.25], rKnee: [1.8, 0, 0], root: [-0.02, 0.05, 0, 0] }),
-  chudanExt: P({ pelvis: [0, 1.35, 0], spine: [0, -1.0, 0.35], rHip: [-0.2, 0, -1.4], rKnee: [0.2, 0, 0], lKnee: [0.15, 0, 0], rSh: [-0.1, 0, 0.7], rEl: [-0.4, 0, 0], root: [-0.02, 0.1, 0, 0] }),
-  jodanChamber: P({ pelvis: [0, 0.85, 0], spine: [0, -0.6, 0.35], rHip: [-0.4, 0, -1.7], rKnee: [2.0, 0, 0], root: [0.02, 0.04, 0, 0] }),
-  jodanExt: P({ pelvis: [0, 1.45, 0], spine: [0, -1.0, 0.6], head: [0, 0.4, -0.3], rHip: [-0.2, 0, -1.95], rKnee: [0.15, 0, 0], lKnee: [0.1, 0, 0], rSh: [0.1, 0, 0.9], rEl: [-0.3, 0, 0], root: [0.04, 0.08, 0, 0] }),
+  gedanChamber: P({ pelvis: [0, 0.9, 0], spine: [0.05, -0.5, 0.1], rHip: [-0.3, 0, -0.85], rKnee: [1.5, 0, 0], root: [-0.04, 0.05, 0, 0] }),
+  gedanExt: P({ pelvis: [0, 1.45, 0], spine: [0.05, -1.0, 0.2], rHip: [-0.2, 0, -1.15], rKnee: [0.25, 0, 0], lKnee: [0.3, 0, 0], rSh: [-0.2, 0, 0.6], rEl: [-0.5, 0, 0], root: [-0.06, 0.12, 0, 0] }),
+  chudanChamber: P({ pelvis: [0, 1.0, 0], spine: [0, -0.6, 0.15], rHip: [-0.35, 0, -1.5], rKnee: [1.8, 0, 0], root: [-0.02, 0.05, 0, 0] }),
+  chudanExt: P({ pelvis: [0, 1.6, 0], spine: [0, -1.15, 0.35], rHip: [-0.2, 0, -1.75], rKnee: [0.2, 0, 0], lKnee: [0.15, 0, 0], rSh: [-0.1, 0, 0.7], rEl: [-0.4, 0, 0], root: [-0.02, 0.1, 0, 0] }),
+  jodanChamber: P({ pelvis: [0, 1.1, 0], spine: [0, -0.6, 0.35], rHip: [-0.4, 0, -2.0], rKnee: [2.0, 0, 0], root: [0.02, 0.04, 0, 0] }),
+  jodanExt: P({ pelvis: [0, 1.75, 0], spine: [0, -1.2, 0.75], head: [0, 0.4, -0.3], rHip: [-0.2, 0, -2.4], rKnee: [0.15, 0, 0], lKnee: [0.1, 0, 0], rSh: [0.1, 0, 0.9], rEl: [-0.3, 0, 0], root: [0.04, 0.08, 0, 0] }),
 
-  ushiroTurn: P({ root: [-0.08, 0, Math.PI * 0.85, 0], rHip: [-0.9, 0, 0], rKnee: [1.9, 0, 0], spine: [0.25, 0, 0], head: [0, -0.6, 0] }),
-  ushiroExt: P({ root: [-0.08, 0.1, Math.PI, 0], spine: [0.55, 0, 0], head: [-0.4, -0.9, 0], rHip: [1.35, 0, 0], rKnee: [0.1, 0, 0], lKnee: [0.3, 0, 0] }),
-  uMawashiExt: P({ root: [0, 0.05, Math.PI * 1.45, 0], pelvis: [0, 0, 0], spine: [0.1, 0, 0.4], rHip: [0.2, 0, -1.8], rKnee: [0.1, 0, 0], lKnee: [0.1, 0, 0] }),
-  ushiroBack: P({ root: [-0.06, 0, Math.PI * 1.7, 0] }),
+  // Draaitrappen draaien met negatieve yaw (rug naar de tegenstander, dan rond). Bij yaw -1,5π wijst de
+  // rechterzijde (en dus een zijwaarts geheven rechterbeen) precies naar de tegenstander.
+  ushiroTurn: P({ root: [-0.08, 0, -Math.PI * 0.85, 0], rHip: [-0.9, 0, 0], rKnee: [1.9, 0, 0], spine: [0.25, 0, 0], head: [0, -0.6, 0] }),
+  ushiroExt: P({ root: [-0.08, 0.1, -Math.PI, 0], spine: [0.75, 0, 0], head: [-0.4, -0.9, 0], rHip: [1.65, 0, 0], rKnee: [0.1, 0, 0], lKnee: [0.3, 0, 0] }),
+  uMawashiTurn: P({ root: [-0.05, 0.02, -Math.PI, 0], pelvis: [0, 0, 0], spine: [0.2, 0, 0.1], head: [0, -0.8, 0], rHip: [-0.3, 0, -1.0], rKnee: [1.3, 0, 0], lKnee: [0.35, 0, 0] }),
+  uMawashiExt: P({ root: [0.03, 0.08, -Math.PI * 1.5, 0], pelvis: [0, 0, 0], spine: [0.05, 0, 0.6], head: [0, -0.3, 0.2], rHip: [0, 0, -2.6], rKnee: [0.08, 0, 0], lKnee: [0.12, 0, 0], lSh: [-0.8, 0, -0.6], lEl: [-1.4, 0, 0], rSh: [0.2, 0, 0.9], rEl: [-0.4, 0, 0] }),
+  uMawashiFollow: P({ root: [0, 0.05, -Math.PI * 1.75, 0], pelvis: [0, 0, 0], spine: [0.05, 0, 0.3], rHip: [-0.2, 0, -1.5], rKnee: [0.7, 0, 0], lKnee: [0.2, 0, 0] }),
+  ushiroBack: P({ root: [-0.06, 0, -Math.PI * 1.7, 0] }),
 
-  kakatoUp: P({ rHip: [-2.5, 0, -0.1], rKnee: [0.05, 0, 0], spine: [-0.3, 0.1, 0], lKnee: [0.1, 0, 0], root: [0.04, 0.02, 0, 0] }),
-  kakatoDown: P({ rHip: [-0.9, 0, -0.05], rKnee: [0.1, 0, 0], spine: [0.15, 0.1, 0], root: [-0.06, 0.15, 0, 0] }),
+  // Axe kick: knie op, gestrekt been hoog boven het hoofd, hiel recht naar beneden
+  kakatoChamber: P({ rHip: [-1.6, 0, -0.35], rKnee: [1.4, 0, 0], spine: [-0.1, 0, 0], root: [0.02, 0.02, 0, 0] }),
+  kakatoUp: P({ rHip: [-2.75, 0, -0.15], rKnee: [0.05, 0, 0], spine: [-0.35, 0.1, 0], lKnee: [0.1, 0, 0], root: [0.06, 0.02, 0, 0] }),
+  kakatoHit: P({ rHip: [-2.0, 0, -0.05], rKnee: [0.04, 0, 0], spine: [0.0, 0.1, 0], head: [0.1, 0.3, 0], lKnee: [0.15, 0, 0], root: [0.02, 0.14, 0, 0] }),
+  kakatoDown: P({ rHip: [-0.8, 0, -0.05], rKnee: [0.1, 0, 0], spine: [0.15, 0.1, 0], root: [-0.06, 0.15, 0, 0] }),
+  // Double tap: na de lage trap blijft de knie hoog (zijwaarts) voor de hoge trap
+  tapRechamber: P({ pelvis: [0, 1.1, 0], spine: [0, -0.6, 0.2], rHip: [-0.4, 0, -1.7], rKnee: [2.0, 0, 0], root: [-0.02, 0.06, 0, 0] }),
 
   hiza: P({ rHip: [-1.75, 0, 0.1], rKnee: [2.3, 0, 0], spine: [-0.18, 0.1, 0], lSh: [-1.3, 0, -0.1], lEl: [-1.2, 0, 0], rSh: [-1.3, 0, 0.1], rEl: [-1.2, 0, 0], root: [0.02, 0.18, 0, 0] }),
   tobiPrep: P({ root: [-0.2, 0, 0, 0], lKnee: [0.9, 0, 0], rKnee: [0.9, 0, 0], lHip: [-0.6, 0, 0.08], rHip: [-0.1, 0, 0] }),
@@ -58,12 +67,15 @@ export const POSES = {
   rolPrep: P({ root: [-0.25, 0.05, 0, 0.35], spine: [0.4, 0, 0], lKnee: [1.0, 0, 0], rKnee: [1.0, 0, 0], lHip: [-0.8, 0, 0.1], rHip: [-0.4, 0, -0.1] }),
   rolDive: P({ root: [-0.15, 0.1, 0, 1.4], spine: [0.5, 0, 0], head: [0.6, 0, 0], lHip: [0.3, 0, 0.1], lKnee: [0.6, 0, 0], rHip: [0.5, 0, -0.1], rKnee: [0.3, 0, 0], lSh: [-2.6, 0, -0.2], rSh: [-2.6, 0, 0.2], lEl: [-0.3, 0, 0], rEl: [-0.3, 0, 0] }),
   rolInvert: P({ root: [0.12, 0.15, 0, Math.PI], spine: [0.3, 0, 0], head: [0.5, 0, 0], lHip: [-1.2, 0, 0.15], lKnee: [1.6, 0, 0], rHip: [-0.4, 0, -0.1], rKnee: [0.1, 0, 0], lSh: [-2.9, 0, -0.3], rSh: [-2.9, 0, 0.3], lEl: [-0.2, 0, 0], rEl: [-0.2, 0, 0] }),
-  rolStrike: P({ root: [-0.42, 0.2, 0, Math.PI * 2 - 0.55], spine: [0.35, 0, 0], head: [0.3, 0, 0], rHip: [-2.2, 0, -0.05], rKnee: [0.05, 0, 0], lHip: [-1.4, 0, 0.15], lKnee: [1.9, 0, 0], lSh: [0.4, 0, 0.5], rSh: [0.4, 0, -0.5], lEl: [-0.3, 0, 0], rEl: [-0.3, 0, 0] }),
+  rolStrike: P({ root: [-0.18, 0.25, 0, Math.PI * 2 - 0.1], spine: [0.3, 0, 0], head: [0.3, 0, 0], rHip: [-2.65, 0, -0.05], rKnee: [0.05, 0, 0], lHip: [-1.3, 0, 0.15], lKnee: [1.9, 0, 0], lSh: [0.4, 0, 0.5], rSh: [0.4, 0, -0.5], lEl: [-0.3, 0, 0], rEl: [-0.3, 0, 0] }),
   rolUp: P({ root: [-0.3, 0.12, 0, Math.PI * 2 - 0.1], spine: [0.35, 0, 0], lKnee: [1.2, 0, 0], rKnee: [0.9, 0, 0], lHip: [-0.9, 0, 0.1], rHip: [-0.6, 0, -0.1] }),
   // Gewichtheffen (overhead press): halter op de schouders → boven het hoofd
   pressDown: P({ root: [-0.02, 0, 0, 0], pelvis: [0, 0, 0], spine: [-0.05, 0, 0], head: [-0.05, 0, 0], lSh: [-0.35, 0, 0.75], lEl: [-2.55, 0, 0], rSh: [-0.35, 0, -0.75], rEl: [-2.55, 0, 0], lHip: [0, 0, 0.14], lKnee: [0.12, 0, 0], rHip: [0, 0, -0.14], rKnee: [0.12, 0, 0] }),
   pressUp: P({ root: [0, 0, 0, 0], pelvis: [0, 0, 0], spine: [-0.08, 0, 0], head: [-0.15, 0, 0], lSh: [-2.75, 0, 0.42], lEl: [-0.15, 0, 0], rSh: [-2.75, 0, -0.42], rEl: [-0.15, 0, 0], lHip: [0, 0, 0.14], lKnee: [0, 0, 0], rHip: [0, 0, -0.14], rKnee: [0, 0, 0] }),
   pressStrain: P({ root: [-0.08, 0, 0, 0], pelvis: [0, 0, 0], spine: [-0.15, 0, 0.05], head: [-0.25, 0, 0], lSh: [-1.6, 0, 0.7], lEl: [-1.6, 0, 0], rSh: [-1.6, 0, -0.7], rEl: [-1.6, 0, 0], lHip: [0, 0, 0.16], lKnee: [0.35, 0, 0], rHip: [0, 0, -0.16], rKnee: [0.35, 0, 0] }),
+  // tai sabaki (uitwijken) en snelle stap terug
+  sabaki: P({ root: [-0.16, 0, 0.3, 0], spine: [0.25, -0.2, 0.15], lKnee: [0.7, 0, 0], rKnee: [0.6, 0, 0], lSh: [-1.2, 0, -0.4], lEl: [-2.2, 0, 0], rSh: [-1.1, 0, 0.4], rEl: [-2.3, 0, 0] }),
+  dash: P({ root: [-0.1, -0.08, 0, 0], spine: [-0.12, 0, 0], lKnee: [0.55, 0, 0], rKnee: [0.5, 0, 0], lSh: [-1.2, 0, -0.4], lEl: [-2.2, 0, 0], rSh: [-1.1, 0, 0.4], rEl: [-2.3, 0, 0] }),
   hitBody: P({ spine: [0.55, 0.1, 0], head: [0.3, 0.3, 0], root: [-0.12, -0.12, 0, 0], lSh: [-0.7, 0, -0.5], rSh: [-0.6, 0, 0.5], lEl: [-1.9, 0, 0], rEl: [-1.9, 0, 0] }),
   hitHead: P({ spine: [-0.35, 0, 0.1], head: [-0.6, 0.6, 0.2], root: [-0.04, -0.15, 0, 0], lSh: [-0.5, 0, -0.1], rSh: [-0.3, 0, 0.3], lEl: [-1.0, 0, 0], rEl: [-1.0, 0, 0] }),
   hitLeg: P({ lKnee: [1.0, 0, 0], lHip: [-0.2, 0, 0.15], root: [-0.2, -0.05, 0, 0], spine: [0.25, -0.2, 0.15] }),

@@ -93,7 +93,7 @@ export class Match {
     const kiFrac = Math.max(0, victim.ki / victim.kiMax);
     const upAt = finished ? Infinity : 1.3 + Math.random() * 1.2 + (1 - kiFrac) * 1.4 + (kd.cause === 'legs' ? 0.4 : 0);
     this.kd = { victim, attacker, t: 0, upAt, counted: 0, kd };
-    attacker.state = 'idle'; attacker.queue = [];
+    attacker.queue = []; attacker.chainOk = false; // de aanvaller maakt de techniek af (geen sprong naar rust)
     this.arena.ref.pose('refYame', 9);
     this.h.knockdown(victim, attacker, kd);
   }

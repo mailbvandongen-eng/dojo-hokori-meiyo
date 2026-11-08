@@ -127,5 +127,16 @@ export function buildFighter(data, corner = 'aka', costume = {}) {
   const v = new THREE.Vector3();
   function partWorld(name, out = new THREE.Vector3()) { (J[name] || root).getWorldPosition(v); return out.copy(v); }
 
-  return { group, root, joints: J, setPose, partWorld, height: 1.8 * L, scale: L };
+  // treffer-flits: alle materialen van deze vechter lichten kort op (wit, of oranje bij een counter)
+  const mats = new Set(); group.traverse(o => { if (o.isMesh && o.material?.emissive) mats.add(o.material); });
+  const flashCol = new THREE.Color(); let flashT = 0;
+  function hitFlash(color = '#ffffff') { flashCol.set(color); flashT = 0.12; }
+  function tickFlash(dt) {
+    if (flashT <= 0) return;
+    flashT = Math.max(0, flashT - dt);
+    const k = flashT / 0.12 * 0.55;
+    for (const m of mats) { m.emissive.copy(flashCol); m.emissiveIntensity = k; }
+  }
+
+  return { group, root, joints: J, setPose, partWorld, hitFlash, tickFlash, height: 1.8 * L, scale: L };
 }

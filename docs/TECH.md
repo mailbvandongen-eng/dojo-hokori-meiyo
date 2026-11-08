@@ -83,18 +83,26 @@ frame(raw dt)
 
 ### 3.2 Vechter (fighter.js)
 
-Toestanden: `idle · walk · attack · block · lowblock · parry · hit · down · getup · stand · rei · osu · victory`.
+Toestanden: `idle · walk · attack · block · lowblock · parry · hit · sabaki · dash · down · getup · stand · rei · osu · victory · pose`.
 
-Een techniek (`moves.js`) heeft `startup · active · recovery` en keyframes `[pose, tijd]`. Op `startup` valt het treffermoment. `resolveHit` controleert in deze volgorde:
-1. **bereik**: reach van de techniek + bereik van de vechter
-2. **overtreding**: in de toernooimodus geeft een gezichtsstoot chui
-3. **parry**: een counter-signature van de verdediger
-4. **blok**: hoog/midden-blok tegen jodan/chudan, sune uke tegen gedan
-5. **schade**: ki en de schadeteller van de zone; een counter doet ×1,25
-6. **knock-down**: finisher, ki op, beendrempel, rompdrempel of een kans bij een hoofdtreffer
-7. **reactie**: hit-pose, terugslag, stun
+Een techniek (`moves.js`) heeft een of meer **treffers** (`hits`, met tijd, venster, doelzone en schade), een `recovery`, keyframes `[pose, tijd]` en een **raakvlak** (`limb`: rShin, rArm, lArm, rElbow, rThigh). Per frame in het raakvenster:
+1. pose zetten en het raakvlak (lijn tussen twee gewrichten, 11 meetpunten) in wereldcoördinaten meten
+2. **contact** met de doelzone van de tegenstander:
+   - jodan: een bol rond de echte hoofdpositie plus nek en schouders
+   - chudan: de romp
+   - gedan: de benen
+3. bij contact `resolveHit`:
+   1. tai sabaki ontwijkt
+   2. parry
+   3. blok of perfect blok (voordeel en counter-venster voor de verdediger)
+   4. schade met combo-afbouw
+   5. knock-down
+   6. hitstun
+4. voorbij het venster zonder contact: misser (+100 ms herstel)
 
-De speler en de AI geven hetzelfde input-object door (`{dir, move, uke, pressed}`). Daarom kan de AI niets wat een speler niet kan.
+Alle tuning staat bovenaan in `TUNE` (combolimiet, afbouw, perfect venster, kaeshi, sabaki, dash, rand). `separate()` houdt vechters uit elkaar en geeft terugslag bij de rand door aan de aanvaller.
+
+De speler en de AI geven hetzelfde input-object door (`{dir, move, uke, pressed}`, met de richtingen n/f/b/u/d/ub/db/uf/df). Daarom kan de AI niets wat een speler niet kan. De AI blokt per treffer op het doel (laag of hoog), countert na een blok, wijkt uit de hoek met tai sabaki en breekt soms uit een combo.
 
 ### 3.3 Wedstrijd (match.js)
 
@@ -165,6 +173,8 @@ npx cap open android|ios
 | Rooktest | `node tools/test/smoke.cjs` | splash → menu → toernooi → gevecht, screenshots, JS-fouten |
 | Posegalerij | `node tools/test/poses.cjs` | screenshot van elke techniek op het treffermoment |
 | Regels | `node tools/test/rules.cjs 8` | AI tegen AI: elke wedstrijd eindigt (ippon/hantei/encho) |
+| Mechanica | `node tools/test/mechanics.cjs` | raakdetectie van alle technieken (Ushiro Mawashi Geri apart), combolimiet, blokvoordeel, perfect uke + kaeshi, kiai-uitbraak, rand (geen jogai door terugslag), tai sabaki, double tap, axe kick |
+| Kalibratie | `node tools/test/calibrate.cjs` | grootste raakafstand per techniek (voor `reach`) |
 | Campaign | `node tools/test/campaign.cjs` | vechter maken, bokszak, clubtoernooi (titel, vrijspelen), upgrade, gewichtheffen, online leaderboard, WK-finale tegen Sensei Wesley (zwarte band) |
 | Vrijspelen | `node tools/test/unlocks.cjs` | modus Toernooi: volgorde van vrijspelen, Sensei Wesley in de finale |
 | Zoom | `node tools/test/zoom.cjs` | snel tikken zoomt de pagina niet in |

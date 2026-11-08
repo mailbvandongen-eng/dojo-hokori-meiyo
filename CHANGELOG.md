@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.5.0 (2026-11-09): gevechtssysteem vernieuwd
+- **Raakdetectie op contact:** per frame wordt het raakvlak (scheen, vuist, knie, elleboog) gemeten tegen de doelzone van de tegenstander (hoofd, romp of benen). Het bereik is opnieuw gemeten; het was 0,35-0,5 m te ruim.
+- **Ushiro Mawashi Geri gerepareerd:** het lichaam draaide de verkeerde kant op, waardoor het been bij het treffermoment naar achteren wees. Hij draait nu correct en de hiel raakt het hoofd.
+- **Trappen op de juiste hoogte:** de jodan-trap raakt het hoofd in plaats van de schouder, de lage trap de dij in plaats van de enkel. De ronde trappen wijzen recht op de tegenstander.
+- **Nieuw:** Axe kick (↗ + GERI) en de laag-hoog trap / double tap (↘ + GERI, twee treffers: laag en hoog).
+- **Geen eindeloze combo's meer:** de lussen in de combinatietabel zijn weg, maximaal 3 technieken per reeks, met schade- en stun-afbouw.
+- **Blokken en counteren:**
+  - Blok geeft voordeel en een counter-venster.
+  - Perfect uke laat de aanvaller wankelen.
+  - Kaeshi: snellere, hardere counter.
+  - Kiai-uitbraak uit een combo.
+  - Missers en geblokte technieken kosten extra herstel.
+  - In de tweede helft van het herstel mag je al blokken.
+- **Rand van de mat:** terugslag tegen de rand gaat naar de aanvaller (geen jogai meer door terugslag), en er is tai sabaki (UKE + ↑) om uit de hoek te komen. Twee keer snel naar achteren = snelle stap terug.
+- **Vloeiender:**
+  - Lopen met versnelling, vloeiend draaien bij het wisselen van kant.
+  - Geen terugdraai meer na een draaitrap.
+  - De aanvaller maakt bij een knock-down zijn trap af.
+  - Een witte of oranje (counter) treffer-flits op het lichaam, en meldingen voor renzoku, kaeshi, perfect uke en tai sabaki.
+- **Vlaggen van de hoekscheidsrechters:** grotere hata met donkere rand en eigen licht. De hoekscheidsrechters staan op en wapperen met de vlag, de camera toont bij de hantei de hele mat, en in beeld komen stemkaarten (AKA/SHIRO/HIKIWAKE) per scheidsrechter.
+- **De AI** blokt per treffer (laag/hoog), countert na een blok, wijkt uit de hoek en breekt uit combo's.
+- **Nieuwe vechter:** Sensei Crystal (vrouw, 3e dan), vrij te spelen na de senpai en vóór Sensei Conchita.
+- **Nieuwe tests:** `mechanics.cjs` (16 controles) en `calibrate.cjs`.
+
 ## 0.4.0 (2026-11-08): campaign, vrijspelen en online leaderboard
 - **Campaign Mode (hoofdmodus).** Maak je vechter (meisje of jongen, kapsel, huid, haar) en begin als witte band.
   - Om en om training en toernooi.

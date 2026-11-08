@@ -1,6 +1,6 @@
 # Game Design Document: Dojo Hokori Meiyo Fight Game
 
-Versie 0.4 · 8 november 2026 · status: prototype (fase 1)
+Versie 0.5 · 9 november 2026 · status: prototype (fase 1)
 
 > **Eer & Trots (誇り名誉, Hokori Meiyo) · Osu no Seishin (押忍の精神)**
 > Een full-contact Kyokushin-vechtgame voor en over de vechters van Dojo Hokori Meiyo in Zoetermeer.
@@ -43,11 +43,45 @@ Een mobiele vechtgame (iOS en Android) met de klap en het spektakel van Tekken e
 | **UKE** 受 | wering | vasthouden = dekking hoog/midden; met ↓ = sune uke (scheenblok) |
 | **KIAI** 気 | strijdkreet | signature (1/3 meter) of super (volle meter) |
 
-De richting telt mee en is relatief (→ = naar de tegenstander toe). Zo heeft elke knop 4 tot 7 technieken. Ook de diagonalen naar achteren tellen: **↖ + GERI = Ushiro Mawashi Geri** (draaiende hiel naar het hoofd) en **↙ + GERI = Rol Kick** (Kaiten Kakato Geri: rollend naar voren, de hiel valt van boven; spectaculair maar riskant). De volledige tabel staat in [ROSTER.md](ROSTER.md#basis-moveset-alle-vechters).
+De richting telt mee en is relatief (→ = naar de tegenstander toe). Ook de vier diagonalen hebben een eigen trap:
 
-**Renzoku waza (combinaties):** druk opnieuw op TSUKI of GERI terwijl een techniek raakt of geblokt wordt. Voorbeeld: hidari seiken → migi gyaku-tsuki → gedan mawashi geri, de klassieke Kyokushin-combinatie.
+| Input | Techniek |
+|---|---|
+| ↖ + GERI | **Ushiro Mawashi Geri**: draaiende hiel naar het hoofd |
+| ↗ + GERI | **Axe kick** (Kakato Geri): het gestrekte been hoog op, de hiel valt op hoofd of sleutelbeen |
+| ↘ + GERI | **Laag-hoog (double tap)**: lage trap op de dij en zonder neerzetten meteen hoog |
+| ↙ + GERI | **Rol Kick** (Kaiten Kakato Geri): rollend naar voren, de hiel van boven |
 
-**Inputbuffer:** een druk blijft 150 ms geldig, zodat techniekjes niet "wegvallen" tijdens herstel.
+De volledige tabel staat in [ROSTER.md](ROSTER.md#basis-moveset-alle-vechters).
+
+**Renzoku waza (combinaties):** druk opnieuw op TSUKI of GERI terwijl een techniek raakt of geblokt wordt (bijvoorbeeld hidari seiken → migi gyaku-tsuki → gedan mawashi geri). Maximaal 3 technieken per reeks, zonder lussen.
+
+**Inputbuffer:** een druk blijft 200 ms geldig, zodat technieken niet "wegvallen" tijdens het herstel.
+
+### 2.1b Raakdetectie
+
+- Een techniek raakt alleen als het **raakvlak zichtbaar contact maakt**. Het raakvlak is de scheen of voet bij trappen, de onderarm of vuist bij stoten, de knie of de elleboog. Er wordt per frame gemeten tijdens het raakvenster van de techniek; slaat een frame het venster over, dan wordt het midden van het venster gemeten.
+- Elke techniek heeft een **doelzone** op de tegenstander:
+  - **jodan:** een bol rond het echte hoofd, plus nek en bovenkant van de schouders
+  - **chudan:** de romp
+  - **gedan:** de benen
+
+  Een hoge trap moet dus echt het hoofd raken.
+- Het bereik in de data is gemeten op het zichtbare bereik (`tools/test/calibrate.cjs`). Staat de tegenstander net buiten bereik, dan stapt de vechter in tijdens de opbouw.
+- 2,5D: afstand telt langs de vechtlijn; in de diepte is er een marge van 0,5 m (alleen tai sabaki ontwijkt zo).
+- De kijkrichting staat vast tijdens een techniek. Wie om je heen stapt, laat je trap missen.
+
+### 2.1c Verdedigen en counteren
+
+| Situatie | Wat er gebeurt |
+|---|---|
+| **Blok** (UKE vasthouden; ↓ = sune uke) | treffer gestopt, een beetje ki-schade. De verdediger is na 140 ms vrij; de aanvaller herstelt 100 ms langer. |
+| **Perfect uke** (UKE net voor de treffer, binnen 0,2 s) | de aanvaller **wankelt** (0,36 s), de verdediger krijgt een groot counter-venster |
+| **Kaeshi** (aanvallen in het counter-venster na een blok) | de techniek is 30% sneller en 20% harder; melding "KAESHI" |
+| **Combo-afbouw** | elke volgende treffer in een combo doet 14% minder schade en geeft 20% minder stun, zodat de verdediger na 2 treffers meestal kan blokken |
+| **Kiai-uitbraak** (KIAI tijdens treffers, 1/3 meter) | breekt de combo: de aanvaller wankelt, de verdediger krijgt het initiatief |
+| **Misser** | 100 ms extra herstel: missen wordt afgestraft |
+| **Laat herstel** | in de tweede helft van het herstel van je eigen techniek mag je al blokken |
 
 ### 2.2 Schademodel
 
@@ -75,8 +109,11 @@ Extra regels:
 
 ### 2.4 Beweging en ruimte
 
-- Gevechten spelen zich af op één lijn (2,5D), zoals de klassieke Tekken-camera. Zijstappen (sabaki) en echte 3D-beweging volgen in fase 2.
-- **Jogai:** wie buiten het wedstrijdvlak komt, wordt teruggezet ("Yame! Jogai!"). Drie keer jogai levert een chui op.
+- Gevechten spelen zich af op één lijn (2,5D), zoals de klassieke Tekken-camera. Lopen met versnelling en uitlopen; de vechter draait vloeiend mee als de kant wisselt.
+- **Tai sabaki** (UKE + ↑): stap om de tegenstander heen naar de andere kant (dichtbij), of zijwaarts op de plek (verder weg). In het midden van de beweging ontwijk je aanvallen. Afkoeltijd 1 s.
+- **Snelle stap terug** (twee keer snel ←): in één beweging afstand maken.
+- **Rand van de mat:** wie geraakt wordt of blokt, blijft altijd 12 cm binnen de rand. De rest van de terugslag gaat naar de aanvaller. Zo kan niemand tegen de rand worden vastgezet en krijg je geen jogai door terugslag.
+- **Jogai:** wie zelf buiten het wedstrijdvlak loopt, wordt teruggezet ("Yame! Jogai!"). Drie keer jogai levert een chui op.
 
 ---
 
@@ -153,7 +190,7 @@ In de modus **Dojo (vrij)** mag de jodan-stoot (↑ + TSUKI) en zijn er geen chu
 - **Ellebogen naar de romp** zijn toegestaan in de game, maar niet elke bond staat ze toe. Moet dit een chui worden?
 - **Clinch en body checks** uit de briefing: vasthouden is in echte Kyokushin een overtreding. Voorstel: een korte **clinch-knie** (knie zonder vast te houden) is toegestaan. Echt vasthouden langer dan ±1 s wordt chui (fase 2). Een body check zonder handen (schouderduw) is in de meeste reglementen ook verboden. Daarom staat die er niet in.
 - **Hoofdstoten in specials:** de briefing vraagt "geen head punches behalve bij bepaalde specials". Dat is opgelost via de modus Dojo (vrij). In de modus Toernooi geeft een gezichtsstoot altijd chui. Zo blijft de toernooimodus zuiver.
-- **2 hoekscheidsrechters** (briefing) in plaats van de 4 die op grote toernooien gangbaar zijn. 4 wordt een optie.
+- **2 hoekscheidsrechters** (briefing) in plaats van de 4 die op grote toernooien gangbaar zijn. 4 wordt een optie. Bij de hantei staan ze op en steken de grote rode of witte hata recht omhoog. De camera toont dan de hele mat, en in beeld staat per scheidsrechter een stemkaart (AKA / SHIRO / HIKIWAKE).
 - **Hantei-criteria** in de game: schade, schone treffers, initiatief (naar voren), strafpunten, met per scheidsrechter wat ruis. Officieel zijn de criteria: waza-ari > strafpunten > schade > initiatief/aantal technieken. Dat moet nog fijner worden afgestemd.
 
 ### 3.9 Wedstrijdvlak
@@ -251,7 +288,7 @@ Een stap kost 40 × het huidige niveau. Niveaus: Noob (1-3) · Gevorderd (4-5) �
 
 Het volledige roster met movesets staat in **[ROSTER.md](ROSTER.md)** (gegenereerd uit de data).
 
-- **37 vechters**, met Sensei Wesley (4e dan, bondscoach) als eindbaas en Skylar als rivaal in Story.
+- **38 vechters**, met Sensei Wesley (4e dan, bondscoach) als eindbaas en Skylar als rivaal in Story.
 - **Graad en geslacht** zijn aangeleverd door de dojo. De graad bepaalt de bandkleur en telt mee in de kracht (een 10e kyu vecht op 88%, een 4e dan op 104%). Het geslacht bepaalt de bouw en het kapsel van het figuur.
 - **Bandkleuren van de dojo:** 10e kyu wit · 9e rood · 8e–7e blauw · 6e–5e geel · 4e–3e groen · 2e–1e bruin · dan zwart met gouden strepen.
 - Elke vechter heeft een **stijl-archetype**, 5 stats, 3 signatures, een super, een finisher en een AI-profiel.
@@ -283,7 +320,7 @@ Gradenreeks (bandkleuren van de dojo): 10e kyu wit → 9e rood → 8e blauw → 
 
 1. de lagere senpai (1e dan): Senpai Daan → Senpai Niesje → Senpai Micha
 2. de hogere senpai (2e dan): Senpai Anjay → Senpai Dave → Senpai Ferry
-3. de sensei: Sensei Conchita
+3. de sensei: Sensei Crystal (3e dan) → Sensei Conchita (4e dan)
 4. **Sensei Wesley** (eindbaas) als allerlaatste: alleen door hem **in een finale** te verslaan (de finale van de Hokori Meiyo Cup zodra al het andere vrij is, of de WK-finale in de campaign)
 
 Als tegenstanders zijn ze er altijd. Op de vechterkeuze staat een slotje met de volgende in de rij.

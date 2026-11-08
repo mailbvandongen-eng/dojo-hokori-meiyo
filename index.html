@@ -126,8 +126,14 @@ canvas#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:
 #callout .kanji{font-size:clamp(20px,5vh,44px);color:var(--gold);text-shadow:0 2px 6px #000}
 #special{position:absolute;top:22%;width:100%;text-align:center;font-weight:900;font-size:clamp(14px,3vh,24px);letter-spacing:.15em;opacity:0;transition:opacity .2s;text-shadow:0 2px 6px #000}
 #special.on{opacity:1}#special .jp{display:block;color:var(--gold);font-size:1.6em}
-#votes{position:absolute;top:56%;left:0;right:0;display:flex;justify-content:center;gap:14px;opacity:0;transition:opacity .3s}
-#votes.on{opacity:1}#votes div{width:38px;height:30px;border-radius:3px;box-shadow:0 2px 8px #000}
+#votes{position:absolute;bottom:18%;left:0;right:0;display:flex;justify-content:center;gap:clamp(10px,3vw,26px);opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s}
+#votes.on{opacity:1;transform:none}
+#votes .vote{display:flex;flex-direction:column;align-items:center;gap:4px;text-shadow:0 2px 4px #000}
+#votes .vote i{display:block;width:clamp(54px,9vh,80px);height:clamp(40px,6.6vh,60px);border-radius:4px;box-shadow:0 0 0 3px #000,0 4px 14px #000;animation:wave .5s ease-in-out infinite alternate;transform-origin:left center}
+#votes .vote.aka i{background:#e0102e}#votes .vote.shiro i{background:#fff}#votes .vote.draw i{background:linear-gradient(135deg,#e0102e 50%,#fff 50%)}
+#votes .vote b{font-size:clamp(13px,2.6vh,18px);font-weight:900;letter-spacing:.1em}#votes .vote.aka b{color:#ff4d63}
+#votes .vote small{font-size:10px;opacity:.8}
+@keyframes wave{to{transform:skewY(-6deg) scaleX(.94)}}
 #pauseBtn{position:absolute;top:max(8px,var(--sat));right:50%;transform:translateX(130%);pointer-events:auto;width:34px;height:34px;padding:0;border-radius:50%;font-size:13px}
 
 /* touch */

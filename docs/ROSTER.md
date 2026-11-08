@@ -11,41 +11,42 @@
 |---|---|---|---|---|---|---|---|---|---|---|
 | 1 | **Sensei Wesley** | M | 4e dan (zwart) | Compleet | Eindbaas | 9 | 8 | 8 | 10 | 10 |
 | 2 | **Sensei Conchita** | V | 4e dan (zwart) | Counter-vechter | Mentor in Training Mode | 8 | 8 | 8 | 9 | 9 |
-| 3 | **Senpai Anjay** | M | 2e dan (zwart) | Infighter | Toernooifavoriet | 8 | 7 | 6 | 9 | 8 |
-| 4 | **Senpai Dave** | M | 2e dan (zwart) | Tank | Toernooivechter | 9 | 5 | 7 | 9 | 9 |
-| 5 | **Senpai Ferry** | M | 2e dan (zwart) | Lowkick-specialist | Toernooivechter · veteraan | 9 | 6 | 7 | 9 | 10 |
-| 6 | **Senpai Daan** | M | 1e dan (zwart) | Tank | Toernooivechter | 8 | 5 | 6 | 10 | 9 |
-| 7 | **Senpai Niesje** | V | 1e dan (zwart) | Snelheidsvechter | Toernooivechter | 6 | 10 | 7 | 8 | 7 |
-| 8 | **Senpai Micha** | V | 1e dan (zwart) | Afstandsvechter | Toernooivechter | 7 | 8 | 9 | 8 | 8 |
-| 9 | **Gwenn** | V | 2e kyu (bruin) | Allrounder | Arcade-vechter | 6 | 7 | 7 | 8 | 7 |
-| 10 | **Yassin** | M | 2e kyu (bruin) | Spinner | Toernooivechter | 7 | 8 | 8 | 7 | 6 |
-| 11 | **Seth** | M | 2e kyu (bruin) | Afstandsvechter | Toernooivechter | 7 | 7 | 10 | 7 | 7 |
-| 12 | **Roshni** | V | 4e kyu (groen) | Hoogtrapper | Toernooivechter | 6 | 8 | 9 | 7 | 6 |
-| 13 | **Skylar** | V | 6e kyu (geel) | Technicus | Rivaal in Story Mode | 6 | 9 | 7 | 7 | 7 |
-| 14 | **Djordy** | M | 7e kyu (blauw met streep) | Hoogtrapper | Toernooivechter · specialist high kicks | 7 | 8 | 9 | 7 | 6 |
-| 15 | **Jayh** | M | 7e kyu (blauw met streep) | Spinner | Arcade-vechter | 6 | 8 | 7 | 7 | 6 |
-| 16 | **Laura** | V | 8e kyu (blauw) | Counter-vechter | Toernooivechter | 6 | 7 | 8 | 8 | 8 |
-| 17 | **Azad** | M | 8e kyu (blauw) | Infighter | Arcade-vechter | 7 | 7 | 6 | 8 | 7 |
-| 18 | **Eli** | M | 9e kyu (rood) | Counter-vechter | Arcade-vechter | 6 | 8 | 7 | 7 | 7 |
-| 19 | **Rayaan** | M | 9e kyu (rood) | Hoogtrapper | Arcade-vechter | 6 | 8 | 8 | 6 | 6 |
-| 20 | **Livia** | V | 9e kyu (rood) | Technicus | Arcade-vechter | 5 | 8 | 7 | 8 | 7 |
-| 21 | **Senna** | V | 9e kyu (rood) | Snelheidsvechter | Arcade-vechter | 5 | 9 | 7 | 7 | 6 |
-| 22 | **Sophia** | V | 9e kyu (rood) | Afstandsvechter | Arcade-vechter | 5 | 7 | 9 | 8 | 7 |
-| 23 | **Jailey** | V | 9e kyu (rood) | Allrounder | Arcade-vechter | 5 | 7 | 6 | 9 | 7 |
-| 24 | **Yi-En** | M | 9e kyu (rood) | Technicus | Arcade-vechter | 6 | 9 | 7 | 7 | 7 |
-| 25 | **Ace** | M | 9e kyu (rood) | Spinner | Arcade-vechter | 7 | 8 | 7 | 6 | 6 |
-| 26 | **Riley** | V | 9e kyu (rood) | Lowkick-specialist | Arcade-vechter | 6 | 7 | 7 | 8 | 9 |
-| 27 | **Azim** | M | 9e kyu (rood) | Infighter | Toernooivechter | 8 | 6 | 6 | 8 | 8 |
-| 28 | **Amir** | M | 9e kyu (rood) | Allrounder | Arcade-vechter | 7 | 7 | 7 | 7 | 7 |
-| 29 | **Nino** | M | 9e kyu (rood) | Snelheidsvechter | Arcade-vechter | 5 | 10 | 5 | 7 | 6 |
-| 30 | **Mano** | M | 9e kyu (rood) | Tank | Arcade-vechter | 7 | 5 | 6 | 9 | 8 |
-| 31 | **Naotaka** | M | 9e kyu (rood) | Counter-vechter | Arcade-vechter | 6 | 8 | 7 | 7 | 7 |
-| 32 | **Niven** | M | 9e kyu (rood) | Lowkick-specialist | Arcade-vechter | 6 | 7 | 7 | 8 | 8 |
-| 33 | **James** | M | 10e kyu (wit) | Technicus | Arcade-vechter | 6 | 8 | 7 | 7 | 7 |
-| 34 | **Raf** | M | 10e kyu (wit) | Infighter | Arcade-vechter | 7 | 7 | 6 | 8 | 7 |
-| 35 | **Maylea** | V | 10e kyu (wit) | Hoogtrapper | Arcade-vechter | 5 | 8 | 8 | 7 | 6 |
-| 36 | **Leo** | M | 10e kyu (wit) | Allrounder | Arcade-vechter · beginner | 5 | 7 | 6 | 7 | 6 |
-| 37 | **Nina** | V | 10e kyu (wit) | Snelheidsvechter | Arcade-vechter · beginner | 4 | 9 | 6 | 7 | 6 |
+| 3 | **Sensei Crystal** | V | 3e dan (zwart) | Technicus | Toernooivechter · specialist axe kick | 8 | 9 | 8 | 9 | 8 |
+| 4 | **Senpai Anjay** | M | 2e dan (zwart) | Infighter | Toernooifavoriet | 8 | 7 | 6 | 9 | 8 |
+| 5 | **Senpai Dave** | M | 2e dan (zwart) | Tank | Toernooivechter | 9 | 5 | 7 | 9 | 9 |
+| 6 | **Senpai Ferry** | M | 2e dan (zwart) | Lowkick-specialist | Toernooivechter · veteraan | 9 | 6 | 7 | 9 | 10 |
+| 7 | **Senpai Daan** | M | 1e dan (zwart) | Tank | Toernooivechter | 8 | 5 | 6 | 10 | 9 |
+| 8 | **Senpai Niesje** | V | 1e dan (zwart) | Snelheidsvechter | Toernooivechter | 6 | 10 | 7 | 8 | 7 |
+| 9 | **Senpai Micha** | V | 1e dan (zwart) | Afstandsvechter | Toernooivechter | 7 | 8 | 9 | 8 | 8 |
+| 10 | **Gwenn** | V | 2e kyu (bruin) | Allrounder | Arcade-vechter | 6 | 7 | 7 | 8 | 7 |
+| 11 | **Yassin** | M | 2e kyu (bruin) | Spinner | Toernooivechter | 7 | 8 | 8 | 7 | 6 |
+| 12 | **Seth** | M | 2e kyu (bruin) | Afstandsvechter | Toernooivechter | 7 | 7 | 10 | 7 | 7 |
+| 13 | **Roshni** | V | 4e kyu (groen) | Hoogtrapper | Toernooivechter | 6 | 8 | 9 | 7 | 6 |
+| 14 | **Skylar** | V | 6e kyu (geel) | Technicus | Rivaal in Story Mode | 6 | 9 | 7 | 7 | 7 |
+| 15 | **Djordy** | M | 7e kyu (blauw met streep) | Hoogtrapper | Toernooivechter · specialist high kicks | 7 | 8 | 9 | 7 | 6 |
+| 16 | **Jayh** | M | 7e kyu (blauw met streep) | Spinner | Arcade-vechter | 6 | 8 | 7 | 7 | 6 |
+| 17 | **Laura** | V | 8e kyu (blauw) | Counter-vechter | Toernooivechter | 6 | 7 | 8 | 8 | 8 |
+| 18 | **Azad** | M | 8e kyu (blauw) | Infighter | Arcade-vechter | 7 | 7 | 6 | 8 | 7 |
+| 19 | **Eli** | M | 9e kyu (rood) | Counter-vechter | Arcade-vechter | 6 | 8 | 7 | 7 | 7 |
+| 20 | **Rayaan** | M | 9e kyu (rood) | Hoogtrapper | Arcade-vechter | 6 | 8 | 8 | 6 | 6 |
+| 21 | **Livia** | V | 9e kyu (rood) | Technicus | Arcade-vechter | 5 | 8 | 7 | 8 | 7 |
+| 22 | **Senna** | V | 9e kyu (rood) | Snelheidsvechter | Arcade-vechter | 5 | 9 | 7 | 7 | 6 |
+| 23 | **Sophia** | V | 9e kyu (rood) | Afstandsvechter | Arcade-vechter | 5 | 7 | 9 | 8 | 7 |
+| 24 | **Jailey** | V | 9e kyu (rood) | Allrounder | Arcade-vechter | 5 | 7 | 6 | 9 | 7 |
+| 25 | **Yi-En** | M | 9e kyu (rood) | Technicus | Arcade-vechter | 6 | 9 | 7 | 7 | 7 |
+| 26 | **Ace** | M | 9e kyu (rood) | Spinner | Arcade-vechter | 7 | 8 | 7 | 6 | 6 |
+| 27 | **Riley** | V | 9e kyu (rood) | Lowkick-specialist | Arcade-vechter | 6 | 7 | 7 | 8 | 9 |
+| 28 | **Azim** | M | 9e kyu (rood) | Infighter | Toernooivechter | 8 | 6 | 6 | 8 | 8 |
+| 29 | **Amir** | M | 9e kyu (rood) | Allrounder | Arcade-vechter | 7 | 7 | 7 | 7 | 7 |
+| 30 | **Nino** | M | 9e kyu (rood) | Snelheidsvechter | Arcade-vechter | 5 | 10 | 5 | 7 | 6 |
+| 31 | **Mano** | M | 9e kyu (rood) | Tank | Arcade-vechter | 7 | 5 | 6 | 9 | 8 |
+| 32 | **Naotaka** | M | 9e kyu (rood) | Counter-vechter | Arcade-vechter | 6 | 8 | 7 | 7 | 7 |
+| 33 | **Niven** | M | 9e kyu (rood) | Lowkick-specialist | Arcade-vechter | 6 | 7 | 7 | 8 | 8 |
+| 34 | **James** | M | 10e kyu (wit) | Technicus | Arcade-vechter | 6 | 8 | 7 | 7 | 7 |
+| 35 | **Raf** | M | 10e kyu (wit) | Infighter | Arcade-vechter | 7 | 7 | 6 | 8 | 7 |
+| 36 | **Maylea** | V | 10e kyu (wit) | Hoogtrapper | Arcade-vechter | 5 | 8 | 8 | 7 | 6 |
+| 37 | **Leo** | M | 10e kyu (wit) | Allrounder | Arcade-vechter · beginner | 5 | 7 | 6 | 7 | 6 |
+| 38 | **Nina** | V | 10e kyu (wit) | Snelheidsvechter | Arcade-vechter · beginner | 4 | 9 | 6 | 7 | 6 |
 
 Kr = kracht, Sn = snelheid, Be = bereik, Co = conditie, Bn = benen (weerstand tegen lage trappen). De graad telt in het spel ook mee: een 10e kyu vecht op 88% en een 4e dan op 104%.
 
@@ -68,6 +69,8 @@ Richting is relatief: → = naar de tegenstander toe.
 | ↑ + GERI | Jodan Mawashi Geri | Ronde trap naar het hoofd | jodan | 320 ms | 18 |
 | ↖ + GERI | Ushiro Mawashi Geri | Draaiende hiel naar het hoofd | jodan | 360 ms | 20 |
 | ↙ + GERI | Kaiten Kakato Geri | Rol Kick: rollende hieltrap | jodan | 460 ms | 22 |
+| undefinedGERI | Kakato Geri (Kakato Otoshi) | Axe kick: bijltrap met de hiel | jodan | 280 ms | 19 |
+| undefinedGERI | Gedan-Jodan Mawashi Geri | Laag-hoog trap (double tap) | gedan | 200 ms | 6 |
 | → + GERI (op afstand) | Chudan Mae Geri | Voorwaartse trap naar de buik | chudan | 200 ms | 9 |
 | UKE (vasthouden) | Jodan/Chudan Uke | Dekking hoog en midden | | | |
 | ↓ + UKE | Sune Uke | Scheenblok tegen de lage trap | | | |
@@ -127,6 +130,32 @@ Benen     █████████░
 **Finisher: Zanshin**: Na de ushiro geri blijft Sensei Conchita in kamae staan, alert, terwijl de tegenstander valt.
 
 <sub>AI-profiel: lage trap 0.5 · romp 0.6 · hoofd 0.45 · draai 0.55 · agressie 0.4 · verdediging 0.92</sub>
+
+## Sensei Crystal
+
+*Sensei · Technicus · 3e dan (zwart) · vrouw*
+
+> “Kijk naar je benen, dan kijk ik naar je hoofd.”
+
+Precies, snel en onverbiddelijk. Haar axe kick valt van grote hoogte en haar laag-hoog-combinatie zet elke dekking op het verkeerde been.
+
+```
+Kracht    ████████░░  Snelheid █████████░
+Bereik    ████████░░  Conditie █████████░
+Benen     ████████░░
+```
+
+| Input | Signature | Techniek | Effect |
+|---|---|---|---|
+| KIAI | **Bijl van de sensei** | Kakato Geri | Een axe kick die van boven het hoofd neerkomt. *(schade ×1.2; snelheid ×1.18; grote kans op knock-down)* |
+| → + KIAI | **Laag-hoog** | Gedan-Jodan Mawashi Geri | Laag op de dij, en zonder de voet neer te zetten hoog naar het hoofd. *(schade ×1.15; snelheid ×1.11)* |
+| ↓ + KIAI | **Draaiende hiel** | Ushiro Mawashi Geri | Wegdraaien en de hiel rond naar het hoofd. *(snelheid ×1.18)* |
+
+**Super: Kesshō** (結晶): "Kristal": laag, midden, laag-hoog en de bijl. Reeks: Gedan Mawashi Geri → Migi Seiken Chudan Gyaku-tsuki → Gedan-Jodan Mawashi Geri → Kakato Geri (Kakato Otoshi).
+
+**Finisher: Vallende bijl**: De axe kick in slow motion; de camera kijkt van onderen langs het gestrekte been omhoog.
+
+<sub>AI-profiel: lage trap 0.55 · romp 0.55 · hoofd 0.8 · draai 0.45 · agressie 0.55 · verdediging 0.88</sub>
 
 ## Senpai Anjay
 
@@ -382,7 +411,7 @@ Benen     ██████░░░░
 | → + KIAI | **Valbijl** | Kakato Otoshi | Hoog op, en dan naar beneden. *(schade ×1.1)* |
 | ↓ + KIAI | **Twee niveaus** | Chudan-Jodan | Eerst de ribben, dan het hoofd. *(reeks: Chudan Mawashi Geri → Jodan Mawashi Geri)* |
 
-**Super: Tenchi** (天地): "Hemel en aarde": van laag naar hoog. Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Jodan Mawashi Geri → Kakato Otoshi.
+**Super: Tenchi** (天地): "Hemel en aarde": van laag naar hoog. Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Jodan Mawashi Geri → Kakato Geri (Kakato Otoshi).
 
 **Finisher: Hemelhiel**: Kakato otoshi in slow motion met stofwolk van de tatami.
 
@@ -434,7 +463,7 @@ Benen     ██████░░░░
 | → + KIAI | **Rol Kick** | Kaiten Kakato Geri | Rollend naar voren, de hiel valt op hoofd of schouder. *(schade ×1.1; snelheid ×1.11)* |
 | ↓ + KIAI | **Draaiende hiel** | Ushiro Mawashi Geri | Wegdraaien en de hiel rond naar het hoofd. *(snelheid ×1.18)* |
 
-**Super: Tenkū** (天空): "Hemel": vier trappen die steeds hoger komen. Reeks: Chudan Mawashi Geri → Jodan Mawashi Geri → Ushiro Mawashi Geri → Kakato Otoshi.
+**Super: Tenkū** (天空): "Hemel": vier trappen die steeds hoger komen. Reeks: Chudan Mawashi Geri → Jodan Mawashi Geri → Ushiro Mawashi Geri → Kakato Geri (Kakato Otoshi).
 
 **Finisher: Uit de lucht**: Een rol kick in slow motion; de camera kijkt van onderaf mee.
 
@@ -460,7 +489,7 @@ Benen     ██████░░░░
 | → + KIAI | **Draaiing** | Ushiro Mawashi | Draaiende hiel. |
 | ↓ + KIAI | **Valbijl** | Kakato Otoshi | Van boven. |
 
-**Super: Jiyu** (自由): "Vrijheid". Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Ushiro Geri → Kakato Otoshi.
+**Super: Jiyu** (自由): "Vrijheid". Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Ushiro Geri → Kakato Geri (Kakato Otoshi).
 
 **Finisher: Eigen stijl**: Draaiende camera, eigen kiai.
 
@@ -590,7 +619,7 @@ Benen     ███████░░░
 | → + KIAI | **Scherpte** | Chudan Mawashi | Sneller dan verwacht. *(snelheid ×1.18)* |
 | ↓ + KIAI | **Verrassing** | Kakato Otoshi | Uit het niets. |
 
-**Super: Kime** (決め): Volledige focus op het eindpunt. Reeks: Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Chudan Mawashi Geri → Kakato Otoshi.
+**Super: Kime** (決め): Volledige focus op het eindpunt. Reeks: Migi Seiken Chudan Gyaku-tsuki → Gedan Mawashi Geri → Chudan Mawashi Geri → Kakato Geri (Kakato Otoshi).
 
 **Finisher: Kime**: Bevroren beeld op het moment van kime.
 
@@ -980,7 +1009,7 @@ Benen     ██████░░░░
 | → + KIAI | **Valbijl** | Kakato Otoshi | Van boven. |
 | ↓ + KIAI | **Opbouw** | Chudan-Jodan | Midden, hoog. *(reeks: Chudan Mawashi Geri → Jodan Mawashi Geri)* |
 
-**Super: Shizuka** (静か): "Stil". Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Kakato Otoshi.
+**Super: Shizuka** (静か): "Stil". Reeks: Gedan Mawashi Geri → Chudan Mawashi Geri → Kakato Geri (Kakato Otoshi).
 
 **Finisher: Stilte voor de storm**: Slow motion kakato otoshi.
 
@@ -1046,6 +1075,7 @@ Per vechter afstemmen en in `roster.js` op `bevestigd: true` zetten:
 |---|---|---|---|---|---|
 | Sensei Wesley | ✅ | ✅ | ☐ | ☐ | ☐ |
 | Sensei Conchita | ✅ | ✅ | ☐ | ☐ | ☐ |
+| Sensei Crystal | ✅ | ✅ | ☐ | ☐ | ☐ |
 | Senpai Anjay | ✅ | ✅ | ☐ | ☐ | ☐ |
 | Senpai Dave | ✅ | ✅ | ☐ | ☐ | ☐ |
 | Senpai Ferry | ✅ | ✅ | ☐ | ☐ | ☐ |

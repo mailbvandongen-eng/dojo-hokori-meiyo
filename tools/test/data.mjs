@@ -5,7 +5,7 @@ import { POSES } from '../../src/game/poses.js';
 
 const errs = [];
 // Opgave van de dojo (8 november 2026): naam, geslacht, graad.
-const SPEC = `Sensei Wesley m 4d|Sensei Conchita v 4d|Senpai Anjay m 2d|Senpai Ferry m 2d|Senpai Dave m 2d|Senpai Micha v 1d|Senpai Daan m 1d|Senpai Niesje v 1d|
+const SPEC = `Sensei Wesley m 4d|Sensei Conchita v 4d|Sensei Crystal v 3d|Senpai Anjay m 2d|Senpai Ferry m 2d|Senpai Dave m 2d|Senpai Micha v 1d|Senpai Daan m 1d|Senpai Niesje v 1d|
 Seth m 2k|Gwenn v 2k|Yassin m 2k|Roshni v 4k|Skylar v 6k|Djordy m 7k|Jayh m 7k|Laura v 8k|Azad m 8k|
 Eli m 9k|Rayaan m 9k|Yi-En m 9k|Ace m 9k|Azim m 9k|Amir m 9k|Nino m 9k|Mano m 9k|Naotaka m 9k|Niven m 9k|
 Livia v 9k|Senna v 9k|Sophia v 9k|Jailey v 9k|Riley v 9k|James m 10k|Raf m 10k|Leo m 10k|Maylea v 10k|Nina v 10k`
@@ -23,7 +23,7 @@ for (const s of SPEC) {
 }
 const djordy = ROSTER.find(f => f.id === 'djordy');
 if (djordy.ai.head < 0.8 || djordy.ai.lowkick > 0.4) errs.push('Djordy moet high kicks als specialiteit hebben');
-for (const id of ['ushiro_mawashi', 'rol_kick']) if (!Object.values(INPUT_MAP).includes(id)) errs.push(`${id} zit niet in de basis-moveset`);
+for (const id of ['ushiro_mawashi', 'rol_kick', 'kakato_otoshi', 'double_tap']) if (!Object.values(INPUT_MAP).includes(id)) errs.push(`${id} zit niet in de basis-moveset`);
 if (new Set(names).size !== names.length) errs.push('dubbele naam in roster');
 if (new Set(ROSTER.map(f => f.id)).size !== ROSTER.length) errs.push('dubbele id in roster');
 if (ROSTER.filter(f => f.eindbaas).map(f => f.id).join() !== 'wesley') errs.push('eindbaas moet alleen Sensei Wesley zijn');

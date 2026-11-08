@@ -14,7 +14,9 @@ npm run serve        # python3 -m http.server 8766
 | | Toetsenbord | Touch |
 |---|---|---|
 | Lopen | A / D | joystick links (overal op de linkerhelft) |
-| Diagonaal achteruit (↖ ↙) | W+A / S+A | joystick schuin naar achteren |
+| Diagonalen (↖ ↙ ↗ ↘) | W/S + A/D | joystick schuin |
+| Tai sabaki (uitwijken) | L + W | UKE + joystick omhoog |
+| Snelle stap terug | twee keer A | twee keer naar achteren |
 | Omhoog / omlaag | W / S | joystick omhoog/omlaag |
 | Tsuki (stoot) | J | 突 TSUKI |
 | Geri (trap) | K | 蹴 GERI |
@@ -30,7 +32,13 @@ npm run serve        # python3 -m http.server 8766
 - **Toernooi** (Hokori Meiyo Cup: speel senpai en sensei vrij), **Story**, **Versus** (CPU of 2 spelers), **Training** (met uitleg), **Photo Mode**.
 - **Online leaderboard:** meeste gevechten en meeste toernooizeges (Cloudflare Worker, zie `server/leaderboard`).
 - Kyokushin-wedstrijdregels: rei-ceremonie, Hajime/Yame, waza-ari, ippon, awasete ippon, knock-down-telling, hantei met de vlaggen van de hoekscheidsrechters, encho-sen, chui/genten/hansoku, jogai.
-- 37 vechters (mannen en vrouwen, met de echte graden en bandkleuren van de dojo), elk met stats, 3 signatures, een super en een finisher. 18 technieken met Japanse naam en uitleg, waaronder Ushiro Mawashi Geri en de Rol Kick.
+- 38 vechters (mannen en vrouwen, met de echte graden en bandkleuren van de dojo), elk met stats, 3 signatures, een super en een finisher. 19 technieken met Japanse naam en uitleg, waaronder Ushiro Mawashi Geri, Axe kick, de laag-hoog trap (double tap) en de Rol Kick.
+- Gevechtssysteem:
+  - raakdetectie op zichtbaar contact per doelzone
+  - renzoku van maximaal 3 technieken met afbouw
+  - blok-voordeel, perfect uke, kaeshi (counter) en kiai-uitbraak
+  - tai sabaki en een snelle stap terug
+  - geen vastzetten tegen de rand
 - Schademodel met beenschade (lage trappen), rompschade en hoofdtreffers.
 - Toernooihal met tatami, scheidsrechter, 2 hoekscheidsrechters met rode en witte vlaggen, publiek, banners en wapperende Hokori Meiyo-vlaggen.
 - Graden van 10e kyu tot 3e dan: tot de 5e kyu normaal, tot bruin 2× en tot zwart 4× zo langzaam. Senpai en sensei speel je vrij door toernooien te winnen.
@@ -55,6 +63,8 @@ node tools/test/data.mjs
 NODE_PATH=/root/tools/pw/node_modules node tools/test/smoke.cjs
 NODE_PATH=/root/tools/pw/node_modules node tools/test/rules.cjs 8
 NODE_PATH=/root/tools/pw/node_modules node tools/test/poses.cjs
+NODE_PATH=/root/tools/pw/node_modules node tools/test/mechanics.cjs   # gevechtssysteem
+NODE_PATH=/root/tools/pw/node_modules node tools/test/calibrate.cjs   # bereik per techniek meten
 NODE_PATH=/root/tools/pw/node_modules node tools/test/unlocks.cjs
 NODE_PATH=/root/tools/pw/node_modules node tools/test/campaign.cjs   # met lokale leaderboard-server, zie server/leaderboard
 ```

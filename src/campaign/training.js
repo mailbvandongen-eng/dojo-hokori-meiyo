@@ -171,7 +171,7 @@ export class TrainingSession {
     if (this.kind === 'bokszak') {
       if (p.tsuki) { this.bagInput('tsuki'); this.ctrl.consume(); }
       else if (p.geri) { this.bagInput(raw.down ? 'gedan' : 'geri'); this.ctrl.consume(); }
-      this.f.update(dt, { x: BAG_X + 0.2, state: 'idle' }, { rules: 'toernooi', foul() {}, knockdown() {} });
+      this.f.update(dt, this.bagStub || (this.bagStub = { x: BAG_X, state: 'idle', hurtbox: () => ({ x: BAG_X + Math.sin(this.bag.ang) * BAG_LEN, z: 0, y0: 0.3, y1: 1.85, r: 0.22 }) }), { rules: 'toernooi', foul() {}, knockdown() {} });
       this.f.x = -0.82; this.f.place();
       this.updateBag(dt);
     } else {

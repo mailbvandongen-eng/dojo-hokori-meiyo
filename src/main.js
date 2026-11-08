@@ -114,34 +114,54 @@ const hooks = {
   },
   count(n) { callout(COUNT_ROMAJI[n - 1], '', null, false); sayCount(n); },
   score() { updateScore(); },
-  timeUp() { sfx.taiko(true); setTimeout(() => sfx.taiko(false), 260); },
+  timeUp() { sfx.taiko(true); setTimeout(() => sfx.taiko(false), 260); camMode = 'hantei'; camT = 0; },
+  // beslissing: scheidsrechter (hand) + hoekscheidsrechters (vlaggen), groot in beeld en in de HUD
   votes(v) {
-    const el = $('#votes'); el.innerHTML = v.map(x => `<div style="background:${x === 'aka' ? '#c8102e' : x === 'shiro' ? '#fff' : 'linear-gradient(135deg,#c8102e 50%,#fff 50%)'}"></div>`).join('');
-    el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 2600);
+    camMode = 'hantei'; camT = 0;
+    const who = ['Scheidsrechter', ...arena.judges.map((_, i) => `Hoekrechter ${i + 1}`)];
+    const el = $('#votes');
+    el.innerHTML = v.map((x, i) => `<div class="vote ${x}"><i></i><b>${x === 'aka' ? 'AKA' : x === 'shiro' ? 'SHIRO' : 'HIKIWAKE'}</b><small>${who[i]}</small></div>`).join('');
+    el.classList.add('on'); clearTimeout(votesTimer); votesTimer = setTimeout(() => el.classList.remove('on'), 3600);
+    sfx.block();
   },
   end(winner, how) { onFightEnd(winner, how); },
 };
 
+let votesTimer = 0;
 function onFighterEvent(type, d) {
   if (!G) return;
   const demo = G.demo;
   switch (type) {
     case 'swing': if (!demo) { sfx.whoosh(d.move.type === 'geri' ? 0.3 : 0.16); if (d.move.dmg >= 12 && Math.random() < 0.5) sfx.kiai(1 + Math.random() * 0.2); } break;
     case 'hit': {
-      const t = d.target, z = d.move.zone;
+      const t = d.target, z = (d.hit || d.move).zone;
       const at = t.model.partWorld(z === 'head' ? 'head' : z === 'legs' ? 'lKnee' : 'spine');
       if (z === 'head') at.y += 0.12; if (z === 'body') at.y += 0.25; if (z === 'legs') at.y += 0.18;
       at.x -= d.fighter.facing * 0.12;
       fx.impact(at, d.fighter.facing, d.dmg, z, d.counter);
-      if (!demo) { sfx.hit(Math.min(1.6, d.dmg / 9), z); arena.cheer(d.dmg / 40); if (d.counter) showSpecial('COUNTER', '', 0.6); }
+      if (!demo) {
+        sfx.hit(Math.min(1.6, d.dmg / 9), z); arena.cheer(d.dmg / 40);
+        if (d.counter) showSpecial('COUNTER', '', 0.6);
+        else if (d.combo >= 2) showSpecial(`${d.combo} HIT RENZOKU`, '', 0.5);
+      }
       if (G.mode === 'training' && d.fighter === G.aka) trainInfo(d.move, d.dmg, d.counter);
       break;
     }
     case 'block':
       if (!demo) sfx.block();
       fx.burst(d.target.model.partWorld(d.low ? 'lKnee' : 'lEl'), { n: 8, color: [0.7, 0.85, 1], speed: 1.5, size: 0.05 });
-      if (d.parry && !demo) showSpecial('KAESHI', 'Counter', 0.8);
+      if (!demo && (d.parry || d.perfect)) { showSpecial(d.perfect ? 'PERFECT UKE' : 'KAESHI', d.perfect ? 'Counter nu!' : 'Counter', 0.8); fx.flash(0.15, '#bfe0ff'); }
       if (G.mode === 'training' && d.fighter === G.aka) trainInfo(d.move, 0, false, d.low ? 'Geblokt met sune uke' : 'Geblokt');
+      if (G.mode === 'training' && d.target === G.aka) trainInfo(d.move, 0, false, d.perfect ? 'Perfect uke! Val nu aan voor een kaeshi (counter).' : 'Geblokt. Je hebt nu even een counter-venster.');
+      break;
+    case 'kaeshi': if (!demo) { showSpecial('KAESHI', 'Counter', 0.6); sfx.kiai(1.1); } break;
+    case 'dodge': if (!demo) showSpecial('TAI SABAKI', 'Ontweken', 0.6); break;
+    case 'sabaki': if (!demo) sfx.whoosh(0.35); break;
+    case 'dash': if (!demo) sfx.whoosh(0.2); break;
+    case 'burst':
+      if (demo) break;
+      showSpecial('KIAI!', 'Uitbraak uit de combo', 0.8); sfx.kiai(0.9); fx.flash(0.3, '#ffd76a');
+      fx.ring(d.fighter.model.partWorld('spine').add(new THREE.Vector3(0, 0.3, 0)), d.fighter.facing, '#ffd76a', 2.2);
       break;
     case 'special': if (!demo) { showSpecial(d.name, d.jp, 1.1); sfx.kiai(1.05); } break;
     case 'super':
@@ -246,11 +266,11 @@ function simulate(dt) {
         f.handleInput(c.toFighter(raw, f.facing), o, match);
         if ((f.state === 'attack' && f.t === 0) || f.queue.length > q0 || f.state === 'parry') c.consume();
       } else c.consume();
-    } else if (ai && match.fighting) f.handleInput(ai.input(dt, o), o, match);
+    } else if (ai && match.fighting) f.handleInput(ai.input(dt, o, arena.bounds), o, match);
     else if (G.mode === 'training' && f === shiro && match.fighting) f.handleInput(dummyInput(), o, match);
   }
   aka.update(dt, shiro, match); shiro.update(dt, aka, match);
-  separate(aka, shiro, arena.bounds + 0.3);
+  separate(aka, shiro, arena.bounds);
   // herstel tijdens het gevecht: ki en romp herstellen langzaam, benen nauwelijks (zoals echt)
   for (const f of [aka, shiro]) if (f.state !== 'down' && match.fighting) { f.ki = Math.min(f.kiMax, f.ki + dt * 1.2); f.body = Math.max(0, f.body - dt * 0.8); f.legs = Math.max(0, f.legs - dt * 0.15); }
   if (G.training || G.demo) for (const f of [aka, shiro]) if (f.ki < f.kiMax * 0.15) { f.ki = f.kiMax; f.legs = f.body = 0; }
@@ -273,6 +293,8 @@ function updateCamera(dt) {
       case 'super': { const f = camFocus, ang = 0.6 + camT * 0.9 * f.facing; tmpV.set(f.x + Math.sin(ang) * 3.8, 1.35, Math.cos(ang) * 3.8 + 0.4); tmpL.set(mid, 1.0, 0); k = 2; break; }
       case 'result': { const w = G.match.winner || a, ang = camT * 0.3; tmpV.set(w.x + Math.sin(ang) * 3.2, 1.6, Math.cos(ang) * 3.2); tmpL.set(w.x, 1.1, 0); k = 2; break; }
       case 'custom': tmpV.copy(camCustom.pos); tmpL.copy(camCustom.look); k = 3; break;
+      // hantei: breed beeld met de scheidsrechter en beide hoekscheidsrechters met hun vlaggen
+      case 'hantei': tmpV.set(0, 3.4, 6.2); tmpL.set(0, 1.3, -2.6); k = 2.5; break;
       case 'photo': tmpL.set(mid, 1.0, 0); tmpV.set(mid + Math.sin(photo.theta) * Math.sin(photo.phi) * photo.r, Math.max(0.2, Math.cos(photo.phi) * photo.r + 1.0), Math.cos(photo.theta) * Math.sin(photo.phi) * photo.r); k = 12; break;
     }
   } else if (camMode === 'custom') { tmpV.copy(camCustom.pos); tmpL.copy(camCustom.look); k = 3; }
@@ -499,7 +521,7 @@ function startTraining(id) {
   const partner = id === 'conchita' ? 'anjay' : 'conchita';
   startFight({ mode: 'training', training: true, akaId: id, shiroId: partner, akaCtrl: 'solo', shiroCtrl: 'dummy', akaCostume: playerCostume() });
   $('#trainBar').classList.add('on'); $('#trainInfo').classList.add('on');
-  $('#trainInfo').innerHTML = `<b>Sensei Conchita:</b> Osu! Probeer de technieken uit. Lage trap: <b>↓ + GERI</b>. Ushiro mawashi geri: <b>↖ + GERI</b>. Rol kick: <b>↙ + GERI</b>. Blokken: houd <b>UKE</b> vast, met ↓ voor sune uke.`;
+  $('#trainInfo').innerHTML = `<b>Sensei Conchita:</b> Osu! Probeer de technieken uit. Lage trap: <b>↓ + GERI</b>. Axe kick: <b>↗ + GERI</b>. Laag-hoog: <b>↘ + GERI</b>. Ushiro mawashi geri: <b>↖ + GERI</b>. Rol kick: <b>↙ + GERI</b>. Blokken: houd <b>UKE</b> vast (↓ = sune uke); net op tijd is een perfect uke. Uitwijken: <b>UKE + ↑</b>.`;
   dummyMode = 0; $('#trDummy').textContent = DUMMY[0][1];
 }
 function dummyInput() {
@@ -516,7 +538,7 @@ $('#trReset').addEventListener('click', () => { if (!G) return; for (const f of 
 $('#trQuit').addEventListener('click', openMenu);
 
 // ── Technieken-overzicht ──
-const DIRSYM = { n: '', f: '→ + ', b: '← + ', d: '↓ + ', u: '↑ + ', ub: '↖ + ', db: '↙ + ' };
+const DIRSYM = { n: '', f: '→ + ', b: '← + ', d: '↓ + ', u: '↑ + ', ub: '↖ + ', db: '↙ + ', uf: '↗ + ', df: '↘ + ' };
 function openMoves() {
   paused = true;
   const f = G ? G.aka.data : byId[selId] || ROSTER[0];
@@ -524,9 +546,14 @@ function openMoves() {
   rows.splice(9, 0, `<tr><td class="k">→ + GERI (veraf)</td><td class="n"><b>${MOVES.mae_geri.jp}</b>${MOVES.mae_geri.nl}</td><td>${MOVES.mae_geri.uitleg}</td></tr>`);
   rows.push(`<tr><td class="k">UKE</td><td class="n"><b>${MOVES.uke.jp}</b>${MOVES.uke.nl}</td><td>${MOVES.uke.uitleg}</td></tr>`);
   rows.push(`<tr><td class="k">↓ + UKE</td><td class="n"><b>${MOVES.sune_uke.jp}</b>${MOVES.sune_uke.nl}</td><td>${MOVES.sune_uke.uitleg}</td></tr>`);
+  rows.push(`<tr><td class="k">UKE net op tijd</td><td class="n"><b>Perfect uke</b>Perfect blok</td><td>Blok vlak voor de treffer: de aanvaller wankelt. Val meteen aan voor een kaeshi.</td></tr>`);
+  rows.push(`<tr><td class="k">na een blok: aanval</td><td class="n"><b>Kaeshi</b>Counter</td><td>Na een blok heb je even een counter-venster: je volgende techniek is sneller en harder.</td></tr>`);
+  rows.push(`<tr><td class="k">UKE + ↑</td><td class="n"><b>Tai sabaki</b>Uitwijken</td><td>Stap om de tegenstander heen (ook uit de hoek) en ontwijk een aanval.</td></tr>`);
+  rows.push(`<tr><td class="k">← ← (dubbel)</td><td class="n"><b>Hiki ashi</b>Snelle stap terug</td><td>Maak in één beweging afstand.</td></tr>`);
+  rows.push(`<tr><td class="k">KIAI tijdens treffers</td><td class="n"><b>Kiai-uitbraak</b>Uit de combo breken</td><td>Kost 1/3 kiai-meter: duwt de aanvaller weg en geeft jou het initiatief.</td></tr>`);
   f.signatures.forEach((s, i) => rows.push(`<tr><td class="k">${['', '→ + ', '↓ + '][i]}KIAI</td><td class="n"><b>${s.naam}</b>${s.jp}</td><td>${s.uitleg} <i>(1/3 kiai-meter)</i></td></tr>`));
   rows.push(`<tr><td class="k">KIAI (vol)</td><td class="n"><b>${f.super.naam}</b>${f.super.jp}</td><td>${f.super.uitleg} Raakt de laatste techniek bij een uitgeputte tegenstander: <b>${f.finisher.naam}</b>.</td></tr>`);
-  $('#moveList').innerHTML = `<p style="font-size:12px;opacity:.8;margin:6px 0">Toetsenbord: A/D lopen, W/S omhoog/omlaag, diagonaal naar achteren met W+A of S+A (↖ ↙), J tsuki, K geri, L uke, I kiai. Touch: joystick schuin naar achteren. Combinaties: druk opnieuw tijdens een treffer (renzoku waza).</p><table>${rows.join('')}</table>`;
+  $('#moveList').innerHTML = `<p style="font-size:12px;opacity:.8;margin:6px 0">Toetsenbord: A/D lopen, W/S omhoog/omlaag, diagonalen met W/S + A/D (↖ ↙ ↗ ↘), J tsuki, K geri, L uke, I kiai. Touch: joystick schuin. Renzoku: maximaal 3 technieken per reeks; daarna kan de tegenstander blokken. Combinaties: druk opnieuw tijdens een treffer (renzoku waza).</p><table>${rows.join('')}</table>`;
   overlay('moves', true);
 }
 $('#movesClose').addEventListener('click', () => { overlay('moves', false); if (!$('#pause').classList.contains('on')) paused = false; });

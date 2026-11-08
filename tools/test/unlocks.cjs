@@ -29,7 +29,7 @@ const ok = (c, m) => { console.log((c ? '✔ ' : '✘ ') + m); if (!c) process.e
   const r1 = await winTournament();
   ok(/Senpai Daan/.test(r1.res) && (await p.evaluate(() => __game.profile.unlocks.join())) === 'daan', 'eerste toernooizege speelt Senpai Daan vrij');
   ok(r1.finalOpp !== 'wesley', 'nog geen Sensei Wesley in de finale');
-  await p.evaluate(() => { __game.profile.unlocks.push('niesje', 'micha', 'anjay', 'dave', 'ferry', 'conchita'); localStorage.setItem('dhm-profile-v1', JSON.stringify(__game.profile)); });
+  await p.evaluate(async () => { const { UNLOCK_ORDER } = await import('./src/data/unlocks.js'); for (const id of UNLOCK_ORDER) if (!__game.profile.unlocks.includes(id)) __game.profile.unlocks.push(id); localStorage.setItem('dhm-profile-v1', JSON.stringify(__game.profile)); });
   const r2 = await winTournament();
   ok(r2.finalOpp === 'wesley', 'als alles vrij is: finale tegen Sensei Wesley');
   ok((await p.evaluate(() => __game.profile.unlocks)).includes('wesley'), 'Sensei Wesley vrijgespeeld');

@@ -79,10 +79,11 @@ const ok = (c, m) => { console.log((c ? '✔ ' : '✘ ') + m); if (!c) process.e
   await p.click('#ldClose');
 
   // WK-finale: zet de loopbaan vooruit
-  await p.evaluate(() => {
+  await p.evaluate(async () => {
+    const { UNLOCK_ORDER } = await import('./src/data/unlocks.js');
     const c = JSON.parse(localStorage.getItem('dhm-career-v1'));
     c.xp = 5600; c.tIndex = 6; c.next = 'toernooi'; localStorage.setItem('dhm-career-v1', JSON.stringify(c));
-    const pr = JSON.parse(localStorage.getItem('dhm-profile-v1')); pr.unlocks = ['daan', 'niesje', 'micha', 'anjay', 'dave', 'ferry', 'conchita']; localStorage.setItem('dhm-profile-v1', JSON.stringify(pr));
+    const pr = JSON.parse(localStorage.getItem('dhm-profile-v1')); pr.unlocks = UNLOCK_ORDER.slice(); localStorage.setItem('dhm-profile-v1', JSON.stringify(pr));
   });
   await p.goto(URL); await p.waitForTimeout(2200); await p.click('#splash'); await p.waitForTimeout(500);
   await p.click('[data-go=campaign]'); await p.waitForTimeout(600);

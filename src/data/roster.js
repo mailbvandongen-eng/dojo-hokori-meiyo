@@ -630,6 +630,22 @@ export const ROSTER = [
     finisher: { naam: 'Wervelwind', uitleg: 'Snelle flitsen over het scherm, en dan Ippon.' },
     uiterlijk: { lengte: 0.9, bouw: 0.88, bevestigd: false },
   },
+  {
+    id: 'crystal', geslacht: 'v', naam: 'Sensei Crystal', titel: 'Sensei', graad: { dan: 3 }, bevestigd: { graad: true, geslacht: true },
+    stijl: 'Technicus', rol: 'Toernooivechter · specialist axe kick',
+    persoonlijkheid: 'Precies, snel en onverbiddelijk. Haar axe kick valt van grote hoogte en haar laag-hoog-combinatie zet elke dekking op het verkeerde been.',
+    quote: 'Kijk naar je benen, dan kijk ik naar je hoofd.',
+    stats: { kracht: 8, snelheid: 9, bereik: 8, conditie: 9, benen: 8 },
+    ai: { lowkick: 0.55, body: 0.55, head: 0.8, spin: 0.45, aggression: 0.55, defense: 0.88 },
+    signatures: [
+      s('Bijl van de sensei', 'Kakato Geri', 'kakato_otoshi', { dmg: 1.2, startup: 0.85, kdChance: 0.6 }, 'Een axe kick die van boven het hoofd neerkomt.'),
+      s('Laag-hoog', 'Gedan-Jodan Mawashi Geri', 'double_tap', { dmg: 1.15, startup: 0.9 }, 'Laag op de dij, en zonder de voet neer te zetten hoog naar het hoofd.'),
+      s('Draaiende hiel', 'Ushiro Mawashi Geri', 'ushiro_mawashi', { startup: 0.85 }, 'Wegdraaien en de hiel rond naar het hoofd.'),
+    ],
+    super: { naam: 'Kesshō', jp: '結晶', sequence: ['gedan_mawashi', 'seiken_gyaku', 'double_tap', 'kakato_otoshi'], uitleg: '"Kristal": laag, midden, laag-hoog en de bijl.' },
+    finisher: { naam: 'Vallende bijl', uitleg: 'De axe kick in slow motion; de camera kijkt van onderen langs het gestrekte been omhoog.' },
+    uiterlijk: { lengte: 0.97, bouw: 0.92, bevestigd: false },
+  },
 ];
 
 export const byId = Object.fromEntries(ROSTER.map(f => [f.id, f]));
