@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.1 (2026-11-09): bokszak en weergave hersteld
+- **Kritiek:** op grafische instelling "Laag" liep de game vast (de renderfunctie riep zichzelf eindeloos aan). Hersteld.
+- **Snel tikken op knoppen** (bijvoorbeeld "Jongen" en direct "Begin") werd soms genegeerd door de zoombeveiliging. Die geldt nu alleen buiten knoppen.
+- **Bokszak:**
+  - de vechter staat dichter bij de zak, zodat stoten en trappen zichtbaar raken
+  - een gewone trap op een lage noot (en andersom) telt als OK in plaats van gemist
+  - ruimere timing: perfect ±0,1 s, goed ±0,2 s
+  - duidelijkere uitleg
+- **Vechtermodel:**
+  - de hals van de hoofdscan loopt door tot in de jas (geen gekartelde snijrand of losse hals meer)
+  - de jas is van boven dicht, de kraag sluit om de hals, de revers en de borst liggen plat op de stof
+  - armen en gezicht hebben dezelfde huidtint
+  - het haar sluit strakker om het hoofd
+- **Automatische kwaliteit:** haalt een toestel geen ~30 fps op "Hoog", dan gaan nabewerking en resolutie vanzelf omlaag. Op grote tabletschermen staat de resolutie standaard op 1,5×.
+
 ## 0.6.0 (2026-11-09): realistische vechters
 - **Gescand hoofd:** "Infinite, 3D Head Scan" van Lee Perry-Smith (CC BY 3.0), met de schouders eraf geknipt. Per vechter een huidtint, een vrouwelijke variant (smaller gezicht en kaak) en haar dat de vorm van de schedel volgt (kort, staart of knot). Ook de scheidsrechters hebben dit hoofd.
 - **Nieuwe dogi:**

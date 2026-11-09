@@ -29,7 +29,7 @@ const cfg = Object.assign({ roundTime: 120, rules: 'toernooi', diff: 'senpai', v
 function applySettings() {
   audioSettings.sfx = cfg.sfx; audioSettings.music = cfg.music; audioSettings.voice = cfg.voice !== 'off'; audioSettings.voiceLang = cfg.voice === 'nl' ? 'nl' : 'ja';
   setVolumes();
-  renderer.setPixelRatio(Math.min(devicePixelRatio, cfg.gfx === 'hoog' ? 2 : 1));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, cfg.gfx === 'hoog' ? (innerWidth * innerHeight > 900000 ? 1.5 : 2) : 1));
   renderer.shadowMap.enabled = cfg.gfx === 'hoog';
   setupPost();
   localStorage.setItem('dhm-settings', JSON.stringify(cfg));
@@ -74,7 +74,7 @@ function setupPost() {
 }
 function renderFrame() {
   if (composer) { grainPass.uniforms.time.value = performance.now() / 1000 % 100; composer.render(); }
-  else renderFrame();
+  else renderer.render(scene, camera);
 }
 addEventListener('resize', resize); resize(); applySettings();
 
@@ -271,8 +271,23 @@ function preview(data, pose = 'stand', place = 'right') {
   else { camCustom.pos.set(-1.0, 1.25, 3.1); camCustom.look.set(-0.95, 1.0, 0); }
   camMode = 'custom';
 }
+// Automatische kwaliteit: haalt het toestel geen ~30 fps op "Hoog", dan gaan nabewerking en resolutie omlaag.
+const perf = { t: 0, n: 0, slow: 0, done: false };
+function adaptQuality(rawMs) {
+  if (perf.done || cfg.gfx !== 'hoog' || document.hidden) return;
+  perf.t += rawMs; perf.n++;
+  if (perf.t < 2000) return;
+  const avg = perf.t / perf.n; perf.t = 0; perf.n = 0;
+  if (avg > 34) perf.slow++; else perf.slow = Math.max(0, perf.slow - 1);
+  if (perf.slow >= 2) {
+    perf.done = true;
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25)); composer?.dispose?.(); composer = null; resize();
+    console.info('Kwaliteit automatisch verlaagd (gemiddeld', avg.toFixed(0), 'ms per beeld)');
+  }
+}
 function frame(now) {
   requestAnimationFrame(frame);
+  adaptQuality(now - last);
   const raw = Math.min(0.05, (now - last) / 1000); last = now;
   if (G && !paused) {
     const dt = fx.step(raw); elapsed += dt;
@@ -348,7 +363,8 @@ function updateCamera(dt) {
   let lastEnd = 0;
   document.addEventListener('touchend', e => {
     const now = performance.now();
-    if (now - lastEnd < 350 && !e.target.closest('select,input')) e.preventDefault(); // tweede snelle tik: geen dubbeltik-zoom
+    // tweede snelle tik buiten knoppen: geen dubbeltik-zoom (knoppen hebben touch-action en mogen snel na elkaar)
+    if (now - lastEnd < 350 && !e.target.closest('button,select,input,label,a,.card,[data-btn],[data-tr],[data-up],[data-go]')) e.preventDefault();
     lastEnd = now;
   }, { passive: false });
   // is er toch ingezoomd (bijvoorbeeld door de toegankelijkheidsinstelling), zet de viewport dan terug
@@ -754,6 +770,8 @@ window.__game = {
   get G() { return G; }, startFight, openMenu, cfg, profile, fx, photo, campaign, get tourney() { return tourney; }, openLeaders,
   setCam: m => (camMode = m), pause: v => (paused = v),
   camera: (pos, look) => { camCustom.pos.set(...pos); camCustom.look.set(...look); camMode = 'custom'; },
+  setTicker: fn => (ticker = fn), get ticker() { return ticker; },
+  render(dt = 1 / 30) { updateCamera(dt); renderFrame(); },
   step(dt) { simulate(dt); fx.update(dt); updateCamera(dt); renderFrame(); },
   sim(dt, n = 1) { for (let i = 0; i < n && G; i++) { simulate(dt); fx.update(dt); } },
 };

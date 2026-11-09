@@ -9,7 +9,7 @@ import { GLTFLoader } from '../../lib/three-addons.js';
 
 const BASE = 'assets/models/head/';
 const UNIT = 0.054;          // scan-eenheid → meter (kruin-kin ≈ 0,23 m)
-const NECK_CUT = -1.45;      // alles onder deze hoogte (schouders) eraf
+const NECK_CUT = -2.3;       // alles onder deze hoogte (schouders) eraf; de hals loopt door tot in de jas
 const ANCHOR = -1.05;        // dit punt van de hals komt op het nekgewricht
 const REF_SKIN = new THREE.Color('#dcae92'); // gemiddelde huid van de scantextuur
 
@@ -26,9 +26,14 @@ export const headReady = (async () => {
     maps = { map, normal };
     const src = gltf.scene.getObjectByProperty('isMesh', true).geometry;
     geo = crop(src, (y) => y > NECK_CUT);
+    { // onderste deel van de hals iets smaller, zodat de aanzet van de schouders binnen de kraag blijft
+      const p = geo.attributes.position;
+      for (let i = 0; i < p.count; i++) { const y = p.getY(i); if (y < -1.3) { const k = Math.max(0.72, 1 - (-1.3 - y) * 0.3); p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k); } }
+      geo.computeVertexNormals();
+    }
     geo.translate(0, -ANCHOR, 0); geo.scale(UNIT, UNIT, UNIT); geo.computeBoundingSphere();
     // haar: de schedel boven de haarlijn (voor hoger dan achter), iets naar buiten geduwd
-    hairGeo = crop(src, (y, z) => y > (z > 1.2 ? 2.55 : z > 0 ? 1.7 : 0.55), 0.16);
+    hairGeo = crop(src, (y, z) => y > (z > 1.2 ? 2.55 : z > 0 ? 1.7 : 0.55), 0.1);
     hairGeo.translate(0, -ANCHOR, 0); hairGeo.scale(UNIT, UNIT, UNIT);
     // vrouwelijke variant: smallere kaak en gezicht, voller haar tot in de nek
     geoF = geo.clone(); feminize(geoF);

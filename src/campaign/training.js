@@ -6,7 +6,7 @@ import { Fighter } from '../game/fighter.js';
 import { Controller } from '../game/input.js';
 
 const $ = s => document.querySelector(s);
-const BAG_X = 0.05, BAG_PIVOT_Y = 2.45, BAG_LEN = 1.2;
+const BAG_X = 0.05, BAG_PIVOT_Y = 2.45, BAG_LEN = 1.2, FIGHTER_X = -0.64; // vuist en scheen zakken zichtbaar in de zak
 const NOTE = {
   tsuki: { label: 'TSUKI', jp: '突', color: '#ff8a8a' },
   geri: { label: 'GERI', jp: '蹴', color: '#8ab6ff' },
@@ -30,7 +30,7 @@ export class TrainingSession {
 
   // ── Bokszak ──
   setupBag() {
-    const f = this.f; f.reset(-0.82, 1); f.state = 'idle';
+    const f = this.f; f.reset(FIGHTER_X, 1); f.state = 'idle';
     const g = new THREE.Group(); g.position.set(BAG_X, BAG_PIVOT_Y, 0);
     const leather = new THREE.MeshStandardMaterial({ color: '#7a1414', roughness: 0.55 });
     const chain = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, BAG_LEN - 0.45, 6), new THREE.MeshStandardMaterial({ color: '#888', metalness: 0.8, roughness: 0.3 }));
@@ -52,7 +52,7 @@ export class TrainingSession {
     this.el.innerHTML = `<div class="trTop"><b>BOKSZAK</b><span id="trTime"></span><span id="trScore">0</span><span id="trCombo"></span></div>
       <div id="trJudge"></div>
       <div class="trLane"><div class="trTarget"></div><div id="trNotes"></div></div>
-      <div class="trHelp">Raak de bokszak als de techniek in de cirkel staat · TSUKI = stoot · GERI = trap · ↓ + GERI = lage trap</div>`;
+      <div class="trHelp">Tik als de techniek in de gouden cirkel staat · TSUKI = stoot · GERI = trap · ↓ + GERI = lage trap (gewone GERI telt ook, maar minder)</div>`;
     this.api.camera(new THREE.Vector3(-0.4, 1.45, 3.4), new THREE.Vector3(-0.35, 1.05, 0));
   }
 
@@ -69,13 +69,15 @@ export class TrainingSession {
   bagInput(type) {
     const now = this.t;
     let best = null;
-    for (const n of this.notes) if (n.state === 'open' && Math.abs(n.t - now) < 0.32 && (!best || Math.abs(n.t - now) < Math.abs(best.t - now))) best = n;
+    for (const n of this.notes) if (n.state === 'open' && Math.abs(n.t - now) < 0.34 && (!best || Math.abs(n.t - now) < Math.abs(best.t - now))) best = n;
     // de vechter voert de techniek altijd uit
     const id = type === 'tsuki' ? (this.jabSide++ % 2 ? 'seiken_gyaku' : 'seiken_jab') : type === 'gedan' ? 'gedan_mawashi' : 'chudan_mawashi';
     this.f.state = 'idle'; this.f.startMove(id, { startup: 0.7 });
-    if (!best || best.type !== type) { this.judge(best && best.type !== type ? 'Verkeerde techniek' : 'Te vroeg', 'mis'); this.combo = 0; if (best) best.state = 'mis', this.hits.mis++; return; }
+    // trap op een lage noot of andersom: telt als OK (de lage trap vraagt joystick omlaag + GERI)
+    const kickSwap = best && best.type !== type && best.type !== 'tsuki' && type !== 'tsuki';
+    if (!best || (best.type !== type && !kickSwap)) { this.judge(best ? 'Verkeerde techniek' : 'Te vroeg', 'mis'); this.combo = 0; if (best) best.state = 'mis', this.hits.mis++; return; }
     const d = Math.abs(best.t - now);
-    const [label, val] = d < 0.08 ? ['PERFECT', 100] : d < 0.17 ? ['GOED', 70] : ['OK', 40];
+    const [label, val] = kickSwap ? ['OK', 40] : d < 0.1 ? ['PERFECT', 100] : d < 0.2 ? ['GOED', 70] : ['OK', 40];
     best.state = 'hit'; this.combo++; this.maxCombo = Math.max(this.maxCombo, this.combo);
     this.hits[label === 'PERFECT' ? 'perfect' : label === 'GOED' ? 'goed' : 'ok']++;
     this.score += val * (1 + Math.min(this.combo, 20) * 0.05);
@@ -89,7 +91,7 @@ export class TrainingSession {
     const b = this.bag;
     b.vel += -9.8 / BAG_LEN * Math.sin(b.ang) * dt; b.vel *= Math.exp(-dt * 1.6); b.ang += b.vel * dt;
     b.g.rotation.z = b.ang; // zwaait weg van de vechter (naar +x)
-    for (const n of this.notes) if (n.state === 'open' && this.t - n.t > 0.32) { n.state = 'mis'; this.hits.mis++; this.combo = 0; this.judge('Gemist', 'mis'); }
+    for (const n of this.notes) if (n.state === 'open' && this.t - n.t > 0.34) { n.state = 'mis'; this.hits.mis++; this.combo = 0; this.judge('Gemist', 'mis'); }
     // noten tekenen
     const lane = $('#trNotes'); if (!lane) return;
     const W = lane.clientWidth || 600, speed = W * 0.28;
@@ -172,7 +174,7 @@ export class TrainingSession {
       if (p.tsuki) { this.bagInput('tsuki'); this.ctrl.consume(); }
       else if (p.geri) { this.bagInput(raw.down ? 'gedan' : 'geri'); this.ctrl.consume(); }
       this.f.update(dt, this.bagStub || (this.bagStub = { x: BAG_X, state: 'idle', hurtbox: () => ({ x: BAG_X + Math.sin(this.bag.ang) * BAG_LEN, z: 0, y0: 0.3, y1: 1.85, r: 0.22 }) }), { rules: 'toernooi', foul() {}, knockdown() {} });
-      this.f.x = -0.82; this.f.place();
+      this.f.x = FIGHTER_X; this.f.place();
       this.updateBag(dt);
     } else {
       if (p.tsuki || p.geri || p.kiai || (raw.uke && !this.ukeHeld)) { this.weightInput(); this.ctrl.consume(); }

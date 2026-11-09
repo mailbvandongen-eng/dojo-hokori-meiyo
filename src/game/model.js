@@ -71,7 +71,7 @@ export function buildFighter(data, corner = 'aka', costume = {}) {
   const collar = new THREE.MeshPhysicalMaterial({ color: clothCol.clone().multiplyScalar(0.94), roughness: 0.85, normalMap: fabric, normalScale: new THREE.Vector2(0.8, 0.8), sheen: 0.5 });
   const pants = official ? new THREE.MeshPhysicalMaterial({ color: '#1d2433', roughness: 0.75, normalMap: fabric, normalScale: new THREE.Vector2(0.4, 0.4), sheen: 0.3, side: THREE.DoubleSide }) : cloth;
   // huid van armen en voeten afgestemd op de gescande gezichtshuid (iets lichter en roziger dan de kale kleur)
-  const skinBody = new THREE.Color(skinCol).lerp(new THREE.Color('#e3b49a'), 0.28);
+  const skinBody = new THREE.Color(skinCol).lerp(new THREE.Color('#d9a68c'), 0.12);
   const skin = new THREE.MeshPhysicalMaterial({ color: skinBody, roughness: 0.55, sheen: 0.35, sheenRoughness: 0.5, sheenColor: new THREE.Color('#ffd2b8') });
   const tee = new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 0.85, normalMap: fabric, normalScale: new THREE.Vector2(0.3, 0.3) });
   const belt = beltOf(costume.graad || data.graad);
@@ -109,7 +109,7 @@ export function buildFighter(data, corner = 'aka', costume = {}) {
   // romp: gevormde jas (borst breder dan middel), kraag en revers
   const spine = joint('spine', pelvis, 0, 0.07, 0);
   const torsoH = 0.5 * L, sw = 0.2 * B * SH;
-  const prof = [[0.166 * B * (female ? 0.94 : 1), 0], [0.172 * B, 0.1 * L], [sw * 0.93, 0.25 * L], [sw, 0.37 * L], [sw * 1.01, 0.43 * L], [sw * 0.9, 0.48 * L], [0.1, 0.52 * L]];
+  const prof = [[0.166 * B * (female ? 0.94 : 1), 0], [0.172 * B, 0.1 * L], [sw * 0.93, 0.25 * L], [sw, 0.37 * L], [sw * 1.01, 0.43 * L], [sw * 0.9, 0.48 * L], [0.1, 0.52 * L], [0.055, 0.535 * L], [0.001, 0.54 * L]];
   const torso = new THREE.Mesh(new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 28, Math.PI, Math.PI * 2), jacket);
   torso.geometry.scale(1, 1, 0.64); torso.geometry.computeVertexNormals(); shadow(torso); spine.add(torso);
   // revers: band van rechts-boven (nek) schuin naar links-onder (de linkerpand ligt over de rechter)
@@ -118,29 +118,29 @@ export function buildFighter(data, corner = 'aka', costume = {}) {
     return prof[prof.length - 1][0];
   };
   const onSurf = (x, y, out = 0.008) => { const r = rAt(y); return new THREE.Vector3(x, y, 0.64 * Math.sqrt(Math.max(0.0004, r * r - x * x)) + out); };
-  const lapelPts = [[-0.075, 0.5], [-0.05, 0.4], [0, 0.29], [0.06, 0.17], [0.11, 0.04]].map(([x, y]) => onSurf(x * B, y * L));
-  const lapel = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lapelPts), 20, 0.016, 6), collar); lapel.scale.set(1, 1, 1); shadow(lapel); spine.add(lapel);
-  const innerPts = [[0.075, 0.5], [0.045, 0.4], [0.01, 0.31]].map(([x, y]) => onSurf(x * B, y * L, 0.004));
+  const lapelPts = [[-0.07, 0.5], [-0.05, 0.4], [0, 0.29], [0.06, 0.17], [0.11, 0.04]].map(([x, y]) => onSurf(x * B, y * L, 0.002));
+  const lapel = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lapelPts), 24, 0.013, 6), collar); lapel.scale.set(1, 1, 0.985); lapel.scale.set(1, 1, 1); shadow(lapel); spine.add(lapel);
+  const innerPts = [[0.07, 0.5], [0.045, 0.4], [0.01, 0.31]].map(([x, y]) => onSurf(x * B, y * L, 0.0));
   spine.add(shadow(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(innerPts), 10, 0.014, 6), collar)));
   // kraag om de nek
-  const collarRing = new THREE.Mesh(new THREE.TorusGeometry(0.083, 0.018, 8, 24, Math.PI * 1.25), collar);
-  collarRing.rotation.set(Math.PI / 2, 0, Math.PI * 0.375 + Math.PI); collarRing.position.set(0, torsoH + 0.01, -0.012); collarRing.scale.set(1, 0.85, 1); shadow(collarRing); spine.add(collarRing);
+  const collarRing = new THREE.Mesh(new THREE.TorusGeometry(0.068 * B, 0.014, 8, 28, Math.PI * 1.3), collar);
+  collarRing.rotation.set(Math.PI / 2, 0, Math.PI * 0.35 + Math.PI); collarRing.position.set(0, torsoH + 0.035, -0.006); collarRing.scale.set(1.05, 0.9, 1); shadow(collarRing); spine.add(collarRing);
   // in de V van de jas: borst (man) of wit T-shirt (vrouw)
   const vMat = female && !official ? tee : official ? cloth : skin;
-  const vPatch = blob(0.06 * B, 0.09, 0.03, vMat); vPatch.position.copy(onSurf(-0.015, 0.43 * L, -0.012)); spine.add(vPatch);
-  const neck = cone(female ? 0.045 : 0.057, female ? 0.05 : 0.064, 0.11, skin, 14, false); neck.position.y = torsoH + 0.11; spine.add(neck);
+  const vPatch = blob(0.05 * B, 0.075, 0.012, vMat); vPatch.position.copy(onSurf(-0.01, 0.45 * L, -0.006)); vPatch.rotation.x = -0.35; spine.add(vPatch);
+  const neck = cone(female ? 0.045 : 0.055, female ? 0.05 : 0.06, 0.09, skin, 14, false); neck.position.y = torsoH + 0.07; spine.add(neck); // alleen bij het reservehoofd
   if (female && !official) { const t = cone(0.07, 0.08, 0.05, tee, 18, true); t.position.y = torsoH + 0.035; spine.add(t); }
 
   const head = joint('head', spine, 0, torsoH + 0.09, 0);
   const headOpts = { skin: skinCol, hair: look.haar || '#24180f', kapsel: hairStyle, female, scale: L };
   const scan = makeHead(headOpts);
-  if (scan) head.add(scan);
+  if (scan) { head.add(scan); neck.visible = false; } // de scan heeft zelf een hals
   else { // reserve tot de scan binnen is (bijvoorbeeld de officials, die al bij het opstarten gebouwd worden)
     const tmp = new THREE.Group();
     const skull = blob(0.1, 0.118, 0.107, skin); skull.position.y = 0.11; tmp.add(skull);
     const cap = blob(0.108, 0.1, 0.115, new THREE.MeshStandardMaterial({ color: look.haar || '#24180f', roughness: 0.9 })); cap.position.set(0, 0.15, -0.012); tmp.add(cap);
     head.add(tmp);
-    headReady.then(ok => { const real = ok && makeHead(headOpts); if (real) { head.remove(tmp); head.add(real); } });
+    headReady.then(ok => { const real = ok && makeHead(headOpts); if (real) { head.remove(tmp); head.add(real); neck.visible = false; } });
   }
 
   // armen: schouder, bovenarm in wijde mouw, mouw tot net onder de elleboog, blote onderarm en vuist

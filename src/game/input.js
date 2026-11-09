@@ -54,7 +54,7 @@ export class TouchPad {
     this.jx = 0; this.jy = 0; this.btn = {}; this.tap = {}; this.id = null;
     this.ring = root.querySelector('.ring'); this.knob = root.querySelector('.knob');
     const zone = root.querySelector('.stick');
-    zone.addEventListener('pointerdown', e => { this.id = e.pointerId; this.ox = e.clientX; this.oy = e.clientY; this.show(e.clientX, e.clientY); zone.setPointerCapture(e.pointerId); });
+    zone.addEventListener('pointerdown', e => { this.id = e.pointerId; this.ox = e.clientX; this.oy = e.clientY; this.show(e.clientX, e.clientY); try { zone.setPointerCapture(e.pointerId); } catch { /* niet ondersteund */ } });
     zone.addEventListener('pointermove', e => { if (e.pointerId !== this.id) return; const dx = e.clientX - this.ox, dy = e.clientY - this.oy, r = 50; const l = Math.hypot(dx, dy) || 1, k = Math.min(1, l / r); this.jx = dx / l * k; this.jy = dy / l * k; this.knob.style.transform = `translate(${this.jx * r}px,${this.jy * r}px)`; });
     const end = e => { if (e.pointerId !== this.id) return; this.id = null; this.jx = this.jy = 0; this.ring.style.opacity = 0; };
     zone.addEventListener('pointerup', end); zone.addEventListener('pointercancel', end);
