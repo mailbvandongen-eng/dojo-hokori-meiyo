@@ -44,15 +44,13 @@ class Official {
   }
 }
 
-// Grote hata (vlag) met een donkere rand voor contrast, licht zelf iets op zodat hij ook in de schaduw opvalt.
+// Grote hata (vlag) die zelf iets oplicht, zodat hij ook in de schaduw en van ver opvalt.
 function addFlag(fist, color) {
   const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.9, 8), new THREE.MeshStandardMaterial({ color: '#2a1d10' }));
   pole.position.y = -0.38; pole.rotation.x = Math.PI; fist.add(pole);
   const geo = new THREE.PlaneGeometry(0.68, 0.52, 10, 2); geo.translate(0.34, 0, 0);
-  const cloth = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: color === '#ffffff' ? 0.35 : 0.45, roughness: 0.7, side: THREE.DoubleSide }));
+  const cloth = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: color === '#ffffff' ? 0.45 : 0.6, roughness: 0.7, side: THREE.DoubleSide }));
   cloth.position.set(0, -0.2, 0.01); cloth.rotation.y = Math.PI / 2; pole.add(cloth);
-  const rim = new THREE.Mesh(new THREE.PlaneGeometry(0.73, 0.57), new THREE.MeshBasicMaterial({ color: '#111', side: THREE.DoubleSide }));
-  rim.position.set(0.34, 0, -0.004); cloth.add(rim);
   return { cloth, base: geo.attributes.position.array.slice() };
 }
 
@@ -152,10 +150,10 @@ export function createArena(scene, renderer) {
   let crowdHype = 0;
 
   // ── Licht ──
-  scene.add(new THREE.HemisphereLight('#c9d3ff', '#2a1d14', 0.55));
-  const key = new THREE.DirectionalLight('#fff3df', 2.4);
+  scene.add(new THREE.HemisphereLight('#c9d3ff', '#2a1d14', 0.4));
+  const key = new THREE.DirectionalLight('#ffe9cf', 2.2);
   key.position.set(3, 12, 6); key.castShadow = true;
-  key.shadow.mapSize.set(1024, 1024); key.shadow.camera.left = -6; key.shadow.camera.right = 6; key.shadow.camera.top = 6; key.shadow.camera.bottom = -6;
+  key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 2.5; key.shadow.camera.left = -6; key.shadow.camera.right = 6; key.shadow.camera.top = 6; key.shadow.camera.bottom = -6;
   key.shadow.bias = -0.0005; key.shadow.normalBias = 0.02; scene.add(key);
   const rim = new THREE.DirectionalLight('#9fb6ff', 0.9); rim.position.set(-6, 6, -8); scene.add(rim);
   const warm = new THREE.PointLight('#ffb36b', 25, 30); warm.position.set(0, 9, -12); scene.add(warm);

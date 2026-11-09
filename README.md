@@ -71,4 +71,4 @@ NODE_PATH=/root/tools/pw/node_modules node tools/test/campaign.cjs   # met lokal
 
 ## Licenties
 
-Three.js (MIT, `lib/THREE-LICENSE`), Yuji Boku-font (SIL OFL 1.1, `assets/fonts/OFL-YujiBoku.txt`). Namen en het logo van Dojo Hokori Meiyo zijn van de dojo.
+Three.js en de Three.js-addons (MIT, `lib/THREE-LICENSE`), Yuji Boku-font (SIL OFL 1.1, `assets/fonts/OFL-YujiBoku.txt`), hoofdmodel "Infinite, 3D Head Scan" door Lee Perry-Smith (CC BY 3.0, `assets/models/head/LeePerrySmith_License.txt`). Namen en het logo van Dojo Hokori Meiyo zijn van de dojo.

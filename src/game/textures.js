@@ -135,3 +135,28 @@ export function boardTexture() {
 export function flagMaterial(color) {
   return new THREE.MeshStandardMaterial({ color, roughness: 0.8, side: THREE.DoubleSide });
 }
+
+// ── Stof: normal map met katoenweefsel en zachte verticale plooien (voor de dogi) ──
+let fabricCache = null;
+export function fabricNormal() {
+  if (fabricCache) return fabricCache;
+  const N = 512, c = canvas(N, N), g = c.getContext('2d'), img = g.createImageData(N, N);
+  const H = new Float32Array(N * N);
+  const folds = Array.from({ length: 5 }, () => ({ f: 1 + Math.floor(Math.random() * 2), p: Math.random() * 6.28, a: 0.25 + Math.random() * 0.45, w: 0.5 + Math.random() * 1.5 }));
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const u = x / N, v = y / N;
+    let h = 0;
+    for (const f of folds) h += Math.sin((u * f.f + Math.sin(v * 6.28 * f.w + f.p) * 0.08) * 6.28 + f.p) * f.a * 0.5 * (0.6 + 0.4 * Math.sin(v * 6.28 * f.w)); // zachte plooien (naadloos in u)
+    h += (Math.sin(x * 1.7) * Math.sin(y * 1.7)) * 0.05;                                                             // fijn weefsel
+    h += (Math.random() - 0.5) * 0.22;                                                                               // onregelmatige draad
+    H[y * N + x] = h;
+  }
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const hl = H[y * N + ((x + N - 1) % N)], hr = H[y * N + ((x + 1) % N)], hu = H[((y + N - 1) % N) * N + x], hd = H[((y + 1) % N) * N + x];
+    let nx = (hl - hr) * 1.2, ny = (hu - hd) * 1.2, nz = 1; const l = Math.hypot(nx, ny, nz); nx /= l; ny /= l; nz /= l;
+    const i = (y * N + x) * 4; img.data[i] = (nx * 0.5 + 0.5) * 255; img.data[i + 1] = (ny * 0.5 + 0.5) * 255; img.data[i + 2] = (nz * 0.5 + 0.5) * 255; img.data[i + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 1); t.anisotropy = 4;
+  return (fabricCache = t);
+}

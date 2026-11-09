@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.0 (2026-11-09): realistische vechters
+- **Gescand hoofd:** "Infinite, 3D Head Scan" van Lee Perry-Smith (CC BY 3.0), met de schouders eraf geknipt. Per vechter een huidtint, een vrouwelijke variant (smaller gezicht en kaak) en haar dat de vorm van de schedel volgt (kort, staart of knot). Ook de scheidsrechters hebben dit hoofd.
+- **Nieuwe dogi:**
+  - een gevormde romp met kraag en revers
+  - borst (man) of wit T-shirt (vrouw) in de V van de jas
+  - wijde mouwen tot net onder de elleboog, een uitlopende jasrok en wijde broek
+  - een band met twee lussen en knoop
+  - handen met knokkels en duim, en blote voeten
+- **Stof:** fysiek materiaal met glans (sheen) en een normal map met weefsel en zachte plooien.
+- **Belichting:** omgevingsreflecties (RoomEnvironment), warmer hoofdlicht met scherpere schaduwen. Op "Hoog" een nabewerking: gloed, filmkorrel en vignet.
+- **Hata zonder zwarte rand:** de vlaggen lichten zelf iets op. De gevechtscamera staat iets dichterbij, nog steeds op een vaste afstand.
+- Gewrichten en hun posities zijn ongewijzigd: de raakdetectie en alle tests kloppen nog.
+
 ## 0.5.0 (2026-11-09): gevechtssysteem vernieuwd
 - **Raakdetectie op contact:** per frame wordt het raakvlak (scheen, vuist, knie, elleboog) gemeten tegen de doelzone van de tegenstander (hoofd, romp of benen). Het bereik is opnieuw gemeten; het was 0,35-0,5 m te ruim.
 - **Ushiro Mawashi Geri gerepareerd:** het lichaam draaide de verkeerde kant op, waardoor het been bij het treffermoment naar achteren wees. Hij draait nu correct en de hiel raakt het hoofd.

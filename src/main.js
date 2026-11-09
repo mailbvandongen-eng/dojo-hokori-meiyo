@@ -6,6 +6,8 @@ import { CALLS, COUNT_ROMAJI, TIPS } from './data/terms.js';
 import { profile, save as saveProfile, rankInfo, addResult, addBonus, COSTUMES, costumeUnlocked } from './data/profile.js';
 import { isLocked, nextUnlock, bossFinalDue, unlockAfterTournament, FINAL_BOSS, UNLOCK_ORDER } from './data/unlocks.js';
 import { buildFighter } from './game/model.js';
+import { headReady } from './game/head.js';
+import { EffectComposer, RenderPass, UnrealBloomPass, OutputPass, ShaderPass, RoomEnvironment } from '../lib/three-addons.js';
 import { POSES } from './game/poses.js';
 import { initCampaign } from './campaign/campaign.js';
 import { online } from './data/online.js';
@@ -29,6 +31,7 @@ function applySettings() {
   setVolumes();
   renderer.setPixelRatio(Math.min(devicePixelRatio, cfg.gfx === 'hoog' ? 2 : 1));
   renderer.shadowMap.enabled = cfg.gfx === 'hoog';
+  setupPost();
   localStorage.setItem('dhm-settings', JSON.stringify(cfg));
 }
 
@@ -36,13 +39,43 @@ function applySettings() {
 const canvas = $('#gl');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.98;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 120);
 const arena = createArena(scene, renderer);
 const fx = new FX(scene);
-function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 1.5 ? 48 : 40; camera.updateProjectionMatrix(); }
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); composer?.setSize(w, h); camera.aspect = w / h; camera.fov = w / h < 1.5 ? 48 : 40; camera.updateProjectionMatrix(); }
+
+// ── Belichting en nabewerking ──
+// Omgevingslicht (reflecties op huid en stof) en op "Hoog": gloed, filmkorrel en vignet.
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.22;
+const GrainVignette = {
+  uniforms: { tDiffuse: { value: null }, time: { value: 0 }, amount: { value: 0.035 }, vig: { value: 0.32 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float time, amount, vig; varying vec2 vUv;
+    float rnd(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233)) + time * 7.13) * 43758.5453); }
+    void main(){ vec4 c = texture2D(tDiffuse, vUv);
+      float d = distance(vUv, vec2(0.5)); c.rgb *= 1.0 - vig * smoothstep(0.35, 0.85, d);
+      c.rgb += (rnd(vUv * 900.0) - 0.5) * amount; gl_FragColor = c; }`,
+};
+let composer = null, grainPass = null;
+function setupPost() {
+  composer?.dispose?.(); composer = null;
+  if (cfg.gfx !== 'hoog') return;
+  composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.18, 0.4, 0.96));
+  composer.addPass(new OutputPass());
+  grainPass = new ShaderPass(GrainVignette); composer.addPass(grainPass);
+  composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(innerWidth, innerHeight);
+}
+function renderFrame() {
+  if (composer) { grainPass.uniforms.time.value = performance.now() / 1000 % 100; composer.render(); }
+  else renderFrame();
+}
 addEventListener('resize', resize); resize(); applySettings();
 
 // ── Schermen ──
@@ -251,7 +284,7 @@ function frame(now) {
     if (previewModel) previewModel.group.rotation.y += raw * 0.35;
   }
   updateCamera(raw);
-  renderer.render(scene, camera);
+  renderFrame();
 }
 
 function simulate(dt) {
@@ -288,7 +321,7 @@ function updateCamera(dt) {
     switch (camMode) {
       case 'intro': { const ang = -1.0 + camT * 0.14; tmpV.set(Math.sin(ang) * 6.5, 2.8 - Math.min(1, camT * 0.12), Math.cos(ang) * 6.5); tmpL.set(0, 1.1, -0.4); k = 2; break; }
       // vaste afstand; de camera zoomt alleen uit als de vechters ver uit elkaar staan, nooit in
-      case 'fight': tmpV.set(mid * 0.85, 1.55, Math.min(6.5, 4.4 + Math.max(0, gap - 1.6) * 0.9)); tmpL.set(mid, 1.0, 0); k = 2.5; break;
+      case 'fight': tmpV.set(mid * 0.85, 1.5, Math.min(6.2, 3.9 + Math.max(0, gap - 1.6) * 0.9)); tmpL.set(mid, 1.0, 0); k = 2.5; break;
       case 'kd': { const v = camFocus; tmpV.set(v.x - v.facing * 1.6, 1.1, 3.6); tmpL.set(v.x, 0.7, 0); k = 2; break; }
       case 'super': { const f = camFocus, ang = 0.6 + camT * 0.9 * f.facing; tmpV.set(f.x + Math.sin(ang) * 3.8, 1.35, Math.cos(ang) * 3.8 + 0.4); tmpL.set(mid, 1.0, 0); k = 2; break; }
       case 'result': { const w = G.match.winner || a, ang = camT * 0.3; tmpV.set(w.x + Math.sin(ang) * 3.2, 1.6, Math.cos(ang) * 3.2); tmpL.set(w.x, 1.1, 0); k = 2; break; }
@@ -326,8 +359,9 @@ function updateCamera(dt) {
 }
 
 // ── Splash → menu ──
-$('#splash').addEventListener('pointerup', () => {
+$('#splash').addEventListener('pointerup', async () => {
   unlockAudio(); sfx.taiko(true); setTimeout(() => sfx.kiai(1), 150); say('osu');
+  await Promise.race([headReady, new Promise(r => setTimeout(r, 4000))]); // de hoofdscan is meestal al binnen
   openMenu();
 }, { once: true });
 
@@ -587,7 +621,7 @@ $('#phBack').addEventListener('click', exitPhoto);
   canvas.addEventListener('wheel', e => { if (camMode === 'photo') photo.r = Math.max(1.4, Math.min(9, photo.r * (1 + e.deltaY * 0.001))); }, { passive: true });
 }
 $('#phShot').addEventListener('click', async () => {
-  renderer.render(scene, camera);
+  renderFrame();
   const w = canvas.width, h = canvas.height, c = document.createElement('canvas'); c.width = w; c.height = h;
   const g = c.getContext('2d'); g.filter = $('#phFilter').value; g.drawImage(canvas, 0, 0); g.filter = 'none';
   const logo = getLogo(), s = Math.round(h * 0.16);
@@ -719,7 +753,8 @@ const campaign = initCampaign({
 window.__game = {
   get G() { return G; }, startFight, openMenu, cfg, profile, fx, photo, campaign, get tourney() { return tourney; }, openLeaders,
   setCam: m => (camMode = m), pause: v => (paused = v),
-  step(dt) { simulate(dt); fx.update(dt); updateCamera(dt); renderer.render(scene, camera); },
+  camera: (pos, look) => { camCustom.pos.set(...pos); camCustom.look.set(...look); camMode = 'custom'; },
+  step(dt) { simulate(dt); fx.update(dt); updateCamera(dt); renderFrame(); },
   sim(dt, n = 1) { for (let i = 0; i < n && G; i++) { simulate(dt); fx.update(dt); } },
 };
 
