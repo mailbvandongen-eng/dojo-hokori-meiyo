@@ -10,6 +10,7 @@ import * as THREE from '../../lib/three.module.js';
 import { GLTFLoader, SkeletonUtils } from '../../lib/three-addons.js';
 import { fabricNormal, kanjiDecalTexture } from './textures.js';
 import { beltOf } from '../data/roster.js';
+import { makeRetarget, makeFists } from './mocap.js';
 
 const DIR = 'assets/humans/';
 const cache = new Map();   // id → Promise<gltf|null>
@@ -145,13 +146,11 @@ export function buildHumanFighter(data, corner, costume, gltf) {
     links.push({ joint: J[jn], bone, off: pz.invert().multiply(aligned) });
   }
   const hipsOff = hips.clone().sub(J.pelvis.getWorldPosition(new THREE.Vector3())); // in nulpose: nul (pelvis = heup)
-  // vuisten: vingers krullen, duim over de vingers
-  for (const [k, b] of Object.entries(B)) {
-    const m = k.match(/^(Left|Right)Hand(Index|Middle|Ring|Pinky|Thumb)(\d)$/); if (!m) continue;
-    const thumb = m[2] === 'Thumb', sgn = m[1] === 'Left' ? 1 : -1;
-    b.quaternion.multiply(_q.setFromEuler(new THREE.Euler(thumb ? 0.35 : 1.45, 0, thumb ? 0.45 * sgn : 0)));
-  }
-
+  // vuisten (rolonafhankelijk, uit de rusthouding) en motion capture
+  makeFists(B, group);
+  const mc = makeRetarget(B, group);
+  const restToe = Math.min(wp('LeftToeBase').y, wp('RightToeBase').y), restAnkle = Math.min(wp('LeftFoot').y, wp('RightFoot').y);
+  let mode = 'proc';
   function retarget() {
     group.updateMatrixWorld(true);
     // heup volgt het gameskelet (positie en draaiing)
@@ -169,6 +168,7 @@ export function buildHumanFighter(data, corner, costume, gltf) {
   }
 
   function setPose(p) {
+    mode = 'proc';
     root.position.y = hipH + p.root[0] * L;
     root.position.z = p.root[1];
     root.rotation.set(p.root[3], p.root[2], 0, 'YXZ');
@@ -178,11 +178,40 @@ export function buildHumanFighter(data, corner, costume, gltf) {
 
   // aka/shiro-lint achter op de band
   const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.008), new THREE.MeshStandardMaterial({ color: corner === 'aka' ? '#c8102e' : '#ffffff', roughness: 0.8 }));
-  ribbon.position.set(0, -0.12, -0.15); J.pelvis.add(ribbon);
+  ribbon.position.set(0, -0.12, -0.15); J.pelvis.add(ribbon); group.updateMatrixWorld(true); B.Hips.attach(ribbon); // beweegt mee met de heup
   if (costume.official) scene.traverse(o => { if (o.isMesh && (o.material === obi || o.material === kanji)) o.visible = false; });
 
+  // opname toepassen; voeten op de vloer (verschil in heuphoogte tussen opname en model)
+  let ground = 0;
+  const _a = new THREE.Vector3(), _b = new THREE.Vector3();
+  function applyMocap(f, opt = {}) {
+    mode = 'mocap';
+    mc.apply(f.q, f.hips);
+    group.updateMatrixWorld(true);
+    if (opt.ground !== false) {
+      const inv = _m.copy(group.matrixWorld).invert();
+      const toe = Math.min(B.LeftToeBase.getWorldPosition(_a).applyMatrix4(inv).y, B.RightToeBase.getWorldPosition(_b).applyMatrix4(inv).y) - restToe;
+      const ank = Math.min(B.LeftFoot.getWorldPosition(_a).applyMatrix4(inv).y, B.RightFoot.getWorldPosition(_b).applyMatrix4(inv).y) - restAnkle;
+      const want = -Math.min(toe, ank);
+      ground += (Math.max(-0.15, Math.min(0.15, want)) - ground) * 0.5;
+    } else ground *= 0.9;
+    if (Math.abs(ground) > 1e-4) { B.Hips.position.y += ground / B.Hips.parent.getWorldScale(_a).y; group.updateMatrixWorld(true); }
+  }
+  // raakpunten: in mocap-modus direct uit de botten
+  const PART = { pelvis: 'Hips', spine: 'Spine', head: 'Head', lSh: 'LeftArm', lEl: 'LeftForeArm', rSh: 'RightArm', rEl: 'RightForeArm',
+    lHip: 'LeftUpLeg', lKnee: 'LeftLeg', rHip: 'RightUpLeg', rKnee: 'RightLeg', lFoot: 'LeftToeBase', rFoot: 'RightToeBase' };
   const v = new THREE.Vector3();
-  function partWorld(name, out = new THREE.Vector3()) { (J[name] || root).getWorldPosition(v); return out.copy(v); }
+  function partWorld(name, out = new THREE.Vector3()) {
+    if (mode === 'mocap') {
+      if (name === 'lFist' || name === 'rFist') { // knokkels: hand + iets voorbij de middelvingerbasis
+        const s = name[0] === 'l' ? 'Left' : 'Right';
+        B[s + 'Hand'].getWorldPosition(_a); B[s + 'HandMiddle1'].getWorldPosition(_b);
+        return out.copy(_b).sub(_a).multiplyScalar(1.35).add(_a);
+      }
+      const bn = PART[name]; if (bn && B[bn]) return B[bn].getWorldPosition(out);
+    }
+    (J[name] || root).getWorldPosition(v); return out.copy(v);
+  }
   const mats = new Set(); scene.traverse(o => { if (o.isMesh && o.material?.emissive) mats.add(o.material); });
   const flashCol = new THREE.Color(); let flashT = 0;
   function hitFlash(color = '#ffffff') { flashCol.set(color); flashT = 0.12; }
@@ -193,5 +222,5 @@ export function buildHumanFighter(data, corner, costume, gltf) {
     for (const m of mats) { m.emissive.copy(flashCol); m.emissiveIntensity = k; }
   }
   setPose({ root: [0, 0, 0, 0] });
-  return { group, root, joints: J, setPose, partWorld, hitFlash, tickFlash, height: hips.y / 0.52, scale: L, human: true };
+  return { group, root, joints: J, setPose, applyMocap, hipH: mc.hipH, legH: wp('LeftUpLeg').y, get mode() { return mode; }, partWorld, hitFlash, tickFlash, height: hips.y / 0.52, scale: L, human: true };
 }

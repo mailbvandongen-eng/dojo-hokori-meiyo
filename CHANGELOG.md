@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.8.0 (2026-11-11): echte bewegingen (motion capture)
+- **De vechters bewegen nu als echte karateka's.** Alle technieken, de kamae, het voetenwerk, de blokken, de knock-downs, rei en de overwinning komen uit motion capture van echte vechtsporters:
+  - gyaku zuki, mae geri, gedan mawashi, jodan mawashi en ushiro mawashi geri van een Kyokushin-karateka (Kyokushin-dataset, Silesian University of Technology, CC0)
+  - stoten op het lichaam, hoek, elleboog, chudan mawashi, ushiro geri, axe kick, blokken, opstappen, terugstappen, zijstap, buigen en opstaan uit het Open Motion Project van ACCAD (Ohio State University, CC BY 3.0)
+  - de Rol Kick is een radslagtrap met een hand aan de grond
+- **Vuisten:** echte gebalde vuisten met de duim over de vingers (de handen wezen eerder verkeerd en de armen leken uit de kom te gaan).
+- **Laag-hoog (double tap):** de gedan mawashi gaat halverwege het terugtrekken over in de jodan mawashi.
+- **Lengte van de tegenstander:** stoten en trappen passen hun hoogte aan, dus tegen een kind gaat de lage trap niet meer over het been heen.
+- **Treffers:** het hoofd klapt achterover, de romp klapt dubbel of het been knikt, bovenop de lopende beweging.
+- **Afstand:** de vechters staan niet meer in elkaar.
+  - de raakzones hebben echte maten (romp ~30 cm diep)
+  - minimale afstand van heup tot heup is 0,8 m
+  - het bereik van elke techniek is opnieuw gemeten
+  - de AI houdt 1,0 tot 1,5 m afstand
+- **Opstaan na een knock-down** duurt realistischer: omrollen, hurkzit, opstaan.
+- **Previews** in het menu en de campaign bewegen ook.
+- Nieuwe tests: `tools/test/moves.cjs` (filmstrip per techniek) en `tools/test/fight.cjs` (AI tegen AI, beeld voor beeld).
+
 ## 0.7.0 (2026-11-10): echte mensen (MakeHuman)
 - **Alle vechters, de scheidsrechter en de hoekscheidsrechters zijn nu echte menselijke modellen**, gemaakt met MakeHuman (MPFB in Blender): echte anatomie, huid met textuur, ogen, wenkbrauwen, wimpers, haar en handen met vingers. Ongeveer 42k tot 51k driehoeken per persoon.
 - Per vechter een eigen bouw: lengte, gewicht, spieren en leeftijd volgen geslacht, graad en leeftijdsgroep uit de roster.

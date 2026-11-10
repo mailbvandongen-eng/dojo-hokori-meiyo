@@ -7,7 +7,7 @@ const { chromium } = require('playwright-core');
   const p = await b.newPage({ viewport: { width: 320, height: 200 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(process.env.URL || 'http://127.0.0.1:8766/'); await p.waitForTimeout(1200);
   // met de realistische modellen (MakeHuman): het gameskelet neemt hun lichaamsmaten over
-  if (!process.env.SIMPEL) await p.evaluate(async () => { const { ROSTER } = await import('./src/data/roster.js'); await __game.preload(ROSTER.map(f => f.id)); });
+  if (!process.env.SIMPEL) await p.evaluate(async all => { const { ROSTER } = await import('./src/data/roster.js'); await __game.preload(all ? ROSTER.map(f => f.id) : ['amir']); }, !!process.env.ALL);
   const rows = await p.evaluate(async () => {
     const { MOVES } = await import('./src/data/moves.js'); const F = await import('./src/game/fighter.js');
     __game.pause(true);
@@ -24,14 +24,15 @@ const { chromium } = require('playwright-core');
     };
     for (const [id, m] of Object.entries(MOVES)) {
       if (!m.hits) continue;
-      let lo = 0.62, hi = 2.2;
-      if (!hitsAt(id, lo + 0.01) && !m.travel) { out.push({ id, max: null }); continue; }
-      for (let k = 0; k < 14; k++) { const mid = (lo + hi) / 2; if (hitsAt(id, mid) >= m.hits.length) lo = mid; else hi = mid; }
+      // afstanden aflopen: kortste en langste afstand waarop alle treffers raak zijn
+      let mn = null, mx = null;
+      for (let g = 0.5; g <= 2.01; g += 0.05) if (hitsAt(id, g) >= m.hits.length) { if (mn == null) mn = g; mx = g; }
+      out.push({ id, reach: m.reach, min: mn && +mn.toFixed(2), max: mx && +mx.toFixed(2) }); continue;
       out.push({ id, reach: m.reach, max: +lo.toFixed(2) });
     }
     return out;
   });
-  console.log('techniek            reach  max. raakafstand (alle treffers)');
-  for (const r of rows) console.log(r.id.padEnd(20), String(r.reach).padEnd(6), r.max);
+  console.log('techniek            reach  raakafstand min–max (alle treffers)');
+  for (const r of rows) console.log(r.id.padEnd(20), String(r.reach).padEnd(6), r.min, '–', r.max);
   console.log(errs.join('\n') || 'geen fouten'); await b.close();
 })();

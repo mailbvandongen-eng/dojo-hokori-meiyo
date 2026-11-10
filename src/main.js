@@ -7,7 +7,10 @@ import { profile, save as saveProfile, rankInfo, addResult, addBonus, COSTUMES, 
 import { isLocked, nextUnlock, bossFinalDue, unlockAfterTournament, FINAL_BOSS, UNLOCK_ORDER } from './data/unlocks.js';
 import { buildFighter } from './game/model.js';
 import { headReady } from './game/head.js';
-import { preloadHumans } from './game/human.js';
+import { preloadHumans as preloadModels } from './game/human.js';
+import { clipsReady, Animator, mocapAvailable } from './game/animator.js';
+// modellen én de motion capture-clips
+const preloadHumans = ids => Promise.all([preloadModels(ids), clipsReady]);
 import { EffectComposer, RenderPass, UnrealBloomPass, OutputPass, ShaderPass, RoomEnvironment } from '../lib/three-addons.js';
 import { POSES } from './game/poses.js';
 import { initCampaign } from './campaign/campaign.js';
@@ -260,12 +263,15 @@ function updateHUD() {
 let last = performance.now();
 let ticker = null;                 // trainingen (campaign) draaien buiten een gevecht
 let previewModel = null;           // vechter in beeld bij het maken van je karateka en in de hub
+let previewAnim = null;
 const camCustom = { pos: new THREE.Vector3(), look: new THREE.Vector3() };
 function preview(data, pose = 'stand', place = 'right') {
   if (previewModel) scene.remove(previewModel.group);
   previewModel = null; if (!data) return;
   previewModel = buildFighter(data, 'aka', {});
   previewModel.setPose(POSES[pose] || POSES.stand); previewModel.group.rotation.y = 0.5;
+  // echte beweging: kamae (of rechtop bij osu/stand)
+  previewAnim = previewModel.human && mocapAvailable() ? new Animator({ model: previewModel, state: pose === 'osu' || pose === 'stand' ? 'stand' : 'idle', vx: 0, facing: 1 }) : null;
   scene.add(previewModel.group);
   // 'right': vechter rechts van een paneel links (vechter maken); 'center': tussen twee panelen (hub)
   if (place === 'center') { camCustom.pos.set(0, 1.05, 4.0); camCustom.look.set(0, 0.95, 0); }
@@ -297,7 +303,7 @@ function frame(now) {
   } else if (!G) {
     arena.update(raw, (elapsed += raw));
     if (ticker) { const dt = fx.step(raw); ticker(dt); fx.update(dt); }
-    if (previewModel) previewModel.group.rotation.y += raw * 0.35;
+    if (previewModel) { previewModel.group.rotation.y += raw * 0.35; previewAnim?.update(raw); }
   }
   updateCamera(raw);
   renderFrame();

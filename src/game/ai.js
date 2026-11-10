@@ -38,7 +38,7 @@ export class AI {
     }
     // counter-venster na een blok: direct terugslaan
     if (f.counterT > 0 && f.canAct() && dist < 1.4 && Math.random() < 0.55 * d.skill + 0.15) {
-      inp.pressed[dist < 0.95 ? 'tsuki' : 'geri'] = true; inp.dir = dist < 0.95 ? 'f' : 'n';
+      inp.pressed[dist < 1.05 ? 'tsuki' : 'geri'] = true; inp.dir = dist < 1.05 ? 'f' : 'n';
       return inp;
     }
     // verdedigen: reageer per treffer op het doel (laag of hoog), na een reactietijd
@@ -64,19 +64,19 @@ export class AI {
     this.t -= dt;
     if (this.t <= 0) {
       this.t = d.think * (0.6 + Math.random() * 0.8);
-      const want = 0.75 + (1 - w.aggression) * 0.6 - w.body * 0.1; // gewenste afstand
+      const want = 1.0 + (1 - w.aggression) * 0.5 - w.body * 0.1; // gewenste afstand (heup tot heup)
       this.plan.move = dist > want + 0.25 ? 1 : dist < want - 0.3 ? -1 : (Math.random() < 0.3 ? (Math.random() < w.aggression ? 1 : -1) : 0);
       if (cornered) this.plan.move = Math.random() < 0.5 ? 1 : 0; // niet verder de hoek in
       this.press = null; this.special = null;
       // uit de hoek: tai sabaki
       if (cornered && dist < 1.3 && f.cool.sabaki <= 0 && Math.random() < 0.3 * d.skill) this.special = 'sabaki';
       this.cool -= this.d.think;
-      if (!this.special && f.canAct() && this.cool <= 0 && dist < 1.35 && Math.random() < 0.15 + w.aggression * 0.35) {
+      if (!this.special && f.canAct() && this.cool <= 0 && dist < 1.6 && Math.random() < 0.15 + w.aggression * 0.35) {
         this.cool = 0.25 + Math.random() * 0.6 * (1.3 - w.aggression); // ademhalen tussen aanvallen
         if (f.meter >= 100 && f.data.super && Math.random() < 0.5 * d.skill) this.press = { btn: 'kiai', dir: 'n' };
         else if (f.meter >= 33 && Math.random() < 0.18) this.press = { btn: 'kiai', dir: pick([['n', 1], ['f', 1], ['d', 1]]) };
         else {
-          const close = dist < 0.95;
+          const close = dist < 1.05;
           this.press = pick([
             [{ btn: 'geri', dir: 'd' }, w.lowkick * 1.4],
             [{ btn: 'tsuki', dir: 'f' }, w.body * (close ? 1.4 : 0.6)],

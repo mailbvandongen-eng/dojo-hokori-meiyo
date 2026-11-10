@@ -1,0 +1,24 @@
+<!doctype html><html><body style="margin:0;background:#222"><script type="module">
+import * as THREE from '../../lib/three.module.js';
+import { GLTFLoader } from '../../lib/three-addons.js';
+import { makeRetarget, loadClips, sample, newFrame, makeFists } from '../../src/game/mocap.js';
+const P = new URLSearchParams(location.search);
+const R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); R.setSize(innerWidth, innerHeight); document.body.appendChild(R.domElement);
+const S = new THREE.Scene(); S.background = new THREE.Color('#333');
+S.add(new THREE.HemisphereLight('#fff', '#555', 2.2)); const d = new THREE.DirectionalLight('#fff', 2); d.position.set(2, 4, 3); S.add(d);
+const grid = new THREE.GridHelper(4, 8); S.add(grid);
+const cam = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, 0.1, 50);
+const g = await new GLTFLoader().loadAsync('../../assets/humans/' + (P.get('m') || 'ace') + '.gltf');
+const grp = new THREE.Group(); grp.add(g.scene); S.add(grp);
+const B = {}; g.scene.traverse(o => { if (o.isBone) B[o.name.replace(/^mixamorig:?/, '')] = o; if (o.isMesh) o.frustumCulled = false; });
+makeFists(B, grp); const rt = makeRetarget(B, grp);
+const clips = await loadClips('../../assets/anims/clips.json');
+const fr = newFrame();
+window.show = (name, t, view = 'side') => {
+  const c = clips[name]; sample(c, t, fr); rt.apply(fr.q, fr.hips);
+  const v = P.get('cam') ? JSON.parse(P.get('cam')) : { side: [3.6, 1.2, 0.6], front: [0.4, 1.3, 3.8], back: [-1.5, 1.6, -3], top: [2.5, 3.2, 2.5] }[view];
+  cam.position.set(...v); cam.lookAt(...(P.get('look') ? JSON.parse(P.get('look')) : [0, 0.95, 0.3])); R.render(S, cam);
+  return c.dur;
+};
+window.ready = true;
+</script></body></html>

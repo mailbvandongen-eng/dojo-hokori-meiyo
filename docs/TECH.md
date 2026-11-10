@@ -121,6 +121,15 @@ In de game (`src/game/human.js`) blijft het procedurele spelskelet leidend: pose
 
 Opnieuw bouwen: `node tools/humans/build.mjs [id ...]` (vereist Blender 4.3 met MPFB 2 en de MakeHuman system assets).
 
+**Motion capture (sinds 0.8.0):** de echte vechters bewegen met opnames van echte vechtsporters in plaats van met de procedurele poses.
+
+- Bronnen: het Open Motion Project van ACCAD (Male2, BVH, CC BY 3.0) en de Kyokushin-dataset van de Silesian University of Technology (atleet B0367, Vicon C3D met Plug-in Gait-segmenten, CC0). Downloaden naar `/opt/mocap/accad/m2` (`Male2_bvh.zip`) en `/opt/mocap/kyok/x` (figshare-bestand 24601574).
+- `tools/mocap/build.py` maakt `assets/anims/clips.json`. Per bot per frame staat er een *anatomisch frame*: een rotatie waarvan de eerste as langs het bot wijst en de tweede naar de voorkant van het lichaam. Uit BVH komt dat via een kalibratie op een neutrale staande houding (`convert.py`), uit de Kyokushin-data direct uit de assen van de segmenten (`kyok.py`, met de C3D-lezer `c3dread.py`). Opnames in de andere stand worden gespiegeld, zodat iedereen links voor staat.
+- Per techniek bepaalt het script automatisch het begin van de beweging, de treffer (het verste punt van vuist, scheen of knie) en het einde.
+- In de game (`src/game/mocap.js`) krijgt elk bot de wereldrotatie `A(t) * K`, met `K = inverse(anatomisch rustframe) * rustrotatie`. Dat werkt voor elk MakeHuman-model, ongeacht de rusthouding of de rol van de botten. De vuisten worden één keer gevormd: kootjes buigen om de as dwars op de vinger, en de duim ligt over de vingers.
+- `src/game/animator.js` kiest per toestand van de vechter de opname: kamae, opstappen en terugstappen, blokken, scheenblok, knock-down, opstaan, rei en overwinning. Bij technieken wordt de tijd stuksgewijs vervormd, zodat de treffer in het raakvenster van `moves.js` valt. Het herstel speelt hoogstens 1,6× zo snel af. Arm of been draait iets in schouder of heup, zodat het raakpunt bij de lengte van de tegenstander past. Treffers geven een additieve klap van hoofd, romp of been. De heupbeweging van de opname blijft zichtbaar, en alleen een netto opstap gaat naar de positie van de vechter. De raakdetectie meet op de echte botten.
+- Zonder clips of modellen valt de game terug op de procedurele poses. Het gewichtheffen gebruikt die nog.
+
 ## 4. Route naar eindkwaliteit (art pipeline)
 
 1. **Motion capture in de dojo**: een betaalbaar inertial pak (bijvoorbeeld Rokoko of Xsens-huur) of optische markerless capture (meerdere telefoons). Neem van elke techniek 3 tot 5 takes op met echte vechters: Sensei Wesley voor de eindbaas, de dojoleden voor hun eigen signatures.

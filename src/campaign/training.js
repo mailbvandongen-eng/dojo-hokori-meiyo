@@ -6,7 +6,9 @@ import { Fighter } from '../game/fighter.js';
 import { Controller } from '../game/input.js';
 
 const $ = s => document.querySelector(s);
-const BAG_X = 0.05, BAG_PIVOT_Y = 2.45, BAG_LEN = 1.2, FIGHTER_X = -0.64; // vuist en scheen zakken zichtbaar in de zak
+const BAG_X = 0.05, BAG_PIVOT_Y = 2.45, BAG_LEN = 1.2;
+// vuist en scheen zakken zichtbaar in de zak; met motion capture (echte armlengte en heupinzet) staat de vechter verder weg
+let FIGHTER_X = -0.64;
 const NOTE = {
   tsuki: { label: 'TSUKI', jp: '突', color: '#ff8a8a' },
   geri: { label: 'GERI', jp: '蹴', color: '#8ab6ff' },
@@ -30,7 +32,7 @@ export class TrainingSession {
 
   // ── Bokszak ──
   setupBag() {
-    const f = this.f; f.reset(FIGHTER_X, 1); f.state = 'idle';
+    const f = this.f; FIGHTER_X = f.anim ? -0.9 : -0.64; f.reset(FIGHTER_X, 1); f.state = 'idle';
     const g = new THREE.Group(); g.position.set(BAG_X, BAG_PIVOT_Y, 0);
     const leather = new THREE.MeshStandardMaterial({ color: '#7a1414', roughness: 0.55 });
     const chain = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, BAG_LEN - 0.45, 6), new THREE.MeshStandardMaterial({ color: '#888', metalness: 0.8, roughness: 0.3 }));

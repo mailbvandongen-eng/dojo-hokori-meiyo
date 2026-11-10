@@ -32,6 +32,7 @@ npm run serve        # python3 -m http.server 8766
 - **Toernooi** (Hokori Meiyo Cup: speel senpai en sensei vrij), **Story**, **Versus** (CPU of 2 spelers), **Training** (met uitleg), **Photo Mode**.
 - **Online leaderboard:** meeste gevechten en meeste toernooizeges (Cloudflare Worker, zie `server/leaderboard`).
 - Kyokushin-wedstrijdregels: rei-ceremonie, Hajime/Yame, waza-ari, ippon, awasete ippon, knock-down-telling, hantei met de vlaggen van de hoekscheidsrechters, encho-sen, chui/genten/hansoku, jogai.
+- Echte bewegingen: motion capture van een Kyokushin-karateka (gyaku zuki, mae geri, gedan en jodan mawashi geri, ushiro mawashi geri) en van een vechtsporter van ACCAD (stoten op het lichaam, blokken, voetenwerk, draai- en axe kick).
 - 38 vechters als realistische MakeHuman-modellen (mannen en vrouwen, met de echte graden en bandkleuren van de dojo), elk met stats, 3 signatures, een super en een finisher. 19 technieken met Japanse naam en uitleg, waaronder Ushiro Mawashi Geri, Axe kick, de laag-hoog trap (double tap) en de Rol Kick.
 - Gevechtssysteem:
   - raakdetectie op zichtbaar contact per doelzone
@@ -64,6 +65,8 @@ NODE_PATH=/root/tools/pw/node_modules node tools/test/smoke.cjs
 NODE_PATH=/root/tools/pw/node_modules node tools/test/rules.cjs 8
 NODE_PATH=/root/tools/pw/node_modules node tools/test/poses.cjs
 NODE_PATH=/root/tools/pw/node_modules node tools/test/mechanics.cjs   # gevechtssysteem
+NODE_PATH=/root/tools/pw/node_modules node tools/test/moves.cjs       # filmstrip per techniek (motion capture)
+NODE_PATH=/root/tools/pw/node_modules node tools/test/fight.cjs       # AI tegen AI, beeld voor beeld
 NODE_PATH=/root/tools/pw/node_modules node tools/test/calibrate.cjs   # bereik per techniek meten
 NODE_PATH=/root/tools/pw/node_modules node tools/test/unlocks.cjs
 NODE_PATH=/root/tools/pw/node_modules node tools/test/campaign.cjs   # met lokale leaderboard-server, zie server/leaderboard
@@ -71,4 +74,4 @@ NODE_PATH=/root/tools/pw/node_modules node tools/test/campaign.cjs   # met lokal
 
 ## Licenties
 
-Three.js en de Three.js-addons (MIT, `lib/THREE-LICENSE`), Yuji Boku-font (SIL OFL 1.1, `assets/fonts/OFL-YujiBoku.txt`), hoofdmodel "Infinite, 3D Head Scan" door Lee Perry-Smith (CC BY 3.0, `assets/models/head/LeePerrySmith_License.txt`). Menselijke modellen gemaakt met MakeHuman-assets (CC0) via MPFB 2 (GPL, alleen gebruikt als bouwtool in Blender; de geëxporteerde modellen vallen daar niet onder). Namen en het logo van Dojo Hokori Meiyo zijn van de dojo.
+Three.js en de Three.js-addons (MIT, `lib/THREE-LICENSE`), Yuji Boku-font (SIL OFL 1.1, `assets/fonts/OFL-YujiBoku.txt`), hoofdmodel "Infinite, 3D Head Scan" door Lee Perry-Smith (CC BY 3.0, `assets/models/head/LeePerrySmith_License.txt`). Bewegingen: motion capture uit het [Open Motion Project](https://accad.osu.edu/research/motion-lab/system-data) van ACCAD/The Ohio State University (CC BY 3.0) en de Kyokushin-dataset "Multimodal dataset of Kyokushin karate athletes" van A. Szczęsna, M. Błaszczyszyn en M. Pawlyta, Silesian University of Technology (CC0, [figshare](https://doi.org/10.6084/m9.figshare.c.4981073)). Menselijke modellen gemaakt met MakeHuman-assets (CC0) via MPFB 2 (GPL, alleen gebruikt als bouwtool in Blender; de geëxporteerde modellen vallen daar niet onder). Namen en het logo van Dojo Hokori Meiyo zijn van de dojo.

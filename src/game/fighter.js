@@ -14,11 +14,12 @@
 import { MOVES, INPUT_MAP, CHAINS } from '../data/moves.js';
 import { POSES, GUARD, blendPose, clonePose, ease } from './poses.js';
 import { buildFighter } from './model.js';
+import { Animator, mocapAvailable, clipOfMove } from './animator.js';
 import { graadNiveau } from '../data/roster.js';
 import * as THREE from '../../lib/three.module.js';
 
 const TAU = Math.PI * 2;
-const MIN_GAP = 0.62;
+const MIN_GAP = 0.8;  // heup tot heup: dichter staan lichamen in elkaar
 export const LEG_KD = 130, BODY_KD = 170; // drempels voor knock-down door opgestapelde schade
 
 // Tuning van het gevechtssysteem (op één plek)
@@ -49,6 +50,8 @@ export class Fighter {
     this.data = data; this.corner = corner;
     this.model = buildFighter(data, corner, opts.costume || {});
     scene.add(this.model.group);
+    // echte bewegingen (motion capture) op de MakeHuman-modellen; anders de procedurele poses
+    this.anim = this.model.human && mocapAvailable() && !opts.procedural ? new Animator(this) : null;
     const st = data.stats;
     // graad: een 10e kyu vecht op 88%, een 1e dan op 100%, een 4e dan op 104%
     // opts.scale: sterkte van de tegenstander (campaign: vroege toernooien zijn milder)
@@ -62,7 +65,7 @@ export class Fighter {
     this.speed = 1.18 - st.snelheid * 0.03;       // < 1 = sneller
     this.reachAdd = (st.bereik - 7) * 0.035 + ((data.uiterlijk?.lengte || 1) - 1) * 0.5;
     this.legDef = 1.35 - st.benen * 0.065;
-    this.bodyR = 0.23 * (data.uiterlijk?.bouw || 1);
+    this.bodyR = 0.15 * (data.uiterlijk?.bouw || 1); // halve diepte van de romp (borst tot rug ~30 cm)
     this.cur = clonePose(GUARD); this.tmp = clonePose(GUARD);
     this.clock = 0; this.cool = { sabaki: 0, dash: 0 };
     this.reset(0, 1);
@@ -159,6 +162,7 @@ export class Fighter {
     this.scale = this.speed * (mod.startup || 1);
     this.armor = !!mod.armor; this.isSuper = !!extra.super; this.finalHit = !!extra.final;
     this.startPose = clonePose(this.cur); this.walkTarget = 0; this.vx *= 0.3; this.lastT = 0;
+    if (this.anim && clipOfMove(id)) this.anim.startAttack(id, m, m.recovery); else if (this.anim) this.anim.segs = null;
     this.stats.attacks++;
     this.onEvent?.('swing', { fighter: this, move: m });
   }
@@ -210,14 +214,14 @@ export class Fighter {
     } else if (target === 'chudan') {
       vols.push({ x: chestX, z: hb.z, y0: head.y - 0.78 * L, y1: head.y - 0.05 * L, r: hb.r });  // romp
     } else {
-      vols.push({ x: hb.x, z: hb.z, y0: 0.06, y1: Math.max(0.3, head.y - 0.78 * L), r: 0.3 });   // benen (voorste been inbegrepen)
+      vols.push({ x: hb.x, z: hb.z, y0: 0.06, y1: Math.max(0.3, head.y - 0.62 * L), r: 0.24 });  // benen (voorste been inbegrepen)
     }
     return vols;
   }
   contact(opp, extra = 0, target = 'chudan') {
     const limb = LIMBS[this.move.limb] || LIMBS.rShin;
     this.model.partWorld(limb[0], vA); this.model.partWorld(limb[1], vB);
-    const LR = 0.075 + extra; // dikte van het raakvlak
+    const LR = 0.055 + extra; // dikte van het raakvlak (vuist, scheen)
     // 2,5D: afstand langs de vechtlijn telt; in de diepte een ruime marge (alleen tai sabaki ontwijkt zo)
     const vols = opp.hurtVolumes ? opp.hurtVolumes(target) : (hb => [{ x: hb.x, z: hb.z, y0: hb.y0, y1: hb.y1, r: hb.r }])(opp.hurtbox ? opp.hurtbox() : { x: opp.x, z: 0, y0: 0.1, y1: 1.9, r: 0.22 });
     for (let i = 0; i <= 10; i++) {
@@ -299,6 +303,7 @@ export class Fighter {
       opp.state = 'hit'; opp.t = 0; opp.queue = []; opp.move = null; opp.comboTaken = n + 1;
       opp.stun = (h.zone === 'head' ? 0.42 : h.zone === 'legs' ? 0.3 : 0.32) * (counter ? 1.3 : 1) * stunScale + (this.kaeshi ? 0.08 : 0);
       opp.hitPose = h.zone === 'head' ? 'hitHead' : h.zone === 'legs' ? 'hitLeg' : 'hitBody';
+      opp.anim?.hit(h.zone, 0.7 + dmg / 25);
       opp.vx = this.facing * h.push * 2.2 * (mod.push || 1) * (1 + 0.3 * n);
     }
     this.onEvent?.('hit', { fighter: this, target: opp, move: m, hit: h, dmg, counter: counter || this.kaeshi, kd, combo: n + 1 });
@@ -311,7 +316,7 @@ export class Fighter {
 
   // ── Per frame ──
   update(dt, opp, match) {
-    this.t += dt; this.clock += dt;
+    this.opp = opp; this.t += dt; this.clock += dt;
     this.cool.sabaki -= dt; this.cool.dash -= dt; this.counterT -= dt;
     // kijkrichting volgt de tegenstander, behalve midden in een techniek of tai sabaki
     if (this.state !== 'sabaki' && this.state !== 'attack') this.facing = opp.x >= this.x ? 1 : -1;
@@ -323,16 +328,16 @@ export class Fighter {
         // stap in als de tegenstander net buiten bereik staat (rol kick: voorwaartse rol)
         if (m.travel && T < first.t) this.x += this.facing * Math.min(m.travel / first.t * dt / this.scale, Math.max(0, gap - 0.6));
         else if (T < first.t && gap > reach - 0.1) this.x += this.facing * Math.min(gap - reach + 0.1, (this.isSuper ? 3 : 1.3) * dt);
-        this.attackPose(T); this.model.setPose(this.cur); this.place(dt);
+        this.poseAt(T, true); this.place(dt);
         // treffers in hun raakvenster
         while (this.state === 'attack' && this.hitIndex < m.hits.length) {
           const h = m.hits[this.hitIndex], end = h.t + h.active;
           if (T < h.t) break;
           let hit = false;
           if (this.lastT < h.t && T > end) { // frame sloeg het venster over: meet in het midden
-            this.attackPose(h.t + h.active / 2); this.model.setPose(this.cur);
+            this.poseAt(h.t + h.active / 2);
             hit = this.contact(opp, 0.04, h.target);
-            this.attackPose(T); this.model.setPose(this.cur);
+            this.poseAt(T);
           } else hit = this.contact(opp, T >= end ? 0.04 : 0, h.target);
           if (hit) { this.resolveHit(opp, match, h); this.hitIndex++; continue; }
           if (T >= end) { this.hitIndex++; this.recExtra += TUNE.whiffRecovery; this.onEvent?.('whiff', { fighter: this, move: m }); continue; }
@@ -363,12 +368,17 @@ export class Fighter {
       }
       case 'dash': target = POSES.dash || GUARD; rate = 18; this.vx *= Math.exp(-dt * 7); if (this.t > TUNE.dashTime) { this.state = 'idle'; } break;
       case 'down': target = this.downType === 'back' ? POSES.downBack : POSES.downKnees; rate = this.downType === 'back' ? 7 : 9; break;
-      case 'getup': target = GUARD; rate = 4; if (this.t > 0.8) this.state = 'idle'; break;
+      case 'getup': target = GUARD; rate = 4; if (this.t > (this.anim ? (this.downType === 'back' ? 1.75 : 0.95) : 0.8)) this.state = 'idle'; break;
       case 'rei': target = POSES.rei; rate = 5; break;
       case 'pose': target = POSES[this.poseName] || GUARD; rate = this.poseRate || 6; break; // vrije pose (trainingen)
       case 'stand': target = POSES.stand; rate = 6; break;
       case 'osu': target = POSES.osu; rate = 8; break;
       case 'victory': target = POSES.victory; rate = 5; break;
+    }
+    if (this.anim && this.state !== 'attack') this.x += this.facing * this.anim.settle();
+    if (this.anim && this.anim.update(dt)) { // motion capture
+      this.wrapYaw(); blendPose(this.cur, target, 1 - Math.exp(-dt * rate), this.cur);
+      this.moveBody(dt); return;
     }
     this.wrapYaw(); // eerst normaliseren, anders draait hij na een draaitrap een hele slag terug
     const k = 1 - Math.exp(-dt * rate);
@@ -385,13 +395,26 @@ export class Fighter {
       if (this.legs > LEG_KD * 0.6) tmp.lKnee[0] += 0.15 + Math.sin(this.walkPh * 0.5) * 0.05; // hinkt
       this.model.setPose(tmp);
     } else this.model.setPose(this.cur);
-    // beweging: lopen met versnelling, terugslag en dash met uitlopen
+    this.moveBody(dt);
+  }
+
+  // beweging: lopen met versnelling, terugslag en dash met uitlopen
+  moveBody(dt) {
     if (this.state === 'walk' || this.state === 'idle') this.vx += ((this.state === 'walk' ? this.walkTarget || 0 : 0) - this.vx) * Math.min(1, dt * 14);
     else if (this.state === 'hit' || this.state === 'down' || this.state === 'block' || this.state === 'lowblock') this.vx *= Math.exp(-dt * 6);
     else if (this.state !== 'dash') this.vx *= Math.exp(-dt * 10);
     if (this.state !== 'sabaki') this.x += this.vx * dt;
     this.model.tickFlash?.(dt);
     this.place(dt);
+  }
+
+  // pose op aanvalstijd T; root: de voorwaartse beweging van de opname gaat naar de positie
+  poseAt(T, root = false) {
+    if (this.anim && this.anim.segs) {
+      this.anim.attack(T);
+      return;
+    }
+    this.attackPose(T); this.model.setPose(this.cur);
   }
 
   attackPose(T) {
