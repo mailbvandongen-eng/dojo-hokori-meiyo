@@ -68,7 +68,7 @@ export const MOVES = {
   gedan_mawashi: {
     jp: 'Gedan Mawashi Geri', nl: 'Lage trap op het bovenbeen', type: 'geri',
     target: 'gedan', zone: 'legs', startup: 0.2, active: 0.1, recovery: 0.32,
-    reach: 1.38, dmg: 7, legDmg: 16, push: 0.08, meter: 6,
+    reach: 1.4, dmg: 7, legDmg: 16, push: 0.08, meter: 6,
     limb: 'rShin',
     frames: [['guard', 0], ['gedanChamber', 0.1], ['gedanExt', 0.2], ['gedanExt', 0.3], ['guard', 0.62]],
     uitleg: 'Het handelsmerk van Kyokushin: een harde scheentrap op het bovenbeen. Stapelt beenschade op tot de tegenstander niet meer kan staan.',
@@ -76,7 +76,7 @@ export const MOVES = {
   chudan_mawashi: {
     jp: 'Chudan Mawashi Geri', nl: 'Ronde trap naar de ribben', type: 'geri',
     target: 'chudan', zone: 'body', startup: 0.24, active: 0.1, recovery: 0.34,
-    reach: 1.38, dmg: 12, push: 0.25, meter: 8,
+    reach: 1.4, dmg: 12, push: 0.25, meter: 8,
     limb: 'rShin',
     frames: [['guard', 0], ['chudanChamber', 0.13], ['chudanExt', 0.24], ['chudanExt', 0.34], ['guard', 0.68]],
     uitleg: 'Ronde trap met de scheen tegen de ribben of onder de arm.',
@@ -92,7 +92,7 @@ export const MOVES = {
   ushiro_geri: {
     jp: 'Ushiro Geri', nl: 'Draaiende achterwaartse trap', type: 'geri',
     target: 'chudan', zone: 'body', startup: 0.3, active: 0.1, recovery: 0.4,
-    reach: 1.27, dmg: 16, push: 0.55, meter: 10, bodyBonus: 1.3,
+    reach: 1.31, dmg: 16, push: 0.55, meter: 10, bodyBonus: 1.3,
     limb: 'rShin',
     frames: [['guard', 0], ['ushiroTurn', 0.16], ['ushiroExt', 0.3], ['ushiroExt', 0.4], ['ushiroBack', 0.6], ['guard', 0.8]],
     uitleg: 'Je draait weg en stoot de hiel recht naar achteren in de maag. Gevaarlijk als counter.',
@@ -100,7 +100,7 @@ export const MOVES = {
   ushiro_mawashi: {
     jp: 'Ushiro Mawashi Geri', nl: 'Draaiende hiel naar het hoofd', type: 'geri',
     target: 'jodan', zone: 'head', startup: 0.36, active: 0.1, recovery: 0.45,
-    reach: 1.08, dmg: 20, push: 0.3, meter: 12, kdChance: 0.45,
+    reach: 1.1, dmg: 20, push: 0.3, meter: 12, kdChance: 0.45,
     limb: 'rShin',
     frames: [['guard', 0], ['uMawashiTurn', 0.2], ['uMawashiExt', 0.36], ['uMawashiFollow', 0.48], ['ushiroBack', 0.68], ['guard', 0.91]],
     uitleg: 'De draaiende hieltrap naar het hoofd: je draait weg, je rug naar de tegenstander, en de hiel zwaait rond tegen het hoofd. Spectaculair; mis je, dan sta je even met je rug naar de tegenstander.',
@@ -108,7 +108,7 @@ export const MOVES = {
   kakato_otoshi: {
     jp: 'Kakato Geri (Kakato Otoshi)', nl: 'Axe kick: bijltrap met de hiel', type: 'geri',
     target: 'jodan', zone: 'head', startup: 0.28, active: 0.13, recovery: 0.43,
-    reach: 1.11, dmg: 19, push: 0.12, meter: 12, kdChance: 0.45,
+    reach: 1.14, dmg: 19, push: 0.12, meter: 12, kdChance: 0.45,
     limb: 'rShin',
     frames: [['guard', 0], ['kakatoChamber', 0.12], ['kakatoUp', 0.24], ['kakatoHit', 0.36], ['kakatoDown', 0.5], ['kakatoDown', 0.56], ['guard', 0.84]],
     uitleg: 'De axe kick: het gestrekte been gaat hoog boven het hoofd van de tegenstander en de hiel valt er recht op neer. Raakt hoofd of sleutelbeen; zwaar en moeilijk te blokken met een lage dekking.',
@@ -116,7 +116,7 @@ export const MOVES = {
   double_tap: {
     jp: 'Gedan-Jodan Mawashi Geri', nl: 'Laag-hoog trap (double tap)', type: 'geri',
     target: 'gedan', zone: 'legs', startup: 0.2, active: 0.07, recovery: 0.34,
-    reach: 1.04, dmg: 6, push: 0.05, meter: 5, limb: 'rShin',
+    reach: 1.05, dmg: 6, push: 0.05, meter: 5, limb: 'rShin',
     hits: [
       { t: 0.2, active: 0.07, target: 'gedan', zone: 'legs', dmg: 6, legDmg: 13, push: 0.04, meter: 5 },
       { t: 0.5, active: 0.09, target: 'jodan', zone: 'head', dmg: 15, push: 0.28, meter: 9, kdChance: 0.35 },

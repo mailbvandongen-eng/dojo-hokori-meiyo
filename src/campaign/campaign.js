@@ -58,13 +58,17 @@ export function initCampaign(api) {
       C.save(career); api.onName(career.naam);
       api.sfx.kiai(1); api.say('osu'); hub();
     };
-    if (d.geslacht) api.preview(C.playerFighter(C.fresh(d)), 'osu'); else api.preview(null);
+    if (d.geslacht) {
+      const pf = C.playerFighter(C.fresh(d)); api.preview(pf, 'osu');
+      api.preload([pf.humanId]).then(() => { if (draft === d && $('#create').classList.contains('on')) api.preview(C.playerFighter(C.fresh(d)), 'osu'); });
+    } else api.preview(null);
   }
 
   // ── Hub: profiel, upgrades, volgende stap ──
   function hub(flash) {
     api.clearFight(); api.arena.setMode('training'); api.show('camp');
     api.setMe(me()); api.preview(me(), 'osu', 'center');
+    api.preload([me().humanId]).then(() => { if ($('#camp').classList.contains('on')) api.preview(me(), 'osu', 'center'); });
     const r = rankOf(career.xp), st = career.stats, t = C.nextTournament(career);
     $('#campCard').innerHTML = `
       <div class="who"><b>${career.naam}</b><span>${career.geslacht === 'v' ? 'Karateka · meisje' : 'Karateka · jongen'} · Dojo Hokori Meiyo</span></div>
@@ -103,7 +107,8 @@ export function initCampaign(api) {
   const rankGraad = i => (i >= 10 ? { dan: i - 9 } : { kyu: 10 - i });
 
   // ── Training ──
-  function startTraining(kind) {
+  async function startTraining(kind) {
+    await api.preload([me().humanId]);
     api.preview(null); api.show('none');
     api.sfx.taiko(true);
     session = new TrainingSession(kind, me(), { ...api, done: res => trainingDone(kind, res) });

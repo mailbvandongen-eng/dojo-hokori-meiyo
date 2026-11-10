@@ -99,6 +99,7 @@ export function playerFighter(c) {
   const s = (naam, jp, base, mod, uitleg) => ({ naam, jp, base, mod, uitleg });
   return {
     id: 'me', naam: c.naam, geslacht: c.geslacht, graad: g, speler: true,
+    humanId: c.geslacht === 'v' ? `speler_v_${['staart', 'knot', 'kort'].includes(c.kapsel) ? c.kapsel : 'staart'}` : 'speler_m_kort',
     titel: topTitle(c) || 'Dojo Hokori Meiyo', stijl: `${levelName(Math.round(overallLevel(c)))}`, rol: 'Jouw vechter',
     persoonlijkheid: 'Jouw eigen vechter van Dojo Hokori Meiyo. Begonnen als witte band, op weg naar de zwarte.',
     quote: 'Osu! Ik geef nooit op.',

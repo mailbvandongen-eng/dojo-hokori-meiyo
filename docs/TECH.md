@@ -115,6 +115,12 @@ Gewrichten: `pelvis, spine, head, lSh, lEl, rSh, rEl, lHip, lKnee, rHip, rKnee` 
 
 **Overstap naar echte modellen:** een artist levert glTF-modellen met bones onder dezelfde namen (of een mapping). Elke techniek wordt dan een animatieclip (`AnimationMixer`). De frames in `moves.js` worden markers ("impact op 0,24 s"). De gameplay-timing blijft in `moves.js`, zodat balans en animatie los van elkaar bij te stellen zijn.
 
+**Echte modellen (sinds 0.7.0):** de vechters zijn MakeHuman-modellen. `tools/humans/build.mjs` maakt uit de roster een specificatie per persoon en draait Blender headless met de MPFB-extensie (`tools/humans/gen.py`): menselijk basismodel met macro's (geslacht, leeftijd, spieren, gewicht, lengte), huid, ogen, wenkbrauwen, wimpers, haar, een Mixamo-rig en de dogi uit `tools/humans/gi.py` (gebouwd uit de helper-geometrie van het basismodel). Export als glTF met gedeelde WebP-textures in `assets/humans/tex/` en een `index.json`.
+
+In de game (`src/game/human.js`) blijft het procedurele spelskelet leidend: poses, raakdetectie en tests werken daarop. Bij het laden worden de spelgewrichten op de botten van het model gezet (lengtes van de botten); per frame krijgt elk bot de rotatie van zijn spelgewricht, uitgelijnd via richting en voorwaartse as (retargeting). Haar heeft een dichte onderlaag in de gemiddelde haarkleur, omdat alpha-geteste strengen op lage mipmaps verdwijnen.
+
+Opnieuw bouwen: `node tools/humans/build.mjs [id ...]` (vereist Blender 4.3 met MPFB 2 en de MakeHuman system assets).
+
 ## 4. Route naar eindkwaliteit (art pipeline)
 
 1. **Motion capture in de dojo**: een betaalbaar inertial pak (bijvoorbeeld Rokoko of Xsens-huur) of optische markerless capture (meerdere telefoons). Neem van elke techniek 3 tot 5 takes op met echte vechters: Sensei Wesley voor de eindbaas, de dojoleden voor hun eigen signatures.
@@ -183,9 +189,9 @@ De browsertests verwachten een server op poort 8766 (`npm run serve`) en Playwri
 
 ## 8. Bekende beperkingen van het prototype
 
-- Procedurele figuren in plaats van echte modellen; geen gezichten of handen met vingers.
+- Huidtint en haar per persoon zijn nog standaard; af te stemmen met de dojo (alle vrouwen hebben nu een staart).
+- Geen cloth-simulatie: de dogi beweegt mee met het skelet.
 - 2,5D-beweging (één lijn), nog geen zijstappen.
-- Geen post-processing (bloom/DOF).
 - Spraak via de stem van het toestel. Niet elk toestel heeft een Japanse stem; dan verschijnt alleen tekst.
 - Online en controller-ondersteuning ontbreken nog.
 - Een variabele tijdstap en `Math.random` maken de simulatie niet deterministisch (nodig voor online).

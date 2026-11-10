@@ -10,6 +10,7 @@ import * as THREE from '../../lib/three.module.js';
 import { dogiTexture, fabricNormal } from './textures.js';
 import { beltOf } from '../data/roster.js';
 import { makeHead, headReady } from './head.js';
+import { cachedHuman, buildHumanFighter } from './human.js';
 
 const DOGI = new THREE.Color('#e9e5dc');
 const dogiTexCache = {};
@@ -52,6 +53,9 @@ function makeFoot(mat) {
 }
 
 export function buildFighter(data, corner = 'aka', costume = {}) {
+  // realistisch MakeHuman-model als het geladen is (zie human.js); anders het eenvoudige model hieronder
+  const human = cachedHuman(data.humanId || data.id);
+  if (human) return buildHumanFighter(data, corner, costume, human);
   const look = data.uiterlijk || {};
   const L = look.lengte || 1, B = look.bouw || 1;
   // Geslacht: vrouwen smallere schouders, iets bredere heupen, lang haar (staart of knot)

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0 (2026-11-10): echte mensen (MakeHuman)
+- **Alle vechters, de scheidsrechter en de hoekscheidsrechters zijn nu echte menselijke modellen**, gemaakt met MakeHuman (MPFB in Blender): echte anatomie, huid met textuur, ogen, wenkbrauwen, wimpers, haar en handen met vingers. Ongeveer 42k tot 51k driehoeken per persoon.
+- Per vechter een eigen bouw: lengte, gewicht, spieren en leeftijd volgen geslacht, graad en leeftijdsgroep uit de roster.
+- **Dogi op het lichaam gemodelleerd:** jas met V-hals en revers, mouwen tot onder de elleboog, jasrok, wijde broek, de band in de kleur van de graad met knoop en uiteinden, de kanji op de jas. Vrouwen dragen een wit T-shirt eronder.
+- **Scheidsrechters** in hun officiële kleding (lange mouwen, donkere broek); de hoekscheidsrechters staan op om hun vlag te heffen.
+- **Campaign:** je eigen vechter is ook een MakeHuman-model (meisje met staart, knot of kort haar, of jongen). Huidskleur en haarkleur uit het aanmaakscherm worden toegepast.
+- De modellen worden per gevecht vooraf geladen (1,5 tot 1,9 MB per persoon). Zonder modellen valt de game terug op de oude figuren.
+- De raakdetectie loopt nog steeds over het vaste spelskelet; het model volgt dat skelet (retargeting, ongeveer 0,2 ms per beeld). De afstanden van alle technieken zijn opnieuw gemeten.
+
 ## 0.6.1 (2026-11-09): bokszak en weergave hersteld
 - **Kritiek:** op grafische instelling "Laag" liep de game vast (de renderfunctie riep zichzelf eindeloos aan). Hersteld.
 - **Snel tikken op knoppen** (bijvoorbeeld "Jongen" en direct "Begin") werd soms genegeerd door de zoombeveiliging. Die geldt nu alleen buiten knoppen.

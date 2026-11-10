@@ -33,10 +33,19 @@ export const OFFICIAL_POSES = {
 
 class Official {
   constructor(scene, data, x, z, faceYaw, poseName) {
+    this.scene = scene; this.data = data;
     this.m = buildFighter(data, 'aka', { official: true });
     this.m.group.position.set(x, 0, z); this.m.group.rotation.y = faceYaw; scene.add(this.m.group);
     this.cur = clonePose(OFFICIAL_POSES[poseName]); this.from = clonePose(this.cur); this.to = OFFICIAL_POSES[poseName]; this.t = 1;
     this.m.setPose(this.cur);
+  }
+  // vervangt het eenvoudige model door het realistische zodra dat geladen is (vlaggen gaan mee)
+  rebuild() {
+    const old = this.m, m = buildFighter(this.data, 'aka', { official: true });
+    if (!m.human || old.human) return;
+    m.group.position.copy(old.group.position); m.group.rotation.copy(old.group.rotation); m.group.visible = old.group.visible;
+    for (const side of ['lFist', 'rFist']) for (const c of [...old.joints[side].children]) if (c.userData.flag) m.joints[side].add(c);
+    this.scene.remove(old.group); this.scene.add(m.group); this.m = m; m.setPose(this.cur);
   }
   pose(name, speed = 6) { if (this.to === OFFICIAL_POSES[name]) return; this.from = clonePose(this.cur); this.to = OFFICIAL_POSES[name]; this.t = 0; this.speed = speed; }
   update(dt) {
@@ -46,7 +55,7 @@ class Official {
 
 // Grote hata (vlag) die zelf iets oplicht, zodat hij ook in de schaduw en van ver opvalt.
 function addFlag(fist, color) {
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.9, 8), new THREE.MeshStandardMaterial({ color: '#2a1d10' }));
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.9, 8), new THREE.MeshStandardMaterial({ color: '#2a1d10' })); pole.userData.flag = true;
   pole.position.y = -0.38; pole.rotation.x = Math.PI; fist.add(pole);
   const geo = new THREE.PlaneGeometry(0.68, 0.52, 10, 2); geo.translate(0.34, 0, 0);
   const cloth = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: color === '#ffffff' ? 0.45 : 0.6, roughness: 0.7, side: THREE.DoubleSide }));
@@ -159,11 +168,11 @@ export function createArena(scene, renderer) {
   const warm = new THREE.PointLight('#ffb36b', 25, 30); warm.position.set(0, 9, -12); scene.add(warm);
 
   // ── Officials ──
-  const refData = { naam: 'Shushin', uiterlijk: { lengte: 1.0, bouw: 1.05, haar: '#55504a' } };
+  const refData = { naam: 'Shushin', humanId: 'official_m', uiterlijk: { lengte: 1.0, bouw: 1.05, haar: '#55504a' } };
   const ref = new Official(scene, refData, 0, -1.7, 0, 'refStand');
   const judges = [
-    new Official(scene, { naam: 'Fukushin 1', uiterlijk: { lengte: 0.98, haar: '#1b1410' } }, -S - 0.5, -S + 0.6, Math.PI * 0.25, 'judgeSit'),
-    new Official(scene, { naam: 'Fukushin 2', uiterlijk: { lengte: 1.02, haar: '#3a2a1a' } }, S + 0.5, -S + 0.6, -Math.PI * 0.25, 'judgeSit'),
+    new Official(scene, { naam: 'Fukushin 1', humanId: 'official_v', geslacht: 'v', uiterlijk: { lengte: 0.98, haar: '#1b1410' } }, -S - 0.5, -S + 0.6, Math.PI * 0.25, 'judgeSit'),
+    new Official(scene, { naam: 'Fukushin 2', humanId: 'official_m', uiterlijk: { lengte: 1.02, haar: '#3a2a1a' } }, S + 0.5, -S + 0.6, -Math.PI * 0.25, 'judgeSit'),
   ];
   const chairMat = new THREE.MeshStandardMaterial({ color: '#202024' });
   const handFlags = [];
@@ -200,6 +209,7 @@ export function createArena(scene, renderer) {
 
   return {
     update, ref, judges, bounds: MAT.half + 0.6,
+    upgradeOfficials() { ref.rebuild(); judges.forEach(j => j.rebuild()); },
     setMode(mode) { const on = mode !== 'training'; for (const o of [...matchOnly, ref.m.group, ...judges.map(j => j.m.group)]) o.visible = on; },
     cheer(v = 1) { crowdHype = Math.min(1.5, crowdHype + v); },
     flags(votes) { judges.forEach((j, i) => j.pose(votes ? (votes[i] === 'aka' ? 'judgeAka' : votes[i] === 'shiro' ? 'judgeShiro' : 'judgeDraw') : 'judgeSit')); },

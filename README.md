@@ -32,7 +32,7 @@ npm run serve        # python3 -m http.server 8766
 - **Toernooi** (Hokori Meiyo Cup: speel senpai en sensei vrij), **Story**, **Versus** (CPU of 2 spelers), **Training** (met uitleg), **Photo Mode**.
 - **Online leaderboard:** meeste gevechten en meeste toernooizeges (Cloudflare Worker, zie `server/leaderboard`).
 - Kyokushin-wedstrijdregels: rei-ceremonie, Hajime/Yame, waza-ari, ippon, awasete ippon, knock-down-telling, hantei met de vlaggen van de hoekscheidsrechters, encho-sen, chui/genten/hansoku, jogai.
-- 38 vechters (mannen en vrouwen, met de echte graden en bandkleuren van de dojo), elk met stats, 3 signatures, een super en een finisher. 19 technieken met Japanse naam en uitleg, waaronder Ushiro Mawashi Geri, Axe kick, de laag-hoog trap (double tap) en de Rol Kick.
+- 38 vechters als realistische MakeHuman-modellen (mannen en vrouwen, met de echte graden en bandkleuren van de dojo), elk met stats, 3 signatures, een super en een finisher. 19 technieken met Japanse naam en uitleg, waaronder Ushiro Mawashi Geri, Axe kick, de laag-hoog trap (double tap) en de Rol Kick.
 - Gevechtssysteem:
   - raakdetectie op zichtbaar contact per doelzone
   - renzoku van maximaal 3 technieken met afbouw
@@ -71,4 +71,4 @@ NODE_PATH=/root/tools/pw/node_modules node tools/test/campaign.cjs   # met lokal
 
 ## Licenties
 
-Three.js en de Three.js-addons (MIT, `lib/THREE-LICENSE`), Yuji Boku-font (SIL OFL 1.1, `assets/fonts/OFL-YujiBoku.txt`), hoofdmodel "Infinite, 3D Head Scan" door Lee Perry-Smith (CC BY 3.0, `assets/models/head/LeePerrySmith_License.txt`). Namen en het logo van Dojo Hokori Meiyo zijn van de dojo.
+Three.js en de Three.js-addons (MIT, `lib/THREE-LICENSE`), Yuji Boku-font (SIL OFL 1.1, `assets/fonts/OFL-YujiBoku.txt`), hoofdmodel "Infinite, 3D Head Scan" door Lee Perry-Smith (CC BY 3.0, `assets/models/head/LeePerrySmith_License.txt`). Menselijke modellen gemaakt met MakeHuman-assets (CC0) via MPFB 2 (GPL, alleen gebruikt als bouwtool in Blender; de geëxporteerde modellen vallen daar niet onder). Namen en het logo van Dojo Hokori Meiyo zijn van de dojo.

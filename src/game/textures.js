@@ -160,3 +160,20 @@ export function fabricNormal() {
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 1); t.anisotropy = 4;
   return (fabricCache = t);
 }
+
+// ── Kanji 極真 + Hokori Meiyo-logo als transparant borstembleem (voor de realistische dogi) ──
+const kanjiCache = {};
+export function kanjiDecalTexture(dark = false) {
+  const key = dark ? 'd' : 'w';
+  if (kanjiCache[key]) return kanjiCache[key];
+  const W = 256, H = 512, c = canvas(W, H), g = c.getContext('2d'), t = tex(c);
+  const draw = () => {
+    g.clearRect(0, 0, W, H);
+    const ink = dark ? '#f4f1ea' : '#121212';
+    drawGlyph(g, '極', 28, 10, 200, ink); drawGlyph(g, '真', 28, 200, 200, ink);
+    const lg = getLogo(); if (lg) g.drawImage(lg, 78, 408, 100, 100);
+    t.needsUpdate = true;
+  };
+  draw(); logoReady.then(draw);
+  return (kanjiCache[key] = t);
+}

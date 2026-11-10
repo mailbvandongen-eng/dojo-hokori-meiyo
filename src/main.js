@@ -7,6 +7,7 @@ import { profile, save as saveProfile, rankInfo, addResult, addBonus, COSTUMES, 
 import { isLocked, nextUnlock, bossFinalDue, unlockAfterTournament, FINAL_BOSS, UNLOCK_ORDER } from './data/unlocks.js';
 import { buildFighter } from './game/model.js';
 import { headReady } from './game/head.js';
+import { preloadHumans } from './game/human.js';
 import { EffectComposer, RenderPass, UnrealBloomPass, OutputPass, ShaderPass, RoomEnvironment } from '../lib/three-addons.js';
 import { POSES } from './game/poses.js';
 import { initCampaign } from './campaign/campaign.js';
@@ -378,15 +379,19 @@ function updateCamera(dt) {
 $('#splash').addEventListener('pointerup', async () => {
   unlockAudio(); sfx.taiko(true); setTimeout(() => sfx.kiai(1), 150); say('osu');
   await Promise.race([headReady, new Promise(r => setTimeout(r, 4000))]); // de hoofdscan is meestal al binnen
+  preloadHumans(['official_m', 'official_v']).then(() => arena.upgradeOfficials()); // realistische scheidsrechters
   openMenu();
 }, { once: true });
 
+let menuToken = null;
 function openMenu() {
   clearFight(); tourney = null; story = null; ticker = null; preview(null); arena.setMode('match'); camMode = 'menu';
   show('menu'); renderRank();
   const pool = ROSTER.filter(f => !f.eindbaas);
   const a = pool[(Math.random() * pool.length) | 0], b = pool[(Math.random() * pool.length) | 0];
-  startFight({ mode: 'demo', demo: true, akaId: a.id, shiroId: b.id === a.id ? 'wesley' : b.id, akaCtrl: 'ai', shiroCtrl: 'ai', diff: 'sensei' });
+  const demoIds = [a.id, b.id === a.id ? 'wesley' : b.id], token = (menuToken = {});
+  const go = () => { if (menuToken === token && $('#menu').classList.contains('on')) startFight({ mode: 'demo', demo: true, akaId: demoIds[0], shiroId: demoIds[1], akaCtrl: 'ai', shiroCtrl: 'ai', diff: 'sensei' }); };
+  Promise.race([preloadHumans(demoIds.map(humanIdOf)), new Promise(r => setTimeout(r, 8000))]).then(go);
   music(true, 0.3);
 }
 function renderRank() {
@@ -407,8 +412,8 @@ $$('#menu [data-go]').forEach(b => b.addEventListener('click', () => {
   if (go === 'leaders') openLeaders();
   if (go === 'tournament') openSelect({ title: 'Toernooi · kies je vechter', onPick: id => startTournament(id) });
   if (go === 'story') openSelect({ title: 'Story · kies je vechter', onPick: id => startStory(id) });
-  if (go === 'versus') openSelect({ title: 'Versus · speler 1 (aka)', onPick: id => openSelect({ title: 'Versus · tegenstander (shiro)', p2: true, onPick: id2 => loadingThen(() => startFight({ mode: 'versus', akaId: id, shiroId: id2, akaCtrl: vsP2 === 'cpu' ? 'solo' : 'p1', shiroCtrl: vsP2 === 'cpu' ? 'ai' : 'p2', akaCostume: playerCostume() })) }) });
-  if (go === 'training') openSelect({ title: 'Training · kies je vechter', onPick: id => loadingThen(() => startTraining(id)) });
+  if (go === 'versus') openSelect({ title: 'Versus · speler 1 (aka)', onPick: id => openSelect({ title: 'Versus · tegenstander (shiro)', p2: true, onPick: id2 => loadingThen(() => startFight({ mode: 'versus', akaId: id, shiroId: id2, akaCtrl: vsP2 === 'cpu' ? 'solo' : 'p1', shiroCtrl: vsP2 === 'cpu' ? 'ai' : 'p2', akaCostume: playerCostume() }), [id, id2]) }) });
+  if (go === 'training') openSelect({ title: 'Training · kies je vechter', onPick: id => loadingThen(() => startTraining(id), [id, id === 'conchita' ? 'anjay' : 'conchita']) });
   if (go === 'options') openOptions();
 }));
 
@@ -462,10 +467,13 @@ function confirmPick() {
 $('#selOk').addEventListener('click', confirmPick);
 $('#selBack').addEventListener('click', openMenu);
 
-function loadingThen(fn) {
+// Laadscherm; wacht ook tot de realistische modellen van de vechters binnen zijn.
+const humanIdOf = id => (id === 'me' ? meData?.humanId : byId[id]?.humanId || id);
+function loadingThen(fn, ids = []) {
   show('loading'); $('#tip').textContent = TIPS[(Math.random() * TIPS.length) | 0];
   const bar = $('#loading .bar2 i'); bar.style.transition = 'none'; bar.style.width = '0'; requestAnimationFrame(() => { bar.style.transition = ''; bar.style.width = '100%'; });
-  setTimeout(() => { show('none'); fn(); }, 1300);
+  const wait = Promise.race([preloadHumans(ids.map(humanIdOf).filter(Boolean)), new Promise(r => setTimeout(r, 20000))]);
+  Promise.all([wait, new Promise(r => setTimeout(r, 1300))]).then(() => { show('none'); fn(); });
 }
 
 // ── Toernooi (single elimination) ──
@@ -509,7 +517,7 @@ $('#bracketGo').addEventListener('click', () => {
   t.current = mine;
   const final = t.r === t.names.length - 1;
   const diff = t.meta.diff ? t.meta.diff[Math.min(t.r, t.meta.diff.length - 1)] : final ? bump(cfg.diff, 1) : cfg.diff;
-  loadingThen(() => startFight({ mode: t.meta.campaign ? 'campaign' : 'tournament', akaId: t.player, shiroId: opp, akaCtrl: 'solo', shiroCtrl: 'ai', diff, shiroScale: opp === FINAL_BOSS ? Math.max(1, t.meta.scale || 1) : t.meta.scale, akaCostume: t.meta.campaign ? {} : playerCostume() }));
+  loadingThen(() => startFight({ mode: t.meta.campaign ? 'campaign' : 'tournament', akaId: t.player, shiroId: opp, akaCtrl: 'solo', shiroCtrl: 'ai', diff, shiroScale: opp === FINAL_BOSS ? Math.max(1, t.meta.scale || 1) : t.meta.scale, akaCostume: t.meta.campaign ? {} : playerCostume() }), [t.player, opp]);
 });
 $('#bracketQuit').addEventListener('click', () => (tourney?.meta.campaign ? campaign.tournamentOver() : openMenu()));
 function advanceTournament(won, how) {
@@ -560,7 +568,7 @@ function openStory() {
 $('#storyGo').addEventListener('click', () => {
   const s = story, opp = s.ladder[s.i], last = s.i >= s.ladder.length - 3;
   const diff = s.i < 3 ? bump(cfg.diff, -1) : last ? bump(cfg.diff, 1) : cfg.diff;
-  loadingThen(() => startFight({ mode: 'story', akaId: s.player, shiroId: opp, akaCtrl: 'solo', shiroCtrl: 'ai', diff, akaCostume: playerCostume(), shiroCostume: byId[opp].eindbaas ? { dogi: 'wit' } : {} }));
+  loadingThen(() => startFight({ mode: 'story', akaId: s.player, shiroId: opp, akaCtrl: 'solo', shiroCtrl: 'ai', diff, akaCostume: playerCostume(), shiroCostume: byId[opp].eindbaas ? { dogi: 'wit' } : {} }), [s.player, opp]);
 });
 $('#storyQuit').addEventListener('click', openMenu);
 
@@ -718,7 +726,7 @@ $('#resMenu').addEventListener('click', () => { resultNext = null; openMenu(); }
 $('#resAgain').addEventListener('click', () => {
   if (!lastFight) return;
   if (lastFight.mode === 'story') return openStory();
-  const lf = lastFight; loadingThen(() => startFight({ ...lf }));
+  const lf = lastFight; loadingThen(() => startFight({ ...lf }), [lf.akaId, lf.shiroId]);
 });
 $('#resNext').addEventListener('click', () => {
   if (resultNext) { const f = resultNext; resultNext = null; return f(); }
@@ -755,7 +763,7 @@ $('#ldClose').addEventListener('click', () => overlay('leaders', false));
 
 // ── Campaign ──
 const campaign = initCampaign({
-  show, overlay, scene, arena, fx, sfx, say, touch, isTouch, music, preview, openMenu, openLeaders, startBracket,
+  show, overlay, scene, arena, fx, sfx, say, touch, isTouch, music, preview, openMenu, openLeaders, startBracket, preload: ids => preloadHumans(ids.filter(Boolean)),
   clearFight: () => { clearFight(); tourney = null; },
   camera: (pos, look) => { camCustom.pos.copy(pos); camCustom.look.copy(look); camMode = 'custom'; },
   setTicker: fn => (ticker = fn),
@@ -767,10 +775,11 @@ const campaign = initCampaign({
 
 // Testhaak voor de Playwright-tests (tools/test)
 window.__game = {
-  get G() { return G; }, startFight, openMenu, cfg, profile, fx, photo, campaign, get tourney() { return tourney; }, openLeaders,
+  get G() { return G; }, startFight, openMenu, cfg, profile, fx, photo, campaign, arena, get tourney() { return tourney; }, openLeaders,
   setCam: m => (camMode = m), pause: v => (paused = v),
-  camera: (pos, look) => { camCustom.pos.set(...pos); camCustom.look.set(...look); camMode = 'custom'; },
+  camera: (pos, look) => { camCustom.pos.set(...pos); camCustom.look.set(...look); camPos.copy(camCustom.pos); camLook.copy(camCustom.look); camMode = 'custom'; },
   setTicker: fn => (ticker = fn), get ticker() { return ticker; },
+  preload: ids => preloadHumans(ids),
   render(dt = 1 / 30) { updateCamera(dt); renderFrame(); },
   step(dt) { simulate(dt); fx.update(dt); updateCamera(dt); renderFrame(); },
   sim(dt, n = 1) { for (let i = 0; i < n && G; i++) { simulate(dt); fx.update(dt); } },

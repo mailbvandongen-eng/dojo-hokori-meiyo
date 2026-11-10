@@ -7,6 +7,8 @@ const ok = (c, m) => { console.log((c ? '✔ ' : '✘ ') + m); if (!c) process.e
   const b = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const p = await b.newPage({ viewport: { width: 320, height: 200 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(process.env.URL || 'http://127.0.0.1:8766/'); await p.waitForTimeout(1200);
+  // met de realistische modellen (MakeHuman): het gameskelet neemt hun lichaamsmaten over
+  if (!process.env.SIMPEL) await p.evaluate(async () => { const { ROSTER } = await import('./src/data/roster.js'); await __game.preload(ROSTER.map(f => f.id)); });
   await p.evaluate(async () => {
     const F = await import('./src/game/fighter.js'); const { MOVES } = await import('./src/data/moves.js');
     const NONE = { dir: 'n', move: 0, uke: false, pressed: {} };
